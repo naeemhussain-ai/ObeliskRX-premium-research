@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -126,6 +126,81 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function AgeVerificationModal() {
+  const [open, setOpen] = useState(false);
+  const [declined, setDeclined] = useState(false);
+
+  useEffect(() => {
+    const verified = localStorage.getItem("obelisk_verified_21");
+    if (!verified) {
+      // Prevent scrolling when modal is open
+      document.body.style.overflow = "hidden";
+      setOpen(true);
+    }
+  }, []);
+
+  const handleAccept = () => {
+    localStorage.setItem("obelisk_verified_21", "true");
+    document.body.style.overflow = "auto";
+    setOpen(false);
+  };
+
+  const handleDecline = () => {
+    setDeclined(true);
+    // Redirect to google after 2 seconds
+    setTimeout(() => {
+      window.location.href = "https://www.google.com";
+    }, 2000);
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-background/98 backdrop-blur-xl" />
+      <div className="relative z-10 w-full max-w-2xl rounded-3xl bg-white p-8 text-center shadow-[0_0_50px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in-95 duration-500 sm:p-12 border border-border">
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">ObeliskRX</h2>
+        <h3 className="mt-2 text-xl font-medium text-gray-800">Researcher Verification</h3>
+        
+        {declined ? (
+          <div className="mt-8 animate-in fade-in zoom-in duration-300">
+            <p className="text-lg font-semibold text-primary">
+              Access Denied. You must be 21 or older to enter.
+            </p>
+            <p className="mt-2 text-sm text-gray-500">Redirecting...</p>
+          </div>
+        ) : (
+          <div className="animate-in fade-in duration-500">
+            <p className="mt-6 text-sm leading-relaxed text-gray-600">
+              ObeliskRX provides research peptides exclusively to qualified researchers and laboratories for in vitro and laboratory use. Please confirm before continuing. I confirm I am at least 21 years of age, a qualified researcher purchasing for in vitro / laboratory research only, and I understand ObeliskRX DOES NOT provide dosing information or usage instructions for any product distributed on this site.
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-gray-600">
+              By proceeding you affirm the statement above is true. Products are not for human or veterinary use, not for use in diagnostic procedures, and have not been evaluated by the U.S. Food and Drug Administration. <a href="#" className="font-semibold underline hover:text-primary transition-colors">Full disclaimer.</a>
+            </p>
+
+            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+              <button
+                type="button"
+                onClick={handleAccept}
+                className="w-full sm:w-auto rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-95"
+              >
+                I Am 21 Or Older
+              </button>
+              <button
+                type="button"
+                onClick={handleDecline}
+                className="w-full sm:w-auto rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-95"
+              >
+                I Am Under 21
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -144,6 +219,7 @@ function RootComponent() {
           </div>
           <ToastContainer />
           <BackToTop />
+          <AgeVerificationModal />
         </ToastProvider>
       </CartProvider>
     </QueryClientProvider>

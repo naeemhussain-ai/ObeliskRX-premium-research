@@ -10,7 +10,7 @@ import {
   Truck,
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { products, featuredProducts } from "@/lib/products";
+import { products } from "@/lib/products";
 import vaccineImg from "@/assets/products/vacine.jpg";
 import heroVideo from "@/assets/products/video Herosection.mp4";
 
