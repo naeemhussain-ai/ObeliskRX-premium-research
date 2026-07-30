@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ArrowRight,
   BadgeCheck,
@@ -9,7 +10,7 @@ import {
   Truck,
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { featuredProducts } from "@/lib/products";
+import { products, featuredProducts } from "@/lib/products";
 import vaccineImg from "@/assets/products/vacine.jpg";
 import heroVideo from "@/assets/products/video Herosection.mp4";
 
@@ -84,6 +85,25 @@ const features = [
 ];
 
 function Home() {
+  const [filterCategory, setFilterCategory] = useState("All");
+  const [filterPrice, setFilterPrice] = useState("All");
+
+  const categories = ["All", "Metabolic Series", "Recovery Series", "Growth Series", "Longevity Series", "Neuro Series", "Signature Blends"];
+  const priceRanges = [
+    { label: "All Prices", value: "All" },
+    { label: "Under $50", value: "under50" },
+    { label: "$50 - $100", value: "50to100" },
+    { label: "Over $100", value: "over100" },
+  ];
+
+  const filteredProducts = products.filter((p) => {
+    if (filterCategory !== "All" && p.series !== filterCategory) return false;
+    if (filterPrice === "under50" && p.price >= 50) return false;
+    if (filterPrice === "50to100" && (p.price < 50 || p.price > 100)) return false;
+    if (filterPrice === "over100" && p.price <= 100) return false;
+    return true;
+  }).slice(0, 8);
+
   return (
     <>
       {/* ===== HERO ===== */}
@@ -136,20 +156,76 @@ function Home() {
 
       {/* ===== FEATURED PRODUCTS ===== */}
       <section className="container-page py-16">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <h2 className="text-2xl font-bold">Featured Products</h2>
+        <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-border pb-6">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Featured Products</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Filter by category and price range to find the perfect research peptide.
+            </p>
+          </div>
           <Link
             to="/catalog"
-            className="inline-flex items-center gap-1 rounded-full bg-ink px-4 py-2 text-xs font-medium text-ink-foreground hover:bg-primary"
+            className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-ink-foreground transition-all hover:bg-primary hover:shadow-lg active:scale-95"
           >
-            More Products <ArrowRight size={14} />
+            View Entire Catalog <ArrowRight size={16} />
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {featuredProducts.map((p) => (
-            <ProductCard key={p.slug} product={p} />
-          ))}
+
+        {/* Filter Controls */}
+        <div className="mb-8 flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-bold text-gray-700 mr-2">Category:</span>
+            {categories.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setFilterCategory(c)}
+                className={`rounded-full px-4 py-2 text-xs font-semibold transition-all duration-300 ${
+                  filterCategory === c
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "bg-surface text-gray-600 hover:bg-primary/10 hover:text-primary border border-border"
+                }`}
+              >
+                {c.replace(" Series", "")}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-sm font-bold text-gray-700">Price:</span>
+            <select
+              value={filterPrice}
+              onChange={(e) => setFilterPrice(e.target.value)}
+              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-gray-700 shadow-sm outline-none transition-colors focus:border-primary cursor-pointer"
+            >
+              {priceRanges.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
+        {/* Products Grid */}
+        {filteredProducts.length === 0 ? (
+          <div className="py-20 text-center rounded-2xl bg-surface border border-border">
+            <p className="text-gray-500 font-medium">No products match the selected filters.</p>
+            <button 
+              onClick={() => { setFilterCategory("All"); setFilterPrice("All"); }}
+              className="mt-4 text-sm font-bold text-primary underline"
+            >
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {filteredProducts.map((p) => (
+              <div key={p.slug} className="anim-fade-in-up">
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* ===== ABOUT ===== */}
