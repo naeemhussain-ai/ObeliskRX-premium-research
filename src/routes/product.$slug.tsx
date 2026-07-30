@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Facebook, Heart, Link2, Linkedin, Minus, Plus, Star, Twitter } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/lib/cart";
-import { formatPrice, getProduct, priceLabel, products } from "@/lib/products";
+import { formatPrice, getProduct, priceLabel, products, type Product } from "@/lib/products";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
@@ -50,7 +50,7 @@ function ProductNotFound() {
 const shareIcons = [Facebook, Twitter, Star, Linkedin, Link2];
 
 function ProductDetail() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData() as { product: Product };
   const { add } = useCart();
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
