@@ -1,8 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { Facebook, Heart, Link2, Linkedin, Minus, Plus, Star, Twitter } from "lucide-react";
+import { Facebook, Heart, Link2, Linkedin, Minus, Plus, Star, Twitter, Check } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/lib/cart";
+import { useToast } from "@/hooks/useToast";
+import { useStaggerAnimation, useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { formatPrice, getProduct, priceLabel, products, type Product } from "@/lib/products";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -52,12 +54,40 @@ const shareIcons = [Facebook, Twitter, Star, Linkedin, Link2];
 function ProductDetail() {
   const { product } = Route.useLoaderData() as { product: Product };
   const { add } = useCart();
+  const { addToast } = useToast();
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"info" | "method">("info");
   const [rating, setRating] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const [heroRef, heroVisible] = useStaggerAnimation<HTMLDivElement>();
+  const [tabsRef, tabsVisible] = useScrollAnimation<HTMLElement>();
+  const [reviewsRef, reviewsVisible] = useScrollAnimation<HTMLElement>();
 
   const related = products.filter((p) => p.slug !== product.slug).slice(0, 5);
+
+  const handleAdd = () => {
+    setIsAdding(true);
+    const selectedSize = size || product.sizes[0];
+    add(
+      {
+        slug: product.slug,
+        name: product.name,
+        size: selectedSize,
+        price: product.price,
+        image: product.image,
+      },
+      qty,
+    );
+    addToast({
+      message: "Added to cart",
+      subtitle: `${qty}x ${product.name} - ${selectedSize}`,
+      type: "success",
+      image: product.image,
+    });
+    setTimeout(() => setIsAdding(false), 400);
+  };
 
   return (
     <div className="container-page py-8">
@@ -72,14 +102,19 @@ function ProductDetail() {
         / {product.series} / <span className="font-medium text-foreground">{product.name}</span>
       </nav>
 
-      <div className="mt-6 grid gap-12 lg:grid-cols-2">
-        <div className="rounded-lg bg-card p-6 shadow-card">
+      <div 
+        ref={heroRef}
+        className={`mt-6 grid gap-12 lg:grid-cols-2 animate-on-scroll ${heroVisible ? "animate-visible" : ""}`}
+      >
+        <div className="rounded-lg bg-card p-6 shadow-card anim-fade-in-up">
           {/* PRODUCT DETAIL MAIN IMAGE: swap in your own hero shot for this product */}
-          <img
-            src={product.image}
-            alt={`${product.name} vial`}
-            className="aspect-square w-full rounded-lg bg-surface object-cover"
-          />
+          <div className="overflow-hidden rounded-lg">
+            <img
+              src={product.image}
+              alt={`${product.name} vial`}
+              className="aspect-square w-full bg-surface object-cover transition-transform duration-500 hover:scale-105 hover-glow"
+            />
+          </div>
           <div className="mt-4 grid grid-cols-4 gap-3">
             {[0, 1, 2, 3].map((i) => (
               <img
@@ -92,11 +127,12 @@ function ProductDetail() {
           </div>
         </div>
 
-        <div className="rounded-lg bg-card p-6 shadow-card sm:p-8">
+        <div className="rounded-lg bg-card p-6 shadow-card sm:p-8 anim-fade-in-up" style={{ animationDelay: "100ms" }}>
           <h1 className="text-3xl font-bold">{product.name}</h1>
-          <p className="mt-3 text-2xl font-bold">{priceLabel(product)}</p>
+          <p className="mt-3 text-2xl font-bold text-primary">{priceLabel(product)}</p>
+          <div className="my-6 h-px w-full bg-border" />
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{product.description}</p>
-          <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
             {product.specs.map((s) => (
               <li key={s.label}>
                 {s.label}: {s.value}
@@ -142,26 +178,24 @@ function ProductDetail() {
             </div>
             <button
               type="button"
-              onClick={() =>
-                add(
-                  {
-                    slug: product.slug,
-                    name: product.name,
-                    size: size || product.sizes[0],
-                    price: product.price,
-                    image: product.image,
-                  },
-                  qty,
-                )
-              }
-              className="flex-1 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              onClick={handleAdd}
+              disabled={isAdding}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] ${
+                isAdding ? "bg-emerald-500 scale-105" : "bg-primary hover:bg-primary/90 hover:-translate-y-0.5"
+              }`}
             >
-              Add To Cart
+              {isAdding ? (
+                <>
+                  <Check size={18} className="anim-bounce-in" /> Added To Cart
+                </>
+              ) : (
+                "Add To Cart"
+              )}
             </button>
             <button
               type="button"
               aria-label="Add to wishlist"
-              className="rounded-full border border-border p-3 text-muted-foreground hover:text-primary"
+              className="rounded-full border border-border p-3 text-muted-foreground transition-all duration-300 hover:border-primary hover:text-primary hover:scale-110 active:scale-95"
             >
               <Heart size={16} />
             </button>
@@ -181,7 +215,7 @@ function ProductDetail() {
         </div>
       </div>
 
-      <section className="mt-12">
+      <section ref={tabsRef} className={`mt-16 animate-on-scroll animate-scale ${tabsVisible ? "animate-visible" : ""}`}>
         <div className="flex justify-center gap-8 border-b border-border text-xs font-semibold tracking-widest">
           <button
             type="button"
@@ -210,7 +244,10 @@ function ProductDetail() {
         </div>
       </section>
 
-      <section className="grid gap-12 rounded-lg bg-card p-6 shadow-card sm:p-10 lg:grid-cols-2">
+      <section 
+        ref={reviewsRef}
+        className={`mt-12 grid gap-12 rounded-lg bg-card p-6 shadow-card sm:p-10 lg:grid-cols-2 animate-on-scroll animate-scale ${reviewsVisible ? "animate-visible" : ""}`}
+      >
         <div>
           <h2 className="text-lg font-bold">Reviews</h2>
           <p className="mt-4 text-sm text-muted-foreground">There are no reviews yet.</p>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 
 export const Route = createFileRoute("/faq")({
   component: FaqPage,
@@ -73,19 +74,18 @@ function AccordionItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-b border-gray-200 last:border-0">
+    <div className="border-b border-gray-100 last:border-0">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between gap-4 py-5 text-left"
+        className="group flex w-full items-center justify-between gap-4 py-5 text-left outline-none"
       >
-        <span className={`text-sm font-semibold leading-snug transition-colors duration-200 ${open ? "text-primary" : "text-gray-900"}`}>
+        <span className={`text-sm font-semibold leading-snug transition-colors duration-200 group-hover:text-primary ${open ? "text-primary" : "text-gray-900"}`}>
           {q}
         </span>
-        <ChevronDown
-          size={18}
-          className={`shrink-0 text-gray-400 transition-transform duration-300 ${open ? "rotate-180 text-primary" : ""}`}
-        />
+        <span className={`grid size-8 shrink-0 place-items-center rounded-full transition-all duration-300 ${open ? "bg-primary/10 text-primary rotate-180" : "bg-gray-50 text-gray-400 group-hover:bg-primary/5 group-hover:text-primary"}`}>
+          <ChevronDown size={18} />
+        </span>
       </button>
       <div
         className={`overflow-hidden transition-all duration-300 ease-in-out ${
@@ -99,47 +99,56 @@ function AccordionItem({ q, a }: { q: string; a: string }) {
 }
 
 function FaqPage() {
+  const [contentRef, contentVisible] = useStaggerAnimation<HTMLDivElement>();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Page Hero */}
-      <div className="relative overflow-hidden border-b border-border bg-surface py-14">
+      <div className="relative overflow-hidden border-b border-border bg-surface py-16">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/6 blur-[80px]" />
+          <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/10 blur-[100px]" />
         </div>
-        <div className="container-page relative z-10 text-center">
-          <span className="inline-block rounded-full border border-primary/20 bg-primary/10 px-4 py-1 text-[11px] font-bold tracking-widest text-primary uppercase">
+        <div className="container-page relative z-10 text-center anim-fade-in-up">
+          <span className="inline-block rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-[11px] font-bold tracking-widest text-primary uppercase shadow-sm">
             Help Center
           </span>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
             Frequently Asked Questions
           </h1>
-          <p className="mx-auto mt-4 max-w-lg text-sm text-muted-foreground">
+          <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-muted-foreground">
             Everything you need to know about ordering, shipping, product quality, and payment.
           </p>
           {/* Breadcrumb */}
-          <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground font-medium">
             <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-            <span>/</span>
-            <span className="text-foreground font-medium">FAQs</span>
+            <span className="text-gray-300">/</span>
+            <span className="text-foreground">FAQs</span>
           </div>
         </div>
       </div>
 
       {/* FAQ Content */}
-      <div className="container-page py-16">
-        <div className="mx-auto max-w-3xl space-y-10">
-          {sections.map((section) => (
-            <div key={section.category}>
+      <div className="container-page py-20">
+        <div 
+          ref={contentRef}
+          className={`mx-auto max-w-3xl space-y-12 animate-on-scroll ${contentVisible ? "animate-visible" : ""}`}
+        >
+          {sections.map((section, idx) => (
+            <div 
+              key={section.category}
+              className="anim-fade-in-up"
+              style={{ animationDelay: `${idx * 100}ms` }}
+            >
               {/* Category Header */}
-              <div className="mb-2 flex items-center gap-4">
-                <h2 className="shrink-0 text-lg font-extrabold tracking-tight text-foreground">
+              <div className="mb-4 flex items-center gap-4">
+                <h2 className="shrink-0 text-xl font-extrabold tracking-tight text-foreground">
                   {section.category}
                 </h2>
-                <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
+                <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
               </div>
 
               {/* Accordion Card */}
-              <div className="rounded-2xl border border-border bg-white px-6 shadow-card">
+              <div className="rounded-2xl border border-border bg-white px-6 shadow-card-hover transition-shadow duration-300 hover:shadow-xl">
                 {section.qa.map(({ q, a }) => (
                   <AccordionItem key={q} q={q} a={a} />
                 ))}
@@ -148,14 +157,17 @@ function FaqPage() {
           ))}
 
           {/* Bottom CTA */}
-          <div className="rounded-2xl border border-primary/20 bg-primary/5 px-8 py-8 text-center">
-            <h3 className="text-base font-bold text-foreground">Still have questions?</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Our team is here to help. Reach out and we'll get back to you quickly.
+          <div 
+            className="mt-16 rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 px-8 py-10 text-center shadow-lg anim-fade-in-up"
+            style={{ animationDelay: `${sections.length * 100}ms` }}
+          >
+            <h3 className="text-lg font-bold text-foreground">Still have questions?</h3>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+              Our team is here to help. Reach out and we'll get back to you quickly with the answers you need.
             </p>
             <Link
               to="/contact"
-              className="mt-5 inline-block rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground shadow-md transition-opacity hover:opacity-90"
+              className="mt-6 inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98]"
             >
               Contact Us
             </Link>

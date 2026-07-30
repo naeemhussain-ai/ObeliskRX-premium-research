@@ -368,23 +368,23 @@ export function Header() {
         <div className="flex items-center justify-end gap-3">
           <button
             type="button"
+            aria-label="Search"
             onClick={() => setSearchOpen(true)}
-            className="group hidden items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary md:flex"
+            className="group hidden items-center justify-center md:flex"
           >
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
               <Search size={16} />
             </span>
-            Search
           </button>
           <button
             type="button"
+            aria-label="Login / Register"
             onClick={() => setAuthOpen(true)}
-            className="group hidden items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary md:flex"
+            className="group hidden items-center justify-center md:flex"
           >
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
               <User size={16} />
             </span>
-            Login / Register
           </button>
           <Link to="/cart" className="group flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary">
             <span className="relative grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
@@ -411,65 +411,75 @@ export function Header() {
       </div>
 
       {/* Mobile Drawer */}
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-ink/50 animate-in fade-in duration-200" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-0 flex h-full w-72 flex-col gap-2 bg-background p-6 shadow-card-hover animate-in slide-in-from-right duration-300">
+      {open && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[99999] lg:hidden flex justify-end">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={() => setOpen(false)} />
+          <div className="relative z-10 flex h-full w-72 flex-col gap-2 bg-white p-6 shadow-2xl animate-in slide-in-from-right duration-300">
             <button
               type="button"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
-              className="mb-4 self-end transition-transform hover:rotate-90 duration-300"
+              className="mb-4 self-end rounded-full p-2 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900 hover:rotate-90 duration-300"
             >
               <X size={22} />
             </button>
-            {nav.map((item, i) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                activeOptions={{ exact: item.to === "/" }}
-                activeProps={{ className: "text-primary" }}
-                className="rounded-md px-2 py-3 text-base font-medium hover:bg-muted anim-fade-in-up"
-                style={{ animationDelay: `${i * 80}ms` }}
+            <div className="flex-1 overflow-y-auto">
+              {nav.map((item, i) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  activeOptions={{ exact: item.to === "/" }}
+                  activeProps={{ className: "text-primary bg-primary/5" }}
+                  className="block rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="my-4 h-px w-full bg-gray-100" />
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setSearchOpen(true);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
+                style={{ animationDelay: "240ms" }}
               >
-                {item.label}
+                <Search size={18} />
+                Search
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setAuthOpen(true);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
+                style={{ animationDelay: "320ms" }}
+              >
+                <User size={18} />
+                Login / Register
+              </button>
+              <Link
+                to="/cart"
+                onClick={() => setOpen(false)}
+                className="mt-4 flex w-full items-center justify-between rounded-xl bg-primary px-4 py-3 text-base font-bold text-white shadow-md transition-all hover:bg-primary/90 hover:shadow-lg anim-fade-in-up"
+                style={{ animationDelay: "400ms" }}
+              >
+                <span className="flex items-center gap-2">
+                  <ShoppingCart size={18} />
+                  Cart
+                </span>
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                  {count}
+                </span>
               </Link>
-            ))}
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                setSearchOpen(true);
-              }}
-              className="flex items-center gap-2 rounded-md px-2 py-3 text-base font-medium text-left hover:bg-muted anim-fade-in-up"
-              style={{ animationDelay: "240ms" }}
-            >
-              <Search size={18} />
-              Search
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                setAuthOpen(true);
-              }}
-              className="flex items-center gap-2 rounded-md px-2 py-3 text-base font-medium text-left hover:bg-muted anim-fade-in-up"
-              style={{ animationDelay: "320ms" }}
-            >
-              <User size={18} />
-              Login / Register
-            </button>
-            <Link
-              to="/cart"
-              onClick={() => setOpen(false)}
-              className="rounded-md px-2 py-3 text-base font-medium hover:bg-muted anim-fade-in-up"
-              style={{ animationDelay: "400ms" }}
-            >
-              Cart ({count})
-            </Link>
+            </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Auth Side Drawer Popup */}

@@ -41,13 +41,13 @@ function CartPage() {
       </nav>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[7fr_3fr]">
-        <div className="rounded-lg bg-card p-4 shadow-card sm:p-6">
+        <div className="rounded-2xl bg-card p-4 shadow-card sm:p-8">
           {items.length === 0 ? (
             <div className="py-16 text-center">
-              <p className="text-sm text-muted-foreground">Your cart is currently empty.</p>
+              <p className="text-base text-muted-foreground">Your cart is currently empty.</p>
               <Link
                 to="/catalog"
-                className="mt-6 inline-block rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground"
+                className="mt-6 inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5"
               >
                 Browse Catalog
               </Link>
@@ -58,47 +58,47 @@ function CartPage() {
                 <table className="w-full min-w-125 text-sm">
                   <thead>
                     <tr className="border-b border-border text-left text-muted-foreground">
-                      <th className="pb-3 font-medium" colSpan={2}>
+                      <th className="pb-4 font-semibold uppercase tracking-wider text-xs" colSpan={2}>
                         Product
                       </th>
-                      <th className="pb-3 font-medium">Price</th>
-                      <th className="pb-3 font-medium">Quantity</th>
-                      <th className="pb-3 text-right font-medium">Subtotal</th>
+                      <th className="pb-4 font-semibold uppercase tracking-wider text-xs">Price</th>
+                      <th className="pb-4 font-semibold uppercase tracking-wider text-xs">Quantity</th>
+                      <th className="pb-4 text-right font-semibold uppercase tracking-wider text-xs">Subtotal</th>
                     </tr>
                   </thead>
                   <tbody>
                     {items.map((item) => (
-                      <tr key={`${item.slug}-${item.size}`} className="border-b border-border">
-                        <td className="py-5 pr-3 align-middle">
+                      <tr key={`${item.slug}-${item.size}`} className="border-b border-border transition-colors hover:bg-gray-50/50">
+                        <td className="py-6 pr-3 align-middle">
                           <button
                             type="button"
                             aria-label="Remove item"
                             onClick={() => remove(item.slug, item.size)}
-                            className="text-muted-foreground hover:text-primary"
+                            className="grid size-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500"
                           >
                             <X size={16} />
                           </button>
                         </td>
-                        <td className="py-5 pr-4">
-                          <div className="flex min-w-0 items-center gap-3">
+                        <td className="py-6 pr-4">
+                          <div className="flex min-w-0 items-center gap-4">
                             <img
                               src={item.image}
                               alt={item.name}
-                              className="size-12 shrink-0 rounded bg-surface object-cover"
+                              className="size-16 shrink-0 rounded-lg bg-surface object-cover shadow-sm"
                             />
-                            <span className="truncate">
-                              {item.name} - {item.size}
+                            <span className="truncate font-semibold text-gray-900">
+                              {item.name} <span className="ml-1 text-xs font-normal text-muted-foreground border border-border rounded-full px-2 py-0.5">{item.size}</span>
                             </span>
                           </div>
                         </td>
-                        <td className="py-5 text-muted-foreground">{formatPrice(item.price)}</td>
-                        <td className="py-5">
+                        <td className="py-6 font-medium text-gray-900">{formatPrice(item.price)}</td>
+                        <td className="py-6">
                           <QtyInput
                             value={item.qty}
                             onChange={(q) => setQty(item.slug, item.size, q)}
                           />
                         </td>
-                        <td className="py-5 text-right font-semibold">
+                        <td className="py-6 text-right font-bold text-gray-900">
                           {formatPrice(item.price * item.qty)}
                         </td>
                       </tr>
@@ -107,16 +107,16 @@ function CartPage() {
                 </table>
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center gap-3">
+              <div className="mt-8 flex flex-wrap items-center gap-4">
                 <input
                   value={coupon}
                   onChange={(e) => setCoupon(e.target.value)}
                   placeholder="Coupon code"
-                  className="w-52 rounded-full border border-border px-4 py-2 text-sm outline-none focus:border-primary"
+                  className="w-64 rounded-full border border-border bg-surface px-5 py-3 text-sm outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_rgba(var(--primary),0.1)]"
                 />
                 <button
                   type="button"
-                  className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground"
+                  className="rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white shadow-md transition-all duration-300 hover:bg-black hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
                 >
                   Apply Coupon
                 </button>
@@ -125,19 +125,19 @@ function CartPage() {
           )}
         </div>
 
-        <aside className="h-fit rounded-lg bg-card p-6 shadow-card lg:sticky lg:top-24">
-          <h2 className="mb-4 text-xl font-bold">Cart Totals</h2>
-          <div className="flex items-center justify-between border-b border-border py-3 text-sm">
-            <span>Subtotal</span>
-            <span className="text-muted-foreground">{formatPrice(subtotal)}</span>
+        <aside className="h-fit rounded-2xl bg-card p-6 shadow-card sm:p-8 lg:sticky lg:top-24 border border-primary/10">
+          <h2 className="mb-6 text-xl font-bold">Cart Totals</h2>
+          <div className="flex items-center justify-between border-b border-border py-4 text-sm">
+            <span className="font-medium text-gray-600">Subtotal</span>
+            <span className="font-semibold text-gray-900">{formatPrice(subtotal)}</span>
           </div>
-          <div className="flex items-center justify-between border-b border-border py-3 text-sm">
-            <span>Total</span>
-            <span className="text-lg font-bold">{formatPrice(subtotal)}</span>
+          <div className="flex items-center justify-between py-4 text-sm">
+            <span className="font-medium text-gray-600">Total</span>
+            <span className="text-2xl font-black text-primary">{formatPrice(subtotal)}</span>
           </div>
           <button
             type="button"
-            className="mt-5 w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            className="mt-6 w-full rounded-full bg-primary py-4 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98]"
           >
             Proceed To Checkout
           </button>
