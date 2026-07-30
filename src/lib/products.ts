@@ -1,18 +1,18 @@
-import p2t from "@/assets/products/2t-peptide-20mg-metabolic.jpg.asset.json";
-import p3r from "@/assets/products/3r-peptide-10mg-metabolic.jpg.asset.json";
-import bpc from "@/assets/products/bpc-157-10mg-recovery.jpg.asset.json";
-import cjc from "@/assets/products/cjc-1295no-dac-5mg-growth.jpg.asset.json";
-import epi from "@/assets/products/epithalon-50mg-longevity.jpg.asset.json";
-import ghk from "@/assets/products/ghk-cu-50mg-longevity.jpg.asset.json";
-import igf from "@/assets/products/igf-lr3-1mg-metabolic.jpg.asset.json";
-import ipa from "@/assets/products/ipamorelin-5mg-metabolic.jpg.asset.json";
-import klow from "@/assets/products/klow.jpg.asset.json";
-import mots from "@/assets/products/motsc-20mg-growth.jpg.asset.json";
-import nad from "@/assets/products/nad-500mg-longevity.jpg.asset.json";
-import selank from "@/assets/products/selank-10mg-neuro.jpg.asset.json";
-import semax from "@/assets/products/semax-10mg-neuro.jpg.asset.json";
-import tb500 from "@/assets/products/tb-500-10mg-recovery.jpg.asset.json";
-import tesa from "@/assets/products/tesamorelin-10mg-growth.jpg.asset.json";
+import p2t from "@/assets/products/2T-Peptide-20mg-Metabolic $130.00.jpg";
+import p3r from "@/assets/products/3R-Peptide-10mg-Metabolic $70.00 - $130.00 (2).jpg";
+import bpc from "@/assets/products/BPC-157-10mg-Recovery $99.00.jpg";
+import cjc from "@/assets/products/CJC-1295NO-DAC-5mg-Growth $49.99.jpg";
+import epi from "@/assets/products/Epithalon-50mg-Longevity $149.99.jpg";
+import ghk from "@/assets/products/GHK-Cu-50mg-Longevity $49.99.jpg";
+import igf from "@/assets/products/IGF-LR3-1mg-Metabolic $69.00.jpg";
+import ipa from "@/assets/products/Ipamorelin-5mg-Metabolic $56.00.jpg";
+import klow from "@/assets/products/KLOW Blends-80mg-Signature blends $100.99.jpg";
+import mots from "@/assets/products/MOTSC-20mg-Growth $80.99.jpg";
+import nad from "@/assets/products/NAD-500mg-longevity $69.99 - $100.00.jpg";
+import selank from "@/assets/products/Selank-10mg-Neuro $29.99 - $59.99.jpg";
+import semax from "@/assets/products/Semax-10mg-Neuro $29.99.jpg";
+import tb500 from "@/assets/products/TB-500-10mg-Recovery $49.99.jpg";
+import tesa from "@/assets/products/Tesamorelin-10mg-Growth $69.99.jpg";
 
 export type Product = {
   slug: string;
@@ -33,7 +33,7 @@ export const products: Product[] = [
     slug: "2t-peptide",
     name: "2(T) Peptide",
     series: "Metabolic Series",
-    image: p2t.url,
+    image: p2t,
     price: 130,
     oldPrice: 199.99,
     discount: 35,
@@ -51,7 +51,7 @@ export const products: Product[] = [
     slug: "3r-peptide",
     name: "3(R) Peptide",
     series: "Metabolic Series",
-    image: p3r.url,
+    image: p3r,
     price: 70,
     priceMax: 130,
     discount: 35,
@@ -69,7 +69,7 @@ export const products: Product[] = [
     slug: "bpc-157",
     name: "BPC-157",
     series: "Recovery Series",
-    image: bpc.url,
+    image: bpc,
     price: 99,
     oldPrice: 122.99,
     discount: 20,
@@ -87,7 +87,7 @@ export const products: Product[] = [
     slug: "cjc-1295-no-dac",
     name: "CJC-1295 No DAC",
     series: "Growth Series",
-    image: cjc.url,
+    image: cjc,
     price: 49.99,
     oldPrice: 76.99,
     discount: 36,
@@ -105,7 +105,7 @@ export const products: Product[] = [
     slug: "epithalon",
     name: "Epithalon",
     series: "Longevity Series",
-    image: epi.url,
+    image: epi,
     price: 149.99,
     oldPrice: 230.99,
     discount: 35,
@@ -123,7 +123,7 @@ export const products: Product[] = [
     slug: "ghk-cu",
     name: "GHK-Cu",
     series: "Longevity Series",
-    image: ghk.url,
+    image: ghk,
     price: 49.99,
     oldPrice: 76.99,
     discount: 35,
@@ -141,7 +141,7 @@ export const products: Product[] = [
     slug: "igf-lr3",
     name: "IGF-LR3",
     series: "Metabolic Series",
-    image: igf.url,
+    image: igf,
     price: 69,
     oldPrice: 107.99,
     discount: 36,
@@ -159,7 +159,7 @@ export const products: Product[] = [
     slug: "ipamorelin",
     name: "Ipamorelin",
     series: "Metabolic Series",
-    image: ipa.url,
+    image: ipa,
     price: 56,
     oldPrice: 85.99,
     discount: 35,
@@ -177,7 +177,7 @@ export const products: Product[] = [
     slug: "klow-blend",
     name: "KLOW Blend",
     series: "Signature Blends",
-    image: klow.url,
+    image: klow,
     price: 100.99,
     oldPrice: 153.99,
     discount: 34,
@@ -195,7 +195,7 @@ export const products: Product[] = [
     slug: "mots-c",
     name: "MOTS-c",
     series: "Growth Series",
-    image: mots.url,
+    image: mots,
     price: 80.99,
     oldPrice: 122.99,
     discount: 34,
@@ -213,7 +213,7 @@ export const products: Product[] = [
     slug: "nad",
     name: "NAD+",
     series: "Longevity Series",
-    image: nad.url,
+    image: nad,
     price: 69.99,
     priceMax: 100,
     discount: 36,
@@ -231,7 +231,7 @@ export const products: Product[] = [
     slug: "selank",
     name: "Selank",
     series: "Neuro Series",
-    image: selank.url,
+    image: selank,
     price: 29.99,
     priceMax: 59.99,
     discount: 36,
@@ -249,7 +249,7 @@ export const products: Product[] = [
     slug: "semax",
     name: "Semax",
     series: "Neuro Series",
-    image: semax.url,
+    image: semax,
     price: 29.99,
     oldPrice: 45.99,
     discount: 35,
@@ -267,7 +267,7 @@ export const products: Product[] = [
     slug: "tb-500",
     name: "TB-500",
     series: "Recovery Series",
-    image: tb500.url,
+    image: tb500,
     price: 49.99,
     oldPrice: 76.99,
     discount: 35,
@@ -285,7 +285,7 @@ export const products: Product[] = [
     slug: "tesamorelin",
     name: "Tesamorelin",
     series: "Growth Series",
-    image: tesa.url,
+    image: tesa,
     price: 69.99,
     oldPrice: 107.99,
     discount: 35,

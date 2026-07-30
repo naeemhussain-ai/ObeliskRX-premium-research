@@ -1,65 +1,235 @@
 import { Link } from "@tanstack/react-router";
-import { Heart } from "lucide-react";
-import logo from "@/assets/logo.png.asset.json";
+import { useState } from "react";
+import { Heart, Search, ShoppingCart, X, Check } from "lucide-react";
+import logo from "@/assets/Obelisk-Logo-Design-02-1024x154.png";
 import { useCart } from "@/lib/cart";
+import { useToast } from "@/hooks/useToast";
 import { formatPrice, priceLabel, type Product } from "@/lib/products";
 
 export function Logo({ className = "h-8", light = false }: { className?: string; light?: boolean }) {
   return (
     <img
-      src={logo.url}
+      src={logo}
       alt="ObeliskRX"
       className={`${className} w-auto ${light ? "brightness-0 invert" : ""}`}
     />
   );
 }
 
-export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
-  const { wishlist, toggleWishlist } = useCart();
-  const wished = wishlist.includes(product.slug);
+function QuickViewModal({
+  product,
+  onClose,
+}: {
+  product: Product;
+  onClose: () => void;
+}) {
+  const { add } = useCart();
+  const { addToast } = useToast();
+  const [size, setSize] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAdd = () => {
+    setIsAdding(true);
+    const selectedSize = size || product.sizes[0];
+    add(
+      {
+        slug: product.slug,
+        name: product.name,
+        size: selectedSize,
+        price: product.price,
+        image: product.image,
+      },
+      1,
+    );
+    addToast({
+      message: "Added to cart",
+      subtitle: `${product.name} - ${selectedSize}`,
+      type: "success",
+      image: product.image,
+    });
+    setTimeout(() => {
+      setIsAdding(false);
+      onClose();
+    }, 400);
+  };
 
   return (
-    <div className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-card transition-shadow hover:shadow-card-hover">
-      <div className="relative">
-        <span className="absolute left-0 top-0 z-10 rounded-br-lg bg-discount px-2 py-1 text-[11px] font-bold text-discount-foreground">
-          -{product.discount}%
-        </span>
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+
+      {/* Modal */}
+      <div
+        className="relative w-full max-w-sm overflow-hidden rounded-xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
         <button
           type="button"
-          aria-label="Add to wishlist"
-          onClick={() => toggleWishlist(product.slug)}
-          className="absolute right-2 top-2 z-10 rounded-full bg-background p-1.5 text-muted-foreground shadow-card transition-colors hover:text-primary"
+          onClick={onClose}
+          className="absolute right-3 top-3 z-10 flex items-center gap-1 text-sm font-medium text-gray-600 transition-colors hover:text-primary"
         >
-          <Heart size={16} className={wished ? "fill-primary text-primary" : ""} />
+          <X size={16} />
+          Close
         </button>
-        <Link to="/product/$slug" params={{ slug: product.slug }} className="block">
-          {/* PRODUCT IMAGE: replace with your own photo of {product.name} */}
+
+        {/* Product Image */}
+        <div className="flex items-center justify-center bg-gray-50 px-8 pb-4 pt-12">
           <img
             src={product.image}
-            alt={`${product.name} research peptide vial`}
-            loading="lazy"
-            className="aspect-square w-full bg-surface object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            alt={product.name}
+            className="h-48 w-48 object-contain"
           />
-        </Link>
-      </div>
-      <div className={compact ? "p-3" : "p-4"}>
-        <Link
-          to="/product/$slug"
-          params={{ slug: product.slug }}
-          className="text-sm font-semibold text-foreground hover:text-primary"
-        >
-          {product.name}
-        </Link>
-        <p className="mt-1 text-xs text-muted-foreground">{product.series}</p>
-        <p className="mt-2 text-sm font-bold text-foreground">
-          {product.oldPrice && (
-            <span className="mr-2 text-xs font-normal text-muted-foreground line-through">
-              {formatPrice(product.oldPrice)}
-            </span>
-          )}
-          {priceLabel(product)}
-        </p>
+        </div>
+
+        {/* Size Selector */}
+        <div className="px-6 pb-2 pt-4 text-center">
+          <p className="mb-3 text-base font-bold text-gray-900">Size:</p>
+          <select
+            value={size}
+            onChange={(e) => setSize(e.target.value)}
+            className="mx-auto w-full max-w-[220px] rounded-md border border-gray-300 px-4 py-2.5 text-sm text-gray-700 outline-none transition-colors focus:border-primary"
+          >
+            <option value="">Choose an option</option>
+            {product.sizes.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Add To Cart Button */}
+        <div className="px-6 pb-4 pt-4">
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={isAdding}
+            className={`flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] ${
+              isAdding ? "bg-emerald-500 scale-105" : "bg-primary hover:bg-primary/90 hover:-translate-y-0.5"
+            }`}
+          >
+            {isAdding ? (
+              <>
+                <Check size={18} className="anim-bounce-in" /> Added
+              </>
+            ) : (
+              "Add To Cart"
+            )}
+          </button>
+        </div>
+
+        {/* Product Info */}
+        <div className="border-t border-gray-100 px-6 py-4">
+          <Link
+            to="/product/$slug"
+            params={{ slug: product.slug }}
+            onClick={onClose}
+            className="text-sm font-semibold text-foreground hover:text-primary"
+          >
+            {product.name}
+          </Link>
+          <p className="mt-1 text-xs text-muted-foreground">{product.series}</p>
+          <p className="mt-1 text-sm font-bold text-foreground">
+            {product.oldPrice && (
+              <span className="mr-2 text-xs font-normal text-muted-foreground line-through">
+                {formatPrice(product.oldPrice)}
+              </span>
+            )}
+            {priceLabel(product)}
+          </p>
+        </div>
       </div>
     </div>
+  );
+}
+
+export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
+  const { wishlist, toggleWishlist } = useCart();
+  const { addToast } = useToast();
+  const wished = wishlist.includes(product.slug);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleWishlist = () => {
+    toggleWishlist(product.slug);
+    addToast({
+      message: wished ? "Removed from wishlist" : "Added to wishlist",
+      subtitle: product.name,
+      type: wished ? "info" : "success",
+      image: product.image,
+    });
+  };
+
+  return (
+    <>
+      <div className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover-lift">
+        <div className="relative overflow-hidden">
+          <span className="discount-badge absolute left-0 top-0 z-10 rounded-br-lg bg-discount px-2.5 py-1 text-[11px] font-bold text-discount-foreground shadow-sm">
+            -{product.discount}%
+          </span>
+          <button
+            type="button"
+            aria-label="Add to wishlist"
+            onClick={handleWishlist}
+            className="absolute right-2 top-2 z-10 rounded-full bg-background/90 p-1.5 text-muted-foreground shadow-sm backdrop-blur transition-all duration-300 hover:bg-white hover:text-primary hover:scale-110 active:scale-95"
+          >
+            <Heart size={16} className={`transition-all duration-300 ${wished ? "fill-primary text-primary anim-heart-pop" : ""}`} />
+          </button>
+          <Link to="/product/$slug" params={{ slug: product.slug }} className="block overflow-hidden">
+            <img
+              src={product.image}
+              alt={`${product.name} research peptide vial`}
+              loading="lazy"
+              className="aspect-square w-full bg-surface object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+          </Link>
+
+          {/* Hover slide-up bar: "Select Options" + search icon */}
+          <div className="absolute bottom-0 left-0 right-0 z-20 flex translate-y-[120%] items-center gap-2 bg-gradient-to-t from-black/40 to-transparent p-3 pt-6 transition-all duration-300 ease-out group-hover:translate-y-0 opacity-0 group-hover:opacity-100 backdrop-blur-[2px]">
+            <button
+              type="button"
+              onClick={() => setShowModal(true)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-md transition-all duration-300 hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <ShoppingCart size={14} />
+              Select Options
+            </button>
+            <Link
+              to="/product/$slug"
+              params={{ slug: product.slug }}
+              className="grid size-9 shrink-0 place-items-center rounded-full bg-white text-gray-700 shadow-md transition-all duration-300 hover:bg-primary hover:text-white hover:scale-110 hover:shadow-lg active:scale-95"
+            >
+              <Search size={14} />
+            </Link>
+          </div>
+        </div>
+        <div className={`transition-colors duration-300 group-hover:bg-gray-50/50 ${compact ? "p-3" : "p-4"}`}>
+          <Link
+            to="/product/$slug"
+            params={{ slug: product.slug }}
+            className="text-sm font-semibold text-foreground hover:text-primary"
+          >
+            {product.name}
+          </Link>
+          <p className="mt-1 text-xs text-muted-foreground">{product.series}</p>
+          <p className="mt-2 text-sm font-bold text-foreground">
+            {product.oldPrice && (
+              <span className="mr-2 text-xs font-normal text-muted-foreground line-through">
+                {formatPrice(product.oldPrice)}
+              </span>
+            )}
+            {priceLabel(product)}
+          </p>
+        </div>
+      </div>
+
+      {/* Quick View Modal */}
+      {showModal && (
+        <QuickViewModal product={product} onClose={() => setShowModal(false)} />
+      )}
+    </>
   );
 }

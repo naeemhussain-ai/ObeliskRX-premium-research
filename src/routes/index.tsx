@@ -10,6 +10,23 @@ import {
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { featuredProducts } from "@/lib/products";
+import vaccineImg from "@/assets/products/vacine.jpg";
+import heroVideo from "@/assets/products/video Herosection.mp4";
+
+function HeroVideoBackground() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+      <video
+        src={heroVideo}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -72,42 +89,36 @@ function Home() {
       {/* ===== HERO ===== */}
       <section className="container-page pt-6">
         <div className="relative min-h-[500px] overflow-hidden rounded-lg">
-          {/*
-            HERO VIDEO: Upload your background video here. Use autoplay, muted, loop, playsInline.
-            USER: REPLACE THIS DIV WITH BACKGROUND VIDEO
-            <video className="absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline src="/hero.mp4" />
-          */}
-          <div className="absolute inset-0 bg-ink" />
-          {/* HERO OVERLAY: dark gradient overlay on top of video */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40" />
+          {/* HERO YOUTUBE BACKGROUND VIDEO */}
+          <HeroVideoBackground />
+          {/* SLATE GRAY OVERLAY RGB(94, 113, 128) */}
+          <div className="absolute inset-0 bg-[rgb(94,113,128)]/65 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30" />
 
           <div className="relative flex min-h-[500px] flex-col items-center justify-center px-4 py-16 text-center">
-            <span className="rounded-full border border-primary bg-primary/20 px-4 py-1 text-[11px] font-bold tracking-widest text-primary-foreground">
-              TRUSTED BY THOUSANDS
-            </span>
-            <h1 className="mt-6 text-4xl font-bold text-ink-foreground sm:text-5xl">
+            <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl lg:text-6xl tracking-tight">
               Premium Peptides
               <span className="mt-1 block text-primary">You Can Trust</span>
             </h1>
-            <p className="mt-5 max-w-2xl text-sm text-ink-foreground/80 sm:text-base">
+            <p className="mt-5 max-w-2xl text-sm font-medium text-gray-800 sm:text-base leading-relaxed">
               The highest quality peptides, backed by science. Every batch is independently tested
               and verified to 99%+ purity before it ever reaches you.
             </p>
 
-            <div className="mt-8 grid w-full max-w-3xl gap-4 sm:grid-cols-3">
+            <div className="mt-10 grid w-full max-w-3xl gap-4 sm:grid-cols-3">
               {trustCards.map(({ icon: Icon, title, sub }) => (
                 <div
                   key={title}
-                  className="flex items-center gap-3 rounded-lg border border-white/20 bg-white/10 p-4 text-left backdrop-blur"
+                  className="group flex items-center gap-3.5 rounded-xl border-2 border-[rgb(94,113,128)]/40 bg-white/90 p-4 text-left shadow-sm backdrop-blur transition-all duration-300 hover:border-primary hover:shadow-md"
                 >
-                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
-                    <Icon size={17} />
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Icon size={18} />
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold text-ink-foreground">
+                    <span className="block truncate text-sm font-bold text-gray-900 transition-colors duration-300 group-hover:text-primary">
                       {title}
                     </span>
-                    <span className="block text-xs text-ink-foreground/70">{sub}</span>
+                    <span className="block text-xs font-medium text-gray-600">{sub}</span>
                   </span>
                 </div>
               ))}
@@ -115,7 +126,7 @@ function Home() {
 
             <Link
               to="/catalog"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:opacity-90 hover:shadow-lg"
             >
               Shop Now <ArrowRight size={16} />
             </Link>
@@ -176,25 +187,66 @@ function Home() {
               Read More
             </button>
           </div>
-          {/* ABOUT IMAGE: Upload lab/research team photo */}
-          <div className="grid aspect-[4/3] place-items-center rounded-lg bg-secondary text-xs font-medium tracking-widest text-muted-foreground">
-            ABOUT SECTION IMAGE — lab/research photo
+          <div className="overflow-hidden rounded-xl border border-border shadow-md">
+            <img
+              src={vaccineImg}
+              alt="About ObeliskRX Research"
+              className="aspect-[4/3] w-full object-cover transition-transform duration-500 hover:scale-105"
+            />
           </div>
         </div>
       </section>
 
       {/* ===== FEATURES ===== */}
-      <section className="border-t border-border bg-background">
-        <div className="container-page grid gap-8 py-16 text-center sm:grid-cols-2 lg:grid-cols-5">
-          {features.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="flex flex-col items-center">
-              <span className="mb-4 grid size-12 place-items-center rounded-full bg-primary text-primary-foreground">
-                <Icon size={20} />
-              </span>
-              <h3 className="text-sm font-semibold">{title}</h3>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{text}</p>
-            </div>
-          ))}
+      <section className="relative overflow-hidden border-t border-b border-border bg-surface py-20">
+        {/* Soft background ambient gradient */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/5 blur-[100px]" />
+        </div>
+
+        <div className="container-page relative z-10">
+          {/* Section Header */}
+          <div className="mb-14 text-center">
+            <span className="inline-block rounded-full border border-primary/20 bg-primary/10 px-4 py-1 text-[11px] font-bold tracking-widest text-primary uppercase">
+              Why ObeliskRX
+            </span>
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              The Standard Others Don't Meet
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm font-medium text-gray-600">
+              Every decision we make is driven by research integrity — from sourcing to delivery.
+            </p>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            {features.map(({ icon: Icon, title, text }, idx) => (
+              <div
+                key={title}
+                className="group relative flex flex-col rounded-2xl border border-gray-200/90 bg-white p-6 text-center shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl"
+              >
+                {/* Number badge */}
+                <span className="absolute right-4 top-4 text-[11px] font-bold text-gray-300 transition-colors duration-300 group-hover:text-primary">
+                  0{idx + 1}
+                </span>
+
+                {/* Icon Circle */}
+                <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full border border-gray-200 bg-gray-100/90 text-[rgb(94,113,128)] transition-all duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-[0_0_20px_rgba(233,30,99,0.25)]">
+                  <Icon size={22} />
+                </div>
+
+                {/* Thin accent line */}
+                <div className="mx-auto mb-4 h-px w-8 bg-gray-200 transition-all duration-300 group-hover:w-14 group-hover:bg-primary" />
+
+                <h3 className="text-sm font-bold leading-snug text-gray-900 transition-colors duration-300 group-hover:text-primary">
+                  {title}
+                </h3>
+                <p className="mt-3 text-[12px] leading-relaxed text-gray-600">
+                  {text}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </>

@@ -14,6 +14,10 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/lib/cart";
 import { Header } from "@/components/Header";
 import { Footer, Notice } from "@/components/Footer";
+import { ToastProvider } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
+import { BackToTop } from "@/components/BackToTop";
+import favicon from "@/assets/products/Obelisk---Logo-Design---Favicon.png";
 
 
 function NotFoundComponent() {
@@ -99,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: favicon, type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
@@ -128,15 +132,19 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        <div className="flex min-h-screen flex-col bg-surface">
-          <Header />
-          <main className="flex-1">
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </main>
-          <Notice />
-          <Footer />
-        </div>
+        <ToastProvider>
+          <div className="flex min-h-screen flex-col bg-surface">
+            <Header />
+            <main className="flex-1">
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </main>
+            <Notice />
+            <Footer />
+          </div>
+          <ToastContainer />
+          <BackToTop />
+        </ToastProvider>
       </CartProvider>
     </QueryClientProvider>
   );

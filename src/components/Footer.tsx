@@ -58,11 +58,16 @@ const quickLinks = [
   { label: "Home", to: "/" },
   { label: "About", to: "/" },
   { label: "Catalogue", to: "/catalog" },
-  { label: "Research", to: "/research-articles" },
   { label: "Contact Us", to: "/contact" },
 ] as const;
 
-const usefulLinks = ["FAQ", "Refund & Returns", "Privacy Policy", "Terms of Service"];
+const usefulLinks = [
+  { label: "FAQ", to: "/faq" },
+  { label: "Refund & Returns", to: "/refund-policy" },
+  { label: "Privacy Policy", to: "/" },
+  { label: "Terms of Service", to: "/" },
+];
+
 const payments = ["VISA", "stripe", "PayPal", "G Pay", "Apple Pay"];
 
 export function Footer() {
@@ -111,8 +116,10 @@ export function Footer() {
             <h3 className="mb-4 text-sm font-bold text-ink-foreground">Useful Links</h3>
             <ul className="space-y-3 text-sm text-ink-foreground/70">
               {usefulLinks.map((l) => (
-                <li key={l}>
-                  <span className="cursor-pointer hover:text-primary">{l}</span>
+                <li key={l.label}>
+                  <Link to={l.to} className="hover:text-primary transition-colors">
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -128,7 +135,7 @@ export function Footer() {
             </p>
           </div>
         </div>
-        <p className="pt-6 text-center text-xs text-ink-foreground/50">Copyright 2026 OBELISK</p>
+        <p className="pt-6 text-center text-xs text-ink-foreground/50">Copyright 2026 OBELISKRX</p>
       </div>
     </footer>
   );

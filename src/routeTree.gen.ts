@@ -10,15 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as ResearchArticlesRouteImport } from './routes/research-articles'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -36,9 +43,14 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResearchArticlesRoute = ResearchArticlesRouteImport.update({
-  id: '/research-articles',
-  path: '/research-articles',
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
@@ -49,62 +61,76 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
-  '/research-articles': typeof ResearchArticlesRoute
+  '/faq': typeof FaqRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
-  '/research-articles': typeof ResearchArticlesRoute
+  '/faq': typeof FaqRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
-  '/research-articles': typeof ResearchArticlesRoute
+  '/faq': typeof FaqRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/cart'
     | '/catalog'
     | '/contact'
-    | '/research-articles'
+    | '/faq'
+    | '/refund-policy'
     | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/cart'
     | '/catalog'
     | '/contact'
-    | '/research-articles'
+    | '/faq'
+    | '/refund-policy'
     | '/product/$slug'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/cart'
     | '/catalog'
     | '/contact'
-    | '/research-articles'
+    | '/faq'
+    | '/refund-policy'
     | '/product/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
   ContactRoute: typeof ContactRoute
-  ResearchArticlesRoute: typeof ResearchArticlesRoute
+  FaqRoute: typeof FaqRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   ProductSlugRoute: typeof ProductSlugRoute
 }
 
@@ -115,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -138,11 +171,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/research-articles': {
-      id: '/research-articles'
-      path: '/research-articles'
-      fullPath: '/research-articles'
-      preLoaderRoute: typeof ResearchArticlesRouteImport
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$slug': {
@@ -157,12 +197,24 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
   ContactRoute: ContactRoute,
-  ResearchArticlesRoute: ResearchArticlesRoute,
+  FaqRoute: FaqRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   ProductSlugRoute: ProductSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
