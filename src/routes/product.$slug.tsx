@@ -107,7 +107,7 @@ function ProductDetail() {
         className={`mt-6 grid gap-12 lg:grid-cols-2 animate-on-scroll ${heroVisible ? "animate-visible" : ""}`}
       >
         <div className="rounded-lg bg-card p-6 shadow-card anim-fade-in-up">
-          {/* PRODUCT DETAIL MAIN IMAGE: swap in your own hero shot for this product */}
+          {/* PRODUCT DETAIL MAIN IMAGE */}
           <div className="overflow-hidden rounded-lg">
             <img
               src={product.image}
@@ -115,21 +115,25 @@ function ProductDetail() {
               className="aspect-square w-full bg-surface object-cover transition-transform duration-500 hover:scale-105 hover-glow"
             />
           </div>
-          <div className="mt-4 grid grid-cols-4 gap-3">
-            {[0, 1, 2, 3].map((i) => (
-              <img
-                key={i}
-                src={product.image}
-                alt={`${product.name} thumbnail ${i + 1}`}
-                className="aspect-square w-full cursor-pointer rounded-md bg-surface object-cover opacity-80 hover:opacity-100"
-              />
-            ))}
-          </div>
         </div>
 
         <div className="rounded-lg bg-card p-6 shadow-card sm:p-8 anim-fade-in-up" style={{ animationDelay: "100ms" }}>
           <h1 className="text-3xl font-bold">{product.name}</h1>
-          <p className="mt-3 text-2xl font-bold text-primary">{priceLabel(product)}</p>
+          <div className="mt-3 flex flex-wrap items-baseline gap-3">
+            {product.oldPrice && (
+              <span className="text-lg text-muted-foreground line-through font-normal">
+                {formatPrice(product.oldPrice)}
+              </span>
+            )}
+            <span className="text-3xl font-bold text-primary">
+              {priceLabel(product)}
+            </span>
+            {product.discount > 0 && (
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                Save {product.discount}%
+              </span>
+            )}
+          </div>
           <div className="my-6 h-px w-full bg-border" />
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{product.description}</p>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-muted-foreground">

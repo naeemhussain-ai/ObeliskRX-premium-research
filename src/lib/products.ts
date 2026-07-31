@@ -39,7 +39,7 @@ export const products: Product[] = [
     discount: 35,
     sizes: ["20mg"],
     description:
-      "A dual GIP and GLP-1 receptor agonist studied for its role in metabolic and glucose-regulation research.",
+      "A 39-amino-acid synthetic peptide functioning as a dual agonist at the GIP and GLP-1 receptors, studied for its role in glycemic and metabolic research.",
     specs: [
       { label: "CAS Number", value: "2023788-19-2" },
       { label: "Molecular Formula", value: "C225H348N48O68" },
@@ -75,12 +75,11 @@ export const products: Product[] = [
     discount: 20,
     sizes: ["10mg"],
     description:
-      "A synthetic pentadecapeptide derived from a protective protein found in gastric juice, widely studied in tissue-repair research.",
+      "A 15-amino-acid synthetic peptide fragment studied in laboratory models for its role in angiogenesis, tissue signaling, and cellular repair processes.",
     specs: [
       { label: "CAS Number", value: "137525-51-0" },
-      { label: "Molecular Formula", value: "C62H98N16O22" },
-      { label: "Molecular Weight", value: "1,419.53 g/mol" },
       { label: "Amino Acids", value: "15" },
+      { label: "Type", value: "Synthetic pentadecapeptide" },
     ],
   },
   {
@@ -90,14 +89,13 @@ export const products: Product[] = [
     image: cjc,
     price: 49.99,
     oldPrice: 76.99,
-    discount: 36,
+    discount: 35,
     sizes: ["5mg"],
     description:
-      "A growth hormone releasing hormone analog studied for its influence on pulsatile growth hormone secretion.",
+      "A 29-amino-acid synthetic analog of growth hormone-releasing hormone (Mod GRF 1-29), studied for its role in growth hormone signaling research.",
     specs: [
-      { label: "CAS Number", value: "863288-34-0" },
       { label: "Molecular Formula", value: "C152H252N44O42" },
-      { label: "Molecular Weight", value: "3,367.90 g/mol" },
+      { label: "Molecular Weight", value: "~3,367 g/mol" },
       { label: "Amino Acids", value: "29" },
     ],
   },
@@ -111,12 +109,12 @@ export const products: Product[] = [
     discount: 35,
     sizes: ["50mg"],
     description:
-      "A synthetic tetrapeptide studied for its interaction with telomerase activity and cellular aging research.",
+      "A synthetic tetrapeptide modeled on the amino acid composition of epithalamin, studied for its role in telomerase activity and cellular aging research.",
     specs: [
       { label: "CAS Number", value: "307297-39-8" },
+      { label: "Sequence", value: "Ala-Glu-Asp-Gly" },
       { label: "Molecular Formula", value: "C14H22N4O9" },
-      { label: "Molecular Weight", value: "390.35 g/mol" },
-      { label: "Amino Acids", value: "4" },
+      { label: "Molecular Weight", value: "390.34 g/mol" },
     ],
   },
   {
@@ -129,12 +127,11 @@ export const products: Product[] = [
     discount: 35,
     sizes: ["50mg"],
     description:
-      "A naturally occurring copper peptide complex studied in skin remodeling and tissue regeneration research.",
+      "A naturally occurring copper-binding tripeptide, studied in laboratory research for its role in collagen synthesis, tissue remodeling, and cellular signaling.",
     specs: [
-      { label: "CAS Number", value: "89030-95-5" },
-      { label: "Molecular Formula", value: "C14H22N6O4Cu" },
-      { label: "Molecular Weight", value: "401.93 g/mol" },
-      { label: "Amino Acids", value: "3" },
+      { label: "CAS Number", value: "89030-95-5 (copper complex)" },
+      { label: "Sequence", value: "Gly-His-Lys" },
+      { label: "Molecular Weight", value: "340.38 g/mol (tripeptide)" },
     ],
   },
   {
@@ -146,14 +143,8 @@ export const products: Product[] = [
     oldPrice: 107.99,
     discount: 36,
     sizes: ["1mg"],
-    description:
-      "A long arginine analog of insulin-like growth factor 1, studied for its extended half-life in cellular growth research.",
-    specs: [
-      { label: "CAS Number", value: "946870-92-4" },
-      { label: "Molecular Formula", value: "C400H625N111O115S9" },
-      { label: "Molecular Weight", value: "9,111.00 g/mol" },
-      { label: "Amino Acids", value: "83" },
-    ],
+    description: "",
+    specs: [],
   },
   {
     slug: "ipamorelin",
@@ -164,14 +155,8 @@ export const products: Product[] = [
     oldPrice: 85.99,
     discount: 35,
     sizes: ["5mg"],
-    description:
-      "A selective growth hormone secretagogue pentapeptide studied for targeted GH release without cortisol elevation.",
-    specs: [
-      { label: "CAS Number", value: "170851-70-4" },
-      { label: "Molecular Formula", value: "C38H49N9O5" },
-      { label: "Molecular Weight", value: "711.85 g/mol" },
-      { label: "Amino Acids", value: "5" },
-    ],
+    description: "",
+    specs: [],
   },
   {
     slug: "klow-blend",
@@ -183,12 +168,10 @@ export const products: Product[] = [
     discount: 34,
     sizes: ["80mg"],
     description:
-      "A signature research blend combining GHK-Cu, KPV, TB-500, and BPC-157 for combined repair-pathway studies.",
+      "A four-compound research formulation combining GHK-Cu (50mg), BPC-157 (10mg), TB-500 (10mg), and KPV (10mg), supplied for laboratory studies examining tissue repair, cellular signaling, and regenerative research pathways.",
     specs: [
-      { label: "Composition", value: "GHK-Cu, KPV, TB-500, BPC-157" },
-      { label: "Total Mass", value: "80mg" },
-      { label: "Form", value: "Lyophilized powder" },
-      { label: "Purity", value: "99%+" },
+      { label: "Composition", value: "GHK-Cu (CAS 89030-95-5) + BPC-157 (CAS 137525-51-0) + TB-500 (CAS 77591-33-4) + KPV (CAS 75435-82-2)" },
+      { label: "Total", value: "80mg" },
     ],
   },
   {
@@ -201,11 +184,10 @@ export const products: Product[] = [
     discount: 34,
     sizes: ["20mg"],
     description:
-      "A mitochondrial-derived peptide studied for its role in metabolic homeostasis and cellular energy research.",
+      "A 16-amino-acid mitochondrial-derived peptide, studied in laboratory research for its role in cellular energy regulation and metabolic signaling.",
     specs: [
-      { label: "CAS Number", value: "1627580-64-6" },
       { label: "Molecular Formula", value: "C101H152N28O22S2" },
-      { label: "Molecular Weight", value: "2,174.60 g/mol" },
+      { label: "Molecular Weight", value: "2,174.64 g/mol" },
       { label: "Amino Acids", value: "16" },
     ],
   },
@@ -216,15 +198,14 @@ export const products: Product[] = [
     image: nad,
     price: 69.99,
     priceMax: 100,
-    discount: 36,
+    discount: 35,
     sizes: ["500mg", "1000mg"],
     description:
-      "Nicotinamide adenine dinucleotide, a coenzyme central to cellular metabolism and mitochondrial research.",
+      "A naturally occurring coenzyme central to cellular energy metabolism and redox reactions, studied in laboratory research for its role in mitochondrial function and cellular aging pathways. Available in 500mg and 1000mg.",
     specs: [
       { label: "CAS Number", value: "53-84-9" },
       { label: "Molecular Formula", value: "C21H27N7O14P2" },
       { label: "Molecular Weight", value: "663.43 g/mol" },
-      { label: "Purity", value: "99%+" },
     ],
   },
   {
@@ -234,14 +215,15 @@ export const products: Product[] = [
     image: selank,
     price: 29.99,
     priceMax: 59.99,
-    discount: 36,
+    discount: 35,
     sizes: ["10mg", "20mg"],
     description:
-      "A synthetic heptapeptide analog of tuftsin studied in anxiolytic and cognitive neuroscience research.",
+      "A synthetic heptapeptide analog of tuftsin, studied in laboratory research for its role in neurochemical and behavioral signaling pathways.",
     specs: [
       { label: "CAS Number", value: "129954-34-3" },
+      { label: "Sequence", value: "Thr-Lys-Pro-Arg-Pro-Gly-Pro" },
       { label: "Molecular Formula", value: "C33H57N11O9" },
-      { label: "Molecular Weight", value: "751.88 g/mol" },
+      { label: "Molecular Weight", value: "751.87 g/mol" },
       { label: "Amino Acids", value: "7" },
     ],
   },
@@ -255,7 +237,7 @@ export const products: Product[] = [
     discount: 35,
     sizes: ["10mg"],
     description:
-      "A synthetic ACTH(4-10) analog studied for neuroprotective and nootropic mechanisms.",
+      "A synthetic heptapeptide derived from ACTH(4-10), studied in laboratory research for its role in neurotrophic factor expression and cognitive signaling pathways.",
     specs: [
       { label: "CAS Number", value: "80714-61-0" },
       { label: "Molecular Formula", value: "C37H51N9O10S" },
@@ -273,7 +255,7 @@ export const products: Product[] = [
     discount: 35,
     sizes: ["10mg"],
     description:
-      "A synthetic fragment of thymosin beta-4 studied for actin regulation and tissue repair research.",
+      "A 43-amino-acid peptide corresponding to Thymosin Beta-4, studied for its role in actin regulation, cellular migration, and tissue repair signaling in laboratory models.",
     specs: [
       { label: "CAS Number", value: "77591-33-4" },
       { label: "Molecular Formula", value: "C212H350N56O78S" },
@@ -291,11 +273,9 @@ export const products: Product[] = [
     discount: 35,
     sizes: ["10mg"],
     description:
-      "A stabilized growth hormone releasing factor analog studied for adipose tissue and metabolic research.",
+      "A 44-amino-acid synthetic analog of growth hormone-releasing hormone, modified for enhanced stability, studied for its role in growth hormone secretion research.",
     specs: [
       { label: "CAS Number", value: "218949-48-5" },
-      { label: "Molecular Formula", value: "C221H366N72O67S" },
-      { label: "Molecular Weight", value: "5,135.86 g/mol" },
       { label: "Amino Acids", value: "44" },
     ],
   },

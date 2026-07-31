@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Music2 } from "lucide-react";
-import { Logo } from "./ProductCard";
+import logo02 from "../assets/products/Obelisk-Logo-Design-02.png";
 
 const bullets = [
   "Government regulations governing the use of, and exposure to, these products",
@@ -76,7 +76,13 @@ export function Footer() {
       <div className="container-page rounded-lg bg-ink pb-8">
         <div className="grid gap-10 border-b border-ink-foreground/10 pb-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Logo className="h-8" light />
+            <Link to="/" className="inline-block">
+              <img
+                src={logo02}
+                alt="ObeliskRX Logo"
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
             <p className="mt-4 max-w-64 text-sm text-ink-foreground/70">
               Research-grade peptides, verified for precision and integrity.
             </p>
