@@ -15,7 +15,7 @@ export function Notice() {
         <h2 className="mb-4 text-[13px] font-bold text-ink-foreground">Notice</h2>
         <div className="space-y-4">
           <p>
-            All peptides sold on this site are intended exclusively for laboratory and research use..#
+            All peptides sold on this site are intended exclusively for laboratory and research use.
             Products may not be used as a cosmetic, food additive, chemical, drug, or for any
             application not classified as such in this notice. The listing of a material on this
             site does not constitute a license to use it in infringement of any patent.
