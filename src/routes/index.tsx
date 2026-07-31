@@ -256,12 +256,12 @@ function Home() {
                 and research applications only, not for human or animal consumption.
               </p>
             </div>
-            <button
-              type="button"
-              className="mt-6 rounded-full border border-primary px-6 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary-soft"
+            <Link
+              to="/about"
+              className="mt-6 inline-block rounded-full border border-primary px-6 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary-soft"
             >
               Read More
-            </button>
+            </Link>
           </div>
           <div className="overflow-hidden rounded-xl border border-border shadow-md">
             <img
