@@ -345,7 +345,7 @@ export function Header() {
     >
       <div className="container-page grid h-[70px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:grid-cols-3">
         <Link to="/" className="flex min-w-0 items-center">
-          <Logo className="h-7 sm:h-8" />
+          <Logo className="h-10 sm:h-12" />
         </Link>
 
         <nav className="hidden items-center justify-center gap-7 lg:flex">

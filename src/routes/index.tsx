@@ -112,7 +112,7 @@ function Home() {
           {/* HERO YOUTUBE BACKGROUND VIDEO */}
           <HeroVideoBackground />
           {/* SLATE GRAY OVERLAY RGB(94, 113, 128) */}
-          <div className="absolute inset-0 bg-[rgb(94,113,128)]/65 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-[rgb(94,113,128)]/30 backdrop-blur-[1px]" />
           <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30" />
 
           <div className="relative flex min-h-[500px] flex-col items-center justify-center px-4 py-16 text-center">
