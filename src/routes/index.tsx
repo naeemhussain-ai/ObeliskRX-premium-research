@@ -32,13 +32,13 @@ function HeroVideoBackground() {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ObeliskRX — Premium Research Peptides You Can Trust" },
+      { title: "ObeliskRX   Premium Research Peptides You Can Trust" },
       {
         name: "description",
         content:
           "Premium research peptides independently tested and verified to 99%+ purity. Fast USA shipping, COA on every batch. Research use only.",
       },
-      { property: "og:title", content: "ObeliskRX — Premium Research Peptides" },
+      { property: "og:title", content: "ObeliskRX   Premium Research Peptides" },
       {
         property: "og:description",
         content: "Independently tested peptides verified to 99%+ purity. Research use only.",
@@ -243,7 +243,7 @@ function Home() {
               </p>
               <p>
                 Every compound we distribute is sourced from vetted manufacturers and independently
-                tested before it reaches you — not spot-checked, not assumed, verified. Every batch
+                tested before it reaches you   not spot-checked, not assumed, verified. Every batch
                 carries its own certificate of analysis, available to review before you order.
               </p>
               <p>
@@ -290,7 +290,7 @@ function Home() {
               The Standard Others Don't Meet
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm font-medium text-gray-600">
-              Every decision we make is driven by research integrity — from sourcing to delivery.
+              Every decision we make is driven by research integrity   from sourcing to delivery.
             </p>
           </div>
 

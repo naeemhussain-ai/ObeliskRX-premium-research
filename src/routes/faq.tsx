@@ -60,7 +60,7 @@ const sections = [
     qa: [
       {
         q: "What payment methods do you accept?",
-        a: "We currently accept Zelle and Cash App for orders while our full checkout system is being finalized. Once our secure payment processor is live, we will also accept major credit/debit cards, ACH bank transfer, and cryptocurrency — with an instant 15% discount applied on crypto payments at checkout.",
+        a: "We currently accept Zelle and Cash App for orders while our full checkout system is being finalized. Once our secure payment processor is live, we will also accept major credit/debit cards, ACH bank transfer, and cryptocurrency   with an instant 15% discount applied on crypto payments at checkout.",
       },
       {
         q: "Is checkout secure?",

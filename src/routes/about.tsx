@@ -20,7 +20,7 @@ import tm9 from "@/assets/about-pic/c2-tm-p-9-opt.png";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Us — ObeliskRX" },
+      { title: "About Us   ObeliskRX" },
       {
         name: "description",
         content:
@@ -44,10 +44,10 @@ const teamMembers = [
 ];
 
 const aboutParagraphs = [
-  "Welcome to ObeliskRX, your source for rigorously documented peptides for laboratory and research use. Our mission is simple — give researchers material they can trust, backed by proof, not claims.",
-  "Every compound we distribute is sourced from vetted manufacturers and independently tested before it ever reaches you. Each batch is verified by third-party lab analysis, with a certificate of analysis available for review — because in research, verification isn't optional, it's foundational.",
+  "Welcome to ObeliskRX, your source for rigorously documented peptides for laboratory and research use. Our mission is simple   give researchers material they can trust, backed by proof, not claims.",
+  "Every compound we distribute is sourced from vetted manufacturers and independently tested before it ever reaches you. Each batch is verified by third-party lab analysis, with a certificate of analysis available for review   because in research, verification isn't optional, it's foundational.",
   "Our commitment to transparency extends to how we support you. Our team is responsive and knowledgeable, ready to answer questions about sourcing, testing, and documentation for any product in our catalog.",
-  "We prioritize fast, reliable fulfillment so your research timeline stays on track — orders placed before cutoff ship the same day.",
+  "We prioritize fast, reliable fulfillment so your research timeline stays on track   orders placed before cutoff ship the same day.",
   "ObeliskRX was founded on the belief that the research peptide industry should hold itself to a stricter standard of proof. As the field continues to evolve, we remain committed to documentation-first sourcing and uncompromising quality control on every product we carry.",
   "ObeliskRX is a research-use-only supplier. Our products are intended for laboratory and research applications only, not for human or animal consumption.",
 ];

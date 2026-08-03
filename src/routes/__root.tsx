@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -16,8 +16,6 @@ import { Header } from "@/components/Header";
 import { Footer, Notice } from "@/components/Footer";
 import { ToastProvider } from "@/hooks/useToast";
 import { ToastContainer } from "@/components/Toast";
-import { BackToTop } from "@/components/BackToTop";
-import favicon from "@/assets/products/Obelisk---Logo-Design---Favicon.png";
 
 
 function NotFoundComponent() {
@@ -85,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ObeliskRX — Research-Grade Peptides" },
+      { title: "ObeliskRX   Research-Grade Peptides" },
       {
         name: "description",
         content:
@@ -103,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
       },
-      { rel: "icon", href: favicon, type: "image/png" },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
@@ -126,70 +124,6 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-function AgeVerificationModal() {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const verified = localStorage.getItem("obelisk_verified_21");
-    if (!verified) {
-      // Prevent scrolling when modal is open
-      document.body.style.overflow = "hidden";
-      setOpen(true);
-    }
-  }, []);
-
-  const handleAccept = () => {
-    localStorage.setItem("obelisk_verified_21", "true");
-    document.body.style.overflow = "auto";
-    setOpen(false);
-  };
-
-  const handleDecline = () => {
-    // If under 21, save status as false, allow website browsing, but disable add to cart
-    localStorage.setItem("obelisk_verified_21", "false");
-    document.body.style.overflow = "auto";
-    setOpen(false);
-  };
-
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-background/98 backdrop-blur-xl" />
-      <div className="relative z-10 w-full max-w-2xl rounded-3xl bg-white p-8 text-center shadow-[0_0_50px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in-95 duration-500 sm:p-12 border border-border">
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">ObeliskRX</h2>
-        <h3 className="mt-2 text-xl font-medium text-gray-800">Age & Research Verification</h3>
-        
-        <div className="animate-in fade-in duration-500">
-          <p className="mt-6 text-sm leading-relaxed text-gray-600">
-            ObeliskRX provides research peptides exclusively to qualified researchers and laboratories for in vitro and laboratory use. Please confirm your age before continuing.
-          </p>
-          <p className="mt-4 text-sm leading-relaxed text-gray-600">
-            <strong>Note:</strong> If you are under 21, you can still view and browse our products, but you will need permission from an elder (21+) to make purchases or add items to cart.
-          </p>
-
-          <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
-            <button
-              type="button"
-              onClick={handleAccept}
-              className="w-full sm:w-auto rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-95"
-            >
-              I Am 21 Or Older
-            </button>
-            <button
-              type="button"
-              onClick={handleDecline}
-              className="w-full sm:w-auto rounded-full border border-gray-300 bg-white px-8 py-3.5 text-sm font-bold text-gray-700 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md hover:-translate-y-0.5 active:scale-95"
-            >
-              I Am Under 21 (Browse Only)
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -205,10 +139,8 @@ function RootComponent() {
             </main>
             <Notice />
             <Footer />
+            <ToastContainer />
           </div>
-          <ToastContainer />
-          <BackToTop />
-          <AgeVerificationModal />
         </ToastProvider>
       </CartProvider>
     </QueryClientProvider>

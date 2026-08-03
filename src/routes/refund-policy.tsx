@@ -174,7 +174,7 @@ function RefundPolicyPage() {
                 responsible for misuse, improper storage, or reconstitution of any product.
               </p>
               <p>
-                Replacements are issued solely for verified transit damage — not for change of
+                Replacements are issued solely for verified transit damage   not for change of
                 mind, dissatisfaction, or any other reason.
               </p>
               <p>
@@ -240,7 +240,7 @@ function RefundPolicyPage() {
             <p className="mt-4 text-sm leading-relaxed text-gray-600">
               Orders cannot be canceled once payment has processed. If an order hasn’t yet entered
               fulfillment, ObeliskRX LLC may attempt to accommodate a cancellation request as a
-              courtesy, at its sole discretion — cancellation is never guaranteed.
+              courtesy, at its sole discretion   cancellation is never guaranteed.
             </p>
           </section>
 

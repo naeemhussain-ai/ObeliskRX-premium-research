@@ -8,13 +8,13 @@ import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 export const Route = createFileRoute("/catalog")({
   head: () => ({
     meta: [
-      { title: "Shop Research Peptides — ObeliskRX Catalog" },
+      { title: "Shop Research Peptides   ObeliskRX Catalog" },
       {
         name: "description",
         content:
-          "Browse the full ObeliskRX catalog of research peptides — metabolic, recovery, growth, longevity, and neuro series. COA verified.",
+          "Browse the full ObeliskRX catalog of research peptides   metabolic, recovery, growth, longevity, and neuro series. COA verified.",
       },
-      { property: "og:title", content: "Shop Research Peptides — ObeliskRX Catalog" },
+      { property: "og:title", content: "Shop Research Peptides   ObeliskRX Catalog" },
       {
         property: "og:description",
         content: "Browse research peptides by series. Independently tested, 99%+ purity.",

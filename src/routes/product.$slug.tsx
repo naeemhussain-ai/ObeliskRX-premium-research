@@ -16,11 +16,11 @@ export const Route = createFileRoute("/product/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Product not found — ObeliskRX" }, { name: "robots", content: "noindex" }],
+        meta: [{ title: "Product not found   ObeliskRX" }, { name: "robots", content: "noindex" }],
       };
     }
     const { product } = loaderData;
-    const title = `${product.name} — ${product.series} | ObeliskRX`;
+    const title = `${product.name}   ${product.series} | ObeliskRX`;
     return {
       meta: [
         { title },
@@ -57,12 +57,10 @@ function ProductDetail() {
   const { addToast } = useToast();
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
-  const [tab, setTab] = useState<"info" | "method">("info");
   const [rating, setRating] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
 
   const [heroRef, heroVisible] = useStaggerAnimation<HTMLDivElement>();
-  const [tabsRef, tabsVisible] = useScrollAnimation<HTMLElement>();
   const [reviewsRef, reviewsVisible] = useScrollAnimation<HTMLElement>();
 
   const related = products.filter((p) => p.slug !== product.slug).slice(0, 5);
@@ -219,93 +217,8 @@ function ProductDetail() {
         </div>
       </div>
 
-      <section ref={tabsRef} className={`mt-16 animate-on-scroll animate-scale ${tabsVisible ? "animate-visible" : ""}`}>
-        <div className="flex justify-center gap-8 border-b border-border text-xs font-semibold tracking-widest">
-          <button
-            type="button"
-            onClick={() => setTab("info")}
-            className={`pb-3 ${tab === "info" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"}`}
-          >
-            ADDITIONAL INFORMATION
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("method")}
-            className={`pb-3 ${tab === "method" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"}`}
-          >
-            APPLICATION METHOD
-          </button>
-        </div>
-        <div className="py-8 text-sm">
-          {tab === "info" ? (
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <span className="font-medium">Size</span>
-              <span className="text-muted-foreground">{product.sizes.join(", ")}</span>
-            </div>
-          ) : (
-            <p className="text-muted-foreground">Application instructions will be provided here.</p>
-          )}
-        </div>
-      </section>
-
-      <section 
-        ref={reviewsRef}
-        className={`mt-12 grid gap-12 rounded-lg bg-card p-6 shadow-card sm:p-10 lg:grid-cols-2 animate-on-scroll animate-scale ${reviewsVisible ? "animate-visible" : ""}`}
-      >
-        <div>
-          <h2 className="text-lg font-bold">Reviews</h2>
-          <p className="mt-4 text-sm text-muted-foreground">There are no reviews yet.</p>
-        </div>
-        <div>
-          <h3 className="text-sm font-bold">Be the first to review "{product.name}"</h3>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Your email address will not be published. Required fields are marked *
-          </p>
-          <form className="mt-4 space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div className="flex items-center gap-2 text-xs">
-              <span>Your rating *:</span>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button key={n} type="button" onClick={() => setRating(n)} aria-label={`${n} stars`}>
-                  <Star
-                    size={14}
-                    className={n <= rating ? "fill-primary text-primary" : "text-muted-foreground"}
-                  />
-                </button>
-              ))}
-            </div>
-            <div>
-              <label className="text-xs">Your review *</label>
-              <textarea
-                rows={5}
-                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="text-xs">Name *</label>
-              <input className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-primary" />
-            </div>
-            <div>
-              <label className="text-xs">Email *</label>
-              <input
-                type="email"
-                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-primary"
-              />
-            </div>
-            <label className="flex items-start gap-2 text-xs text-muted-foreground">
-              <input type="checkbox" className="mt-0.5" />
-              Save my name, email, and website in this browser for the next time I comment.
-            </label>
-            <button
-              type="submit"
-              className="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground"
-            >
-              Submit
-            </button>
-          </form>
-        </div>
-      </section>
-
-      <section className="py-16">
+      {/* Related Products — above reviews */}
+      <section className="mt-16">
         <h2 className="mb-6 text-2xl font-bold">Related Products</h2>
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
           {related.map((p) => (
@@ -314,7 +227,87 @@ function ProductDetail() {
         </div>
       </section>
 
-      <section className="pb-16">
+      {/* Reviews */}
+      <section
+        ref={reviewsRef}
+        className={`mt-16 animate-on-scroll animate-scale ${reviewsVisible ? "animate-visible" : ""}`}
+      >
+        <h2 className="mb-6 text-2xl font-bold">Customer Reviews</h2>
+        <div className="grid gap-8 lg:grid-cols-[1fr_420px]">
+
+          {/* Left — existing reviews */}
+          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <div className="flex gap-1 mb-3">
+                {[1,2,3,4,5].map((n) => (
+                  <Star key={n} size={22} className="text-muted-foreground/30" />
+                ))}
+              </div>
+              <p className="text-sm font-medium text-foreground">No reviews yet</p>
+              <p className="mt-1 text-xs text-muted-foreground">Be the first to share your experience</p>
+            </div>
+          </div>
+
+          {/* Right — write a review */}
+          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+            <h3 className="text-base font-bold text-foreground">Write a Review</h3>
+            <p className="mt-1 text-xs text-muted-foreground">Required fields are marked *</p>
+
+            <form className="mt-5 space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-foreground">Your rating *</label>
+                <div className="flex gap-1.5">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button key={n} type="button" onClick={() => setRating(n)} aria-label={`${n} stars`}>
+                      <Star
+                        size={20}
+                        className={n <= rating ? "fill-primary text-primary" : "text-muted-foreground/40 hover:text-muted-foreground"}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium text-foreground">Your review *</label>
+                <textarea
+                  rows={4}
+                  placeholder="Share your experience..."
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground/50 focus:border-primary transition-colors resize-none"
+                />
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-foreground">Name *</label>
+                  <input
+                    placeholder="John Doe"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground/50 focus:border-primary transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-foreground">Email *</label>
+                  <input
+                    type="email"
+                    placeholder="john@example.com"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground/50 focus:border-primary transition-colors"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98]"
+              >
+                Submit Review
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Recently Viewed */}
+      <section className="mt-16 pb-8">
         <h2 className="mb-6 text-2xl font-bold">Recently Viewed</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {products.slice(0, 6).map((p) => (
@@ -322,7 +315,7 @@ function ProductDetail() {
               key={p.slug}
               to="/product/$slug"
               params={{ slug: p.slug }}
-              className="flex items-center gap-3 rounded-lg bg-card p-3 shadow-card"
+              className="flex items-center gap-3 rounded-lg bg-card p-3 shadow-card transition-shadow hover:shadow-card-hover"
             >
               <img
                 src={p.image}

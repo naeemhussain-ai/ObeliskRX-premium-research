@@ -8,12 +8,12 @@ import { formatPrice, products } from "@/lib/products";
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
-      { title: "Shopping Cart — ObeliskRX" },
+      { title: "Shopping Cart   ObeliskRX" },
       {
         name: "description",
         content: "Review the research peptides in your ObeliskRX cart and proceed to checkout.",
       },
-      { property: "og:title", content: "Shopping Cart — ObeliskRX" },
+      { property: "og:title", content: "Shopping Cart   ObeliskRX" },
       { property: "og:description", content: "Review your ObeliskRX cart and checkout securely." },
       { property: "og:url", content: "/cart" },
       { name: "robots", content: "noindex" },

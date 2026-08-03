@@ -264,6 +264,22 @@ export const products: Product[] = [
     ],
   },
   {
+    slug: "bpc-157-tb-500-blend",
+    name: "BPC-157 / TB-500 Blend",
+    series: "Recovery Series",
+    image: bpc,
+    price: 129.99,
+    oldPrice: 199.99,
+    discount: 35,
+    sizes: ["20mg"],
+    description:
+      "A combined formulation of BPC-157 and TB-500 in equal proportion, supplied for laboratory research examining their overlapping roles in tissue repair and cellular signaling pathways.",
+    specs: [
+      { label: "Composition", value: "BPC-157 (CAS 137525-51-0) + TB-500 (CAS 77591-33-4)" },
+      { label: "Ratio", value: "1:1" },
+    ],
+  },
+  {
     slug: "tesamorelin",
     name: "Tesamorelin",
     series: "Growth Series",
@@ -290,4 +306,4 @@ export const formatPrice = (n: number) =>
   `$${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
 export const priceLabel = (p: Product) =>
-  p.priceMax ? `${formatPrice(p.price)} — ${formatPrice(p.priceMax)}` : formatPrice(p.price);
+  p.priceMax ? `${formatPrice(p.price)}   ${formatPrice(p.priceMax)}` : formatPrice(p.price);

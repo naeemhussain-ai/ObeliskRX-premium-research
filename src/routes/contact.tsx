@@ -5,7 +5,7 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact ObeliskRX — Research Peptide Support" },
+      { title: "Contact ObeliskRX   Research Peptide Support" },
       {
         name: "description",
         content:

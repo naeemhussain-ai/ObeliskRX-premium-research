@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Eye, EyeOff, Menu, Search, ShoppingCart, User, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import { Logo } from "./ProductCard";
 import { useCart } from "@/lib/cart";
 import { formatPrice, products } from "@/lib/products";
@@ -10,6 +10,7 @@ import { useScrolled } from "@/hooks/useScrolled";
 const nav = [
   { to: "/", label: "Home" },
   { to: "/catalog", label: "Catalog" },
+  { to: "/research-articles", label: "Research Articles" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -143,182 +144,8 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
   );
 }
 
-function AuthDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [isRegister, setIsRegister] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
-
-  if (!open || typeof document === "undefined") return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[99999] flex justify-end">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Side Popup Drawer */}
-      <div className="relative z-10 flex h-screen w-full max-w-sm flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-300">
-        {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-gray-100 bg-white p-5">
-          <h2 className="text-xl font-bold text-gray-900">
-            {isRegister ? "Create An Account" : "Sign in"}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center gap-1 text-xs font-semibold text-gray-700 transition-colors hover:text-primary"
-          >
-            <X size={16} />
-            Close
-          </button>
-        </div>
-
-        {/* Form Body */}
-        <div className="flex-1 overflow-y-auto p-6">
-          {!isRegister ? (
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-800">
-                  Username or email address <span className="text-primary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input-focus-ring mt-1.5 w-full rounded-full border border-gray-300 px-4 py-2.5 text-sm outline-none transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-800">
-                  Password <span className="text-primary">*</span>
-                </label>
-                <div className="relative mt-1.5">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="input-focus-ring w-full rounded-full border border-gray-300 px-4 py-2.5 pr-10 text-sm outline-none transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="mt-2 w-full rounded-full bg-primary py-3 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:opacity-90 hover:shadow-lg active:scale-[0.98]"
-              >
-                Log In
-              </button>
-
-              <div className="flex items-center justify-between pt-1 text-xs">
-                <label className="flex items-center gap-2 text-gray-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                    className="rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  Remember me
-                </label>
-                <a href="#" className="font-medium text-gray-600 hover:text-primary transition-colors">
-                  Lost your password?
-                </a>
-              </div>
-            </form>
-          ) : (
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-800">
-                  Email address <span className="text-primary">*</span>
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input-focus-ring mt-1.5 w-full rounded-full border border-gray-300 px-4 py-2.5 text-sm outline-none transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-800">
-                  Password <span className="text-primary">*</span>
-                </label>
-                <div className="relative mt-1.5">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="input-focus-ring w-full rounded-full border border-gray-300 px-4 py-2.5 pr-10 text-sm outline-none transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="mt-2 w-full rounded-full bg-primary py-3 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:opacity-90 hover:shadow-lg active:scale-[0.98]"
-              >
-                Register
-              </button>
-            </form>
-          )}
-
-          {/* Bottom Switcher Card */}
-          <div className="mt-8 border-t border-gray-100 pt-8 text-center">
-            <div className="mx-auto mb-3 grid size-16 place-items-center rounded-full bg-gray-100/80 text-gray-300">
-              <User size={32} strokeWidth={1.5} />
-            </div>
-            {!isRegister ? (
-              <>
-                <p className="text-base font-bold text-gray-900">No account yet?</p>
-                <button
-                  type="button"
-                  onClick={() => setIsRegister(true)}
-                  className="mt-2 inline-block text-xs font-bold text-gray-900 underline underline-offset-4 transition-colors hover:text-primary"
-                >
-                  Create An Account
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="text-base font-bold text-gray-900">Already have an account?</p>
-                <button
-                  type="button"
-                  onClick={() => setIsRegister(false)}
-                  className="mt-2 inline-block text-xs font-bold text-gray-900 underline underline-offset-4 transition-colors hover:text-primary"
-                >
-                  Sign In
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>,
-    document.body
-  );
-}
-
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { count, subtotal } = useCart();
   const scrolled = useScrolled(20);
@@ -374,16 +201,6 @@ export function Header() {
           >
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
               <Search size={16} />
-            </span>
-          </button>
-          <button
-            type="button"
-            aria-label="Login / Register"
-            onClick={() => setAuthOpen(true)}
-            className="group hidden items-center justify-center md:flex"
-          >
-            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
-              <User size={16} />
             </span>
           </button>
           <Link to="/cart" className="group flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary">
@@ -450,18 +267,6 @@ export function Header() {
                 <Search size={18} />
                 Search
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  setAuthOpen(true);
-                }}
-                className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
-                style={{ animationDelay: "320ms" }}
-              >
-                <User size={18} />
-                Login / Register
-              </button>
               <Link
                 to="/cart"
                 onClick={() => setOpen(false)}
@@ -481,9 +286,6 @@ export function Header() {
         </div>,
         document.body
       )}
-
-      {/* Auth Side Drawer Popup */}
-      <AuthDrawer open={authOpen} onClose={() => setAuthOpen(false)} />
 
       {/* Search Modal */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />

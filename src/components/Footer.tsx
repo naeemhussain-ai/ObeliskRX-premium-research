@@ -43,7 +43,7 @@ export function Notice() {
           </p>
           <p>
             The purchaser expressly represents and warrants to ObeliskRX that they will test, use,
-            manufacture, and market any products purchased — and any materials produced using them —
+            manufacture, and market any products purchased   and any materials produced using them  
             in accordance with the practices of a reasonably prudent person experienced in the
             field, and in strict compliance with all applicable laws and regulations, now in effect
             or hereinafter enacted.
