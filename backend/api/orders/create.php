@@ -106,6 +106,13 @@ try {
 
     $db->commit();
 
+    // Admin ko email bhejo — naya order
+    try {
+        require_once __DIR__ . '/../../helpers/email.php';
+        $newOrder = $db->query("SELECT * FROM orders WHERE id = $orderId")->fetch();
+        sendNewOrderEmail($newOrder);
+    } catch (\Exception $e) {}
+
     success([
         'order_id'     => $orderId,
         'order_number' => $orderNumber,

@@ -44,11 +44,13 @@ $update = $db->prepare("
 ");
 $update->execute([$action, $action === 'rejected' ? $reason : null, $orderId]);
 
-// Email notification (email.php ready hone ke baad uncomment karo)
-// require_once __DIR__ . '/../helpers/email.php';
-// $updatedOrder = $db->query("SELECT * FROM orders WHERE id = $orderId")->fetch();
-// if ($action === 'approved') sendOrderApprovedEmail($updatedOrder);
-// if ($action === 'rejected') sendOrderRejectedEmail($updatedOrder);
+// Customer ko email bhejo
+try {
+    require_once __DIR__ . '/../helpers/email.php';
+    $updatedOrder = $db->query("SELECT * FROM orders WHERE id = $orderId")->fetch();
+    if ($action === 'shipped')  sendOrderShippedEmail($updatedOrder);
+    if ($action === 'rejected') sendOrderCancelledEmail($updatedOrder);
+} catch (\Exception $e) {}
 
 header("Location: order-detail.php?id=$orderId&success=$action");
 exit();

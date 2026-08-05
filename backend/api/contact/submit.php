@@ -37,8 +37,15 @@ $stmt = $db->prepare("
 ");
 $stmt->execute([$name, $email, $subject ?: null, $message]);
 
-// Send notification to owner (email.php ready hone ke baad uncomment karo)
-// require_once __DIR__ . '/../../helpers/email.php';
-// sendContactNotificationEmail([...]);
+// Admin ko email bhejo
+try {
+    require_once __DIR__ . '/../../helpers/email.php';
+    sendContactNotificationEmail([
+        'name'    => $name,
+        'email'   => $email,
+        'subject' => $subject,
+        'message' => $message,
+    ]);
+} catch (\Exception $e) {}
 
 success([], 'Your message has been sent! We will get back to you within 1-2 business days.');
