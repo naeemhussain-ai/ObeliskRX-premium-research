@@ -3,7 +3,7 @@ import { Clock, Mail, CheckCircle2 } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Link } from "@/lib/router";
 
-const API = "http://localhost/obeliskrx/api";
+const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 
 const inputClass =
   "w-full rounded-full border border-border bg-card px-5 py-3.5 text-sm outline-none placeholder:text-muted-foreground focus:border-primary transition-all duration-300 focus:shadow-[0_0_0_4px_rgba(var(--primary),0.1)]";

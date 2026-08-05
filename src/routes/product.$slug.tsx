@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/useToast";
 import { useStaggerAnimation, useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { formatPrice, getProduct, priceLabel, products, type Product } from "@/lib/products";
 
-const API = "http://localhost/obeliskrx/api";
+const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 
 type Review = {
   name: string;

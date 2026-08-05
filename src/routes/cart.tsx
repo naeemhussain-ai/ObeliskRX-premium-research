@@ -5,7 +5,7 @@ import { useCart } from "@/lib/cart";
 import { Link } from "@/lib/router";
 import { formatPrice, products } from "@/lib/products";
 
-const API = "http://localhost/obeliskrx/api";
+const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 
 type Step = "cart" | "checkout" | "success";
 
