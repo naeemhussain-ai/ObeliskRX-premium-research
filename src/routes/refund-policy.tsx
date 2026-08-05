@@ -1,11 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, ShieldAlert, XCircle } from "lucide-react";
+import { Link } from "@/lib/router";
 
-export const Route = createFileRoute("/refund-policy")({
-  component: RefundPolicyPage,
-});
-
-function RefundPolicyPage() {
+export function RefundPolicyPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Page Hero Header */}

@@ -1,4 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown, Play } from "lucide-react";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
@@ -15,21 +14,6 @@ import tm6 from "@/assets/about-pic/c2-tm-p-6-opt.png";
 import tm7 from "@/assets/about-pic/c2-tm-p-7-opt.png";
 import tm8 from "@/assets/about-pic/c2-tm-p-8-opt.png";
 import tm9 from "@/assets/about-pic/c2-tm-p-9-opt.png";
-
-// TanStack Router file-based routing requirement
-export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About Us   ObeliskRX" },
-      {
-        name: "description",
-        content:
-          "Welcome to ObeliskRX, a research-use-only peptide supplier built on a single standard: documentation before distribution.",
-      },
-    ],
-  }),
-  component: AboutPage,
-});
 
 const teamMembers = [
   { id: 1, img: tm1, name: "Team Member 1" },
@@ -52,7 +36,7 @@ const aboutParagraphs = [
   "ObeliskRX is a research-use-only supplier. Our products are intended for laboratory and research applications only, not for human or animal consumption.",
 ];
 
-function AboutPage() {
+export function AboutPage() {
   const [expanded, setExpanded] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   

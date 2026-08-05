@@ -1,11 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
-
-export const Route = createFileRoute("/faq")({
-  component: FaqPage,
-});
+import { Link } from "@/lib/router";
 
 const sections = [
   {
@@ -98,7 +94,7 @@ function AccordionItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-function FaqPage() {
+export function FaqPage() {
   const [contentRef, contentVisible] = useStaggerAnimation<HTMLDivElement>();
 
   return (

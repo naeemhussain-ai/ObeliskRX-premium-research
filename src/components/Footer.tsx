@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Music2 } from "lucide-react";
+import { Link } from "@/lib/router";
 import logo02 from "../assets/products/Obelisk-Logo-Design-02.png";
 
 const bullets = [

@@ -1,0 +1,7 @@
+Options -Indexes
+
+# partials/ folder direct access band karo
+<FilesMatch "^(sidebar|header|footer)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

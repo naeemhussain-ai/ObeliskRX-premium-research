@@ -1,22 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, ExternalLink, FlaskConical } from "lucide-react";
-
-export const Route = createFileRoute("/research-articles")({
-  head: () => ({
-    meta: [
-      { title: "Peptide Research Reference Library   ObeliskRX" },
-      {
-        name: "description",
-        content:
-          "A standalone bibliography of published research on peptides and related compounds. Every reference includes a direct, working link to PubMed, PMC, or the publishing journal.",
-      },
-      { property: "og:title", content: "Peptide Research Reference Library   ObeliskRX" },
-      { property: "og:url", content: "/research-articles" },
-    ],
-    links: [{ rel: "canonical", href: "/research-articles" }],
-  }),
-  component: ResearchArticles,
-});
+import { Link } from "@/lib/router";
 
 type Reference = {
   n: number;
@@ -198,7 +181,7 @@ const sections: Section[] = [
   },
 ];
 
-function ResearchArticles() {
+export function ResearchArticlesPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Header */}

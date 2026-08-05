@@ -1,8 +1,8 @@
-import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Heart, Search, ShoppingCart, X, Check } from "lucide-react";
 import logo from "@/assets/Obelisk-Logo-Design-02-1024x154.png";
 import { useCart } from "@/lib/cart";
+import { Link } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
 import { formatPrice, priceLabel, type Product } from "@/lib/products";
 

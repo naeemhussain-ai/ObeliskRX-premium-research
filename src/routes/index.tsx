@@ -1,4 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   ArrowRight,
@@ -10,6 +9,7 @@ import {
   Truck,
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
+import { Link } from "@/lib/router";
 import { products } from "@/lib/products";
 import vaccineImg from "@/assets/products/vacine.jpg";
 import heroVideo from "@/assets/products/video Herosection.mp4";
@@ -28,27 +28,6 @@ function HeroVideoBackground() {
     </div>
   );
 }
-
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "ObeliskRX   Premium Research Peptides You Can Trust" },
-      {
-        name: "description",
-        content:
-          "Premium research peptides independently tested and verified to 99%+ purity. Fast USA shipping, COA on every batch. Research use only.",
-      },
-      { property: "og:title", content: "ObeliskRX   Premium Research Peptides" },
-      {
-        property: "og:description",
-        content: "Independently tested peptides verified to 99%+ purity. Research use only.",
-      },
-      { property: "og:url", content: "/" },
-    ],
-    links: [{ rel: "canonical", href: "/" }],
-  }),
-  component: Home,
-});
 
 const trustCards = [
   { icon: ShieldCheck, title: "99%+ Purity", sub: "Lab Verified" },
@@ -84,7 +63,7 @@ const features = [
   },
 ];
 
-function Home() {
+export function HomePage() {
   const [filterCategory, setFilterCategory] = useState("All");
   const [filterPrice, setFilterPrice] = useState("All");
 
@@ -107,18 +86,18 @@ function Home() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="container-page pt-6">
-        <div className="relative min-h-[500px] overflow-hidden rounded-lg">
+      <section className="relative w-full h-screen overflow-hidden">
+        <div className="relative h-full w-full">
           {/* HERO YOUTUBE BACKGROUND VIDEO */}
           <HeroVideoBackground />
           {/* SLATE GRAY OVERLAY RGB(94, 113, 128) */}
           <div className="absolute inset-0 bg-[rgb(94,113,128)]/30 backdrop-blur-[1px]" />
           <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30" />
 
-          <div className="relative flex min-h-[500px] flex-col items-center justify-center px-4 py-16 text-center">
+          <div className="relative flex h-full flex-col items-center justify-center px-4 py-16 text-center">
             <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl lg:text-6xl tracking-tight">
-              Premium Peptides
-              <span className="mt-1 block text-primary">You Can Trust</span>
+             Premium research compounds 
+              <span className="mt-1 block text-primary">Synthesized with precision</span>
             </h1>
             <p className="mt-5 max-w-2xl text-sm font-medium text-gray-800 sm:text-base leading-relaxed">
               The highest quality peptides, backed by science. Every batch is independently tested

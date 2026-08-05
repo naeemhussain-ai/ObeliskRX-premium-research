@@ -1,11 +1,10 @@
-import { Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import { Logo } from "./ProductCard";
 import { useCart } from "@/lib/cart";
 import { formatPrice, products } from "@/lib/products";
-import { useScrolled } from "@/hooks/useScrolled";
+import { Link } from "@/lib/router";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -148,8 +147,6 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { count, subtotal } = useCart();
-  const scrolled = useScrolled(20);
-
   // Cart badge bounce animation
   const [badgeBounce, setBadgeBounce] = useState(false);
   const prevCount = useRef(count);
@@ -163,13 +160,7 @@ export function Header() {
   }, [count]);
 
   return (
-    <header
-      className={`sticky top-0 z-50 border-b border-border backdrop-blur transition-all duration-300 ${
-        scrolled
-          ? "header-scrolled"
-          : "bg-background/95"
-      }`}
-    >
+    <header className="sticky top-0 z-50 border-b border-border bg-white shadow-sm">
       <div className="container-page grid h-[70px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:grid-cols-3">
         <Link to="/" className="flex min-w-0 items-center">
           <Logo className="h-10 sm:h-12" />

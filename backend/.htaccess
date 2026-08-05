@@ -1,0 +1,17 @@
+Options -Indexes
+RewriteEngine On
+
+# Config files direct access band karo
+<FilesMatch "\.(sql|md|json|lock)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Admin assets allow karo
+RewriteCond %{REQUEST_URI} ^/admin/assets/
+RewriteRule ^ - [L]
+
+# Sirf api/ aur admin/ allow karo
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} !^/admin/
+RewriteRule ^ - [F]
