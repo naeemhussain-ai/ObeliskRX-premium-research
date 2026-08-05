@@ -47,9 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="login-page">
     <div class="login-card">
         <div class="login-logo">
+            <img src="assets/logo.png" alt="ObeliskRX" onerror="this.style.display='none'">
             <h1>ObeliskRX</h1>
             <p>Admin Panel</p>
         </div>
+        <div class="login-divider"></div>
 
         <?php if ($error): ?>
             <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
@@ -62,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     type="email"
                     id="email"
                     name="email"
+                    class="form-control"
                     value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
                     required
                     autofocus
@@ -74,11 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     type="password"
                     id="password"
                     name="password"
+                    class="form-control"
                     required
                     placeholder="••••••••"
                 >
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Login</button>
         </form>
     </div>
 </body>

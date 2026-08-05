@@ -1,9 +1,12 @@
 <?php
 $allowedOrigins = [
-    'http://obeliskrx.test',           // Laragon local
-    'http://localhost:5173',            // Vite dev server
-    'http://localhost:3000',            // alt dev port
-    'https://staging.yourdomain.com',   // staging (baad mein update karo)
+    'http://obeliskrx.test',             // Laragon local
+    'http://localhost:5173',             // Vite dev server
+    'http://localhost:3000',             // alt dev port
+    'http://axistechstaging.com',        // staging http
+    'https://axistechstaging.com',       // staging https
+    'http://www.axistechstaging.com',    // staging www http
+    'https://www.axistechstaging.com',   // staging www https
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

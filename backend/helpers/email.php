@@ -18,6 +18,7 @@ function makeMailer(): PHPMailer {
     $mail->Password   = SMTP_PASS;
     $mail->SMTPSecure = SMTP_SECURE === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = SMTP_PORT;
+    $mail->Timeout    = 5;
     $mail->CharSet    = 'UTF-8';
     $mail->setFrom(FROM_EMAIL, FROM_NAME);
     $mail->isHTML(true);

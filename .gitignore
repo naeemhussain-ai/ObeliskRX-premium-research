@@ -30,3 +30,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# PHP / Backend
+backend/vendor/
+backend/composer.phar
+backend/config/local.php
+
+# Deploy temp files
+*.zip
+fix-permissions.php
+test-api.php
+backend-plan/
+.claude/
+
+# Screenshots
+image copy*.png

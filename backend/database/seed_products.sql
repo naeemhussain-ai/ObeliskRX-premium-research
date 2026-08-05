@@ -1,9 +1,7 @@
 -- ================================================
 --  ObeliskRX   Product Seed Data (16 products)
---  schema.sql ke BAAD import karo
+--  schema_cpanel.sql ke BAAD import karo
 -- ================================================
-
-USE obeliskrx_db;
 
 INSERT INTO products (slug, name, series, description, price, price_max, old_price, discount, sizes, specs, image_url) VALUES
 
