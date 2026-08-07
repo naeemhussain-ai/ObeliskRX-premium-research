@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { ToastContainer } from "@/components/Toast";
 import { ToastProvider } from "@/hooks/useToast";
 import { CartProvider } from "@/lib/cart";
+import { AuthProvider } from "@/lib/auth";
 import { RouteStateProvider, matchPath, useCurrentPath } from "@/lib/router";
 import { AboutPage } from "@/routes/about";
 import { CartPage } from "@/routes/cart";
@@ -12,6 +13,8 @@ import { CatalogPage } from "@/routes/catalog";
 import { ContactPage } from "@/routes/contact";
 import { FaqPage } from "@/routes/faq";
 import { HomePage } from "@/routes/index";
+import { LoginPage } from "@/routes/login";
+import { AccountPage } from "@/routes/account";
 import { ProductDetailPage } from "@/routes/product.$slug";
 import { RefundPolicyPage } from "@/routes/refund-policy";
 import { ResearchArticlesPage } from "@/routes/research-articles";
@@ -32,6 +35,8 @@ const routes: RouteDefinition[] = [
   { path: "/refund-policy", title: "ObeliskRX | Refund Policy", component: RefundPolicyPage },
   { path: "/research-articles", title: "ObeliskRX | Research Articles", component: ResearchArticlesPage },
   { path: "/cart", title: "ObeliskRX | Shopping Cart", component: CartPage },
+  { path: "/login", title: "ObeliskRX | Sign In", component: LoginPage },
+  { path: "/account", title: "ObeliskRX | My Account", component: AccountPage },
   { path: "/product/$slug", title: "ObeliskRX | Product Detail", component: ProductDetailPage },
 ];
 
@@ -69,6 +74,7 @@ function DocumentTitle({ title }: { title: string }) {
 
 export default function App() {
   return (
+    <AuthProvider>
     <CartProvider>
       <ToastProvider>
         <div className="flex min-h-screen flex-col bg-surface">
@@ -82,5 +88,6 @@ export default function App() {
         </div>
       </ToastProvider>
     </CartProvider>
+    </AuthProvider>
   );
 }

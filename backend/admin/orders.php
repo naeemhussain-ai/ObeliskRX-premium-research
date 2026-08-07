@@ -74,7 +74,12 @@ $pendingCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE status = 'app
                         <td><strong><?= htmlspecialchars($order['order_number']) ?></strong></td>
                         <td>
                             <?= htmlspecialchars($order['first_name'] . ' ' . $order['last_name']) ?><br>
-                            <small class="text-muted"><?= htmlspecialchars($order['email']) ?></small>
+                            <small class="text-muted"><?= htmlspecialchars($order['email']) ?></small><br>
+                            <?php if (!empty($order['customer_id'])): ?>
+                                <span class="badge badge-blue" style="font-size:10px">Registered</span>
+                            <?php else: ?>
+                                <span class="badge badge-gray" style="font-size:10px">Guest</span>
+                            <?php endif; ?>
                         </td>
                         <td><?= count($items) ?> item(s)</td>
                         <td><strong>$<?= number_format($order['total'], 2) ?></strong></td>

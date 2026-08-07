@@ -206,18 +206,18 @@ export function ProductCard({ product, compact = false }: { product: Product; co
             </Link>
           </div>
         </div>
-        <div className={`transition-colors duration-300 group-hover:bg-gray-50/50 ${compact ? "p-3" : "p-4"}`}>
+        <div className={`bg-[#1B3A5C] transition-colors duration-300 group-hover:bg-[#163251] ${compact ? "p-3" : "p-4"}`}>
           <Link
             to="/product/$slug"
             params={{ slug: product.slug }}
-            className="text-sm font-semibold text-foreground hover:text-primary"
+            className="text-sm font-semibold text-white hover:text-primary"
           >
             {product.name}
           </Link>
-          <p className="mt-1 text-xs text-muted-foreground">{product.series}</p>
-          <p className="mt-2 text-sm font-bold text-foreground">
+          <p className="mt-1 text-xs text-white/60">{product.series}</p>
+          <p className="mt-2 text-sm font-bold text-white">
             {product.oldPrice && (
-              <span className="mr-2 text-xs font-normal text-muted-foreground line-through">
+              <span className="mr-2 text-xs font-normal text-white/50 line-through">
                 {formatPrice(product.oldPrice)}
               </span>
             )}

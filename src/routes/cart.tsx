@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { Minus, Plus, X, Package, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Minus, Plus, X, Package, CheckCircle2, LogIn, UserPlus, UserCheck } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/lib/cart";
-import { Link } from "@/lib/router";
+import { useAuth } from "@/lib/auth";
+import { Link, navigateTo } from "@/lib/router";
 import { formatPrice, products } from "@/lib/products";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 
-type Step = "cart" | "checkout" | "success";
+type Step = "cart" | "auth" | "checkout" | "success";
 
 type CheckoutForm = {
   first_name: string;
@@ -39,6 +40,7 @@ const EMPTY: CheckoutForm = {
 
 export function CartPage() {
   const { items, remove, setQty, subtotal, clear } = useCart();
+  const { customer, isLoggedIn, token } = useAuth();
   const [coupon, setCoupon] = useState("");
   const [step, setStep] = useState<Step>("cart");
   const [form, setForm] = useState<CheckoutForm>(EMPTY);
@@ -46,6 +48,36 @@ export function CartPage() {
   const [error, setError] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
   const suggestions = products.slice(0, 5);
+
+  // Jab checkout step pe aao aur logged in ho, profile se form pre-fill karo
+  useEffect(() => {
+    if (step !== "checkout" || !isLoggedIn || !token) return;
+
+    fetch(`${API}/auth/me.php`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.success) return;
+        const p = data.data.customer;
+        const [firstName = "", ...rest] = (p.name ?? "").trim().split(" ");
+        const lastName = rest.join(" ");
+        setForm((prev) => ({
+          ...prev,
+          first_name:    firstName,
+          last_name:     lastName,
+          email:         p.email         ?? prev.email,
+          phone:         p.phone         ?? prev.phone,
+          address_line1: p.address_line1 ?? prev.address_line1,
+          address_line2: p.address_line2 ?? prev.address_line2,
+          city:          p.city          ?? prev.city,
+          state:         p.state         ?? prev.state,
+          zip:           p.zip           ?? prev.zip,
+          country:       p.country       ?? prev.country,
+        }));
+      })
+      .catch(() => {});
+  }, [step, isLoggedIn, token]);
 
   const handleField = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -56,9 +88,12 @@ export function CartPage() {
     setSubmitting(true);
     setError("");
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
       const res = await fetch(`${API}/orders/create.php`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           ...form,
           items: items.map((i) => ({
@@ -113,6 +148,107 @@ export function CartPage() {
           >
             Continue Shopping
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Auth Choice Step ─────────────────────────────────
+  if (step === "auth") {
+    return (
+      <div className="container-page py-8">
+        <nav className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <button type="button" onClick={() => setStep("cart")} className="hover:text-primary transition-colors">
+            Shopping cart
+          </button>
+          <span>→</span>
+          <span className="font-semibold text-foreground underline underline-offset-8">Checkout</span>
+          <span>→</span>
+          <span>Order complete</span>
+        </nav>
+
+        <div className="mt-10 mx-auto max-w-2xl">
+          <h2 className="mb-6 text-xl font-bold text-center">How would you like to continue?</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Sign in / Account option */}
+            <div className="rounded-2xl border-2 border-[#1B3A5C]/30 bg-card p-6 flex flex-col gap-4 shadow-sm hover:border-[#1B3A5C] transition-colors">
+              <div className="grid size-11 place-items-center rounded-full bg-[#1B3A5C]/10 text-[#1B3A5C]">
+                {isLoggedIn ? <UserCheck size={22} /> : <LogIn size={22} />}
+              </div>
+              {isLoggedIn ? (
+                <>
+                  <div>
+                    <p className="font-bold text-base">Continue as {customer?.name}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{customer?.email}</p>
+                  </div>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>✓ Order linked to your account</li>
+                    <li>✓ Track status in My Account</li>
+                    <li>✓ View full order history</li>
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={() => setStep("checkout")}
+                    className="mt-auto w-full rounded-full bg-[#1B3A5C] py-3 text-sm font-bold text-white shadow transition-all hover:bg-[#163251]"
+                  >
+                    Continue to Checkout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <p className="font-bold text-base">Sign in / Create Account</p>
+                    <p className="text-xs text-muted-foreground mt-1">Track your orders &amp; save history</p>
+                  </div>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>✓ View past &amp; upcoming orders</li>
+                    <li>✓ Save your wishlist</li>
+                    <li>✓ Faster future checkouts</li>
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={() => navigateTo("/login")}
+                    className="mt-auto w-full rounded-full bg-[#1B3A5C] py-3 text-sm font-bold text-white shadow transition-all hover:bg-[#163251]"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <LogIn size={15} /> Sign In / Register
+                    </span>
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Guest option */}
+            <div className="rounded-2xl border-2 border-border bg-card p-6 flex flex-col gap-4 shadow-sm hover:border-gray-400 transition-colors">
+              <div className="grid size-11 place-items-center rounded-full bg-gray-100 text-gray-500">
+                <UserPlus size={22} />
+              </div>
+              <div>
+                <p className="font-bold text-base">Continue as Guest</p>
+                <p className="text-xs text-muted-foreground mt-1">No account needed</p>
+              </div>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li>✓ Quick &amp; easy checkout</li>
+                <li>✓ No registration required</li>
+                <li className="text-gray-400">✗ Can't track order in account</li>
+              </ul>
+              <button
+                type="button"
+                onClick={() => setStep("checkout")}
+                className="mt-auto w-full rounded-full border-2 border-border py-3 text-sm font-bold text-foreground transition-all hover:border-gray-400"
+              >
+                Continue as Guest
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setStep("cart")}
+            className="mt-6 w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            ← Back to cart
+          </button>
         </div>
       </div>
     );
@@ -352,7 +488,7 @@ export function CartPage() {
           </div>
           <button
             type="button"
-            onClick={() => items.length > 0 && setStep("checkout")}
+            onClick={() => items.length > 0 && setStep(isLoggedIn ? "checkout" : "auth")}
             disabled={items.length === 0}
             className="mt-6 w-full rounded-full bg-primary py-4 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >

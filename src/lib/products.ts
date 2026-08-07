@@ -1,18 +1,19 @@
-import p2t from "@/assets/products/2T-Peptide-20mg-Metabolic $130.00.jpg";
-import p3r from "@/assets/products/3R-Peptide-10mg-Metabolic $70.00 - $130.00 (2).jpg";
-import bpc from "@/assets/products/BPC-157-10mg-Recovery $99.00.jpg";
-import cjc from "@/assets/products/CJC-1295NO-DAC-5mg-Growth $49.99.jpg";
-import epi from "@/assets/products/Epithalon-50mg-Longevity $149.99.jpg";
-import ghk from "@/assets/products/GHK-Cu-50mg-Longevity $49.99.jpg";
-import igf from "@/assets/products/IGF-LR3-1mg-Metabolic $69.00.jpg";
-import ipa from "@/assets/products/Ipamorelin-5mg-Metabolic $56.00.jpg";
-import klow from "@/assets/products/KLOW Blends-80mg-Signature blends $100.99.jpg";
-import mots from "@/assets/products/MOTSC-20mg-Growth $80.99.jpg";
-import nad from "@/assets/products/NAD-500mg-longevity $69.99 - $100.00.jpg";
-import selank from "@/assets/products/Selank-10mg-Neuro $29.99 - $59.99.jpg";
-import semax from "@/assets/products/Semax-10mg-Neuro $29.99.jpg";
-import tb500 from "@/assets/products/TB-500-10mg-Recovery $49.99.jpg";
-import tesa from "@/assets/products/Tesamorelin-10mg-Growth $69.99.jpg";
+import p2t from "@/assets/products/2T-Peptide-20mg.jpg";
+import p3r from "@/assets/products/3R-Peptide-10mg.jpg";
+import bpc from "@/assets/products/BPC-157-10mg.jpg";
+import bpctb from "@/assets/products/BPC-157-TB500-10mg.jpg";
+import cjc from "@/assets/products/CJC-1295-NO-DAC-5mg.jpg";
+import epi from "@/assets/products/Epithalon-50mg.jpg";
+import ghk from "@/assets/products/GHK-Cu-50mg.jpg";
+import igf from "@/assets/products/IGF-LR3-1mg.jpg";
+import ipa from "@/assets/products/Ipamorelin-5mg.jpg";
+import klow from "@/assets/products/KLOW-80mg.jpg";
+import mots from "@/assets/products/MOTSC-20mg.jpg";
+import nad from "@/assets/products/NAD-500mg.jpg";
+import selank from "@/assets/products/Selank-10mg.jpg";
+import semax from "@/assets/products/Semax-10mg.jpg";
+import tb500 from "@/assets/products/TB-500-10mg.jpg";
+import tesa from "@/assets/products/Tesamorelin-10mg.jpg";
 
 export type Product = {
   slug: string;
@@ -267,7 +268,7 @@ export const products: Product[] = [
     slug: "bpc-157-tb-500-blend",
     name: "BPC-157 / TB-500 Blend",
     series: "Recovery Series",
-    image: bpc,
+    image: bpctb,
     price: 129.99,
     oldPrice: 199.99,
     discount: 35,

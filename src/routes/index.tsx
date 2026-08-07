@@ -99,7 +99,7 @@ export function HomePage() {
              Premium research compounds 
               <span className="mt-1 block text-primary">Synthesized with precision</span>
             </h1>
-            <p className="mt-5 max-w-2xl text-sm font-medium text-gray-800 sm:text-base leading-relaxed">
+            <p className="mt-5 max-w-2xl text-sm font-semibold text-white sm:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">
               The highest quality peptides, backed by science. Every batch is independently tested
               and verified to 99%+ purity before it ever reaches you.
             </p>

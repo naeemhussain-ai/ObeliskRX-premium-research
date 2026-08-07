@@ -10,7 +10,11 @@ $allowedOrigins = [
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowedOrigins)) {
+
+// Allow any localhost port for local development
+$isLocalhost = preg_match('/^https?:\/\/localhost(:\d+)?$/', $origin);
+
+if ($isLocalhost || in_array($origin, $allowedOrigins)) {
     header("Access-Control-Allow-Origin: $origin");
 }
 

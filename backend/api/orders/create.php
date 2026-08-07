@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../config/cors.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../helpers/response.php';
 require_once __DIR__ . '/../../helpers/validator.php';
+require_once __DIR__ . '/../../helpers/customer_auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') error('Method not allowed', 405);
 
@@ -31,6 +32,9 @@ foreach ($body['items'] as $item) {
 
 $db = getDB();
 
+// ── Optionally link logged-in customer ──────────────
+$customerId = getCustomerIdFromRequest($db);
+
 // ── Generate unique order number ────────────────────
 do {
     $orderNumber = generateOrderNumber();
@@ -44,17 +48,18 @@ try {
 
     $stmt = $db->prepare("
         INSERT INTO orders (
-            order_number, first_name, last_name, email, phone,
+            customer_id, order_number, first_name, last_name, email, phone,
             address_line1, address_line2, city, state, zip, country,
             special_notes, items, subtotal, shipping_fee, total, payment_method, status
         ) VALUES (
-            :order_number, :first_name, :last_name, :email, :phone,
+            :customer_id, :order_number, :first_name, :last_name, :email, :phone,
             :address_line1, :address_line2, :city, :state, :zip, :country,
             :special_notes, :items, :subtotal, :shipping_fee, :total, :payment_method, 'approved'
         )
     ");
 
     $stmt->execute([
+        ':customer_id'   => $customerId,
         ':order_number'  => $orderNumber,
         ':first_name'    => sanitizeString($body['first_name']),
         ':last_name'     => sanitizeString($body['last_name']),
@@ -105,6 +110,32 @@ try {
     }
 
     $db->commit();
+
+    // Logged-in customer ka address save karo
+    if ($customerId) {
+        try {
+            $db->prepare("
+                UPDATE customers SET
+                    phone         = ?,
+                    address_line1 = ?,
+                    address_line2 = ?,
+                    city          = ?,
+                    state         = ?,
+                    zip           = ?,
+                    country       = ?
+                WHERE id = ?
+            ")->execute([
+                sanitizeString($body['phone'] ?? ''),
+                sanitizeString($body['address_line1']),
+                sanitizeString($body['address_line2'] ?? ''),
+                sanitizeString($body['city']),
+                sanitizeString($body['state']),
+                sanitizeString($body['zip']),
+                sanitizeString($body['country']),
+                $customerId,
+            ]);
+        } catch (\Exception $e) {}
+    }
 
     // Admin ko email bhejo — naya order
     try {

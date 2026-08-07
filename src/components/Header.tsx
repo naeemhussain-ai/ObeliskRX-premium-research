@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Menu, Search, ShoppingCart, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { Logo } from "./ProductCard";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 import { formatPrice, products } from "@/lib/products";
 import { Link } from "@/lib/router";
 
@@ -147,6 +148,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { count, subtotal } = useCart();
+  const { isLoggedIn, customer } = useAuth();
   // Cart badge bounce animation
   const [badgeBounce, setBadgeBounce] = useState(false);
   const prevCount = useRef(count);
@@ -184,6 +186,27 @@ export function Header() {
         </nav>
 
         <div className="flex items-center justify-end gap-3">
+          {/* Account icon */}
+          <Link
+            to={isLoggedIn ? "/account" : "/login"}
+            className="group hidden items-center justify-center md:flex"
+            aria-label={isLoggedIn ? "My Account" : "Sign In"}
+          >
+            <span
+              title={isLoggedIn ? customer?.name : "Sign In"}
+              className="relative grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-[#1B3A5C] group-hover:text-white group-hover:scale-110"
+            >
+              {isLoggedIn ? (
+                <span className="text-[11px] font-bold">{customer?.name?.[0]?.toUpperCase()}</span>
+              ) : (
+                <User size={16} />
+              )}
+              {isLoggedIn && (
+                <span className="absolute -right-1 -top-1 size-2.5 rounded-full bg-emerald-500 border-2 border-white" />
+              )}
+            </span>
+          </Link>
+
           <button
             type="button"
             aria-label="Search"
@@ -245,6 +268,15 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
+              <Link
+                to={isLoggedIn ? "/account" : "/login"}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
+                style={{ animationDelay: "160ms" }}
+              >
+                <User size={18} />
+                {isLoggedIn ? `My Account (${customer?.name})` : "Sign In / Register"}
+              </Link>
               <div className="my-4 h-px w-full bg-gray-100" />
               <button
                 type="button"
