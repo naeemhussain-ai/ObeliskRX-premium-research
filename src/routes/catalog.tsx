@@ -430,7 +430,7 @@ export function CatalogPage() {
                 <div
                   key={p.slug}
                   className={`animate-on-scroll animate-scale ${gridVisible ? "animate-visible" : ""}`}
-                  style={{ transitionDelay: `${i * 80}ms` }}
+                  style={{ transitionDelay: `${i * 30}ms` }}
                 >
                   <ProductCard product={p} />
                 </div>

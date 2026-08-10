@@ -183,6 +183,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
               src={product.image}
               alt={`${product.name} research peptide vial`}
               loading="lazy"
+              decoding="async"
               className="aspect-square w-full bg-surface object-cover transition-transform duration-500 group-hover:scale-110"
             />
           </Link>

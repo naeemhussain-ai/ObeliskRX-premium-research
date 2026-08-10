@@ -37,6 +37,7 @@ export function navigateTo(path: string, replace = false) {
   const method = replace ? "replaceState" : "pushState";
   const targetPath = path === "/" ? `${appBase || ""}/` : `${appBase}${path}`;
   window.history[method](null, "", targetPath);
+  window.scrollTo({ top: 0, behavior: "instant" });
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 

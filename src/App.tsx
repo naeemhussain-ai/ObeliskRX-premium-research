@@ -43,6 +43,10 @@ const routes: RouteDefinition[] = [
 function RoutedPage() {
   const currentPath = useCurrentPath();
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [currentPath]);
+
   for (const route of routes) {
     const params = matchPath(route.path, currentPath);
     if (!params) continue;

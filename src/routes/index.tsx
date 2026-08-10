@@ -23,6 +23,8 @@ function HeroVideoBackground() {
         loop
         muted
         playsInline
+        preload="auto"
+        poster={vaccineImg}
         className="absolute inset-0 h-full w-full object-cover"
       />
     </div>
