@@ -56,16 +56,16 @@ export function Notice() {
 
 const quickLinks = [
   { label: "Home", to: "/" },
-  { label: "About", to: "/" },
   { label: "Catalogue", to: "/catalog" },
+  { label: "Research Articles", to: "/research-articles" },
   { label: "Contact Us", to: "/contact" },
 ] as const;
 
 const usefulLinks = [
   { label: "FAQ", to: "/faq" },
   { label: "Refund & Returns", to: "/refund-policy" },
-  { label: "Privacy Policy", to: "/" },
-  { label: "Terms of Service", to: "/" },
+  { label: "Privacy Policy", to: "/privacy-policy" },
+  { label: "Terms of Service", to: "/terms" },
 ];
 
 const payments = ["VISA", "stripe", "PayPal", "G Pay", "Apple Pay"];

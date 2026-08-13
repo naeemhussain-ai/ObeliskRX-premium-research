@@ -17,6 +17,8 @@ import { LoginPage } from "@/routes/login";
 import { AccountPage } from "@/routes/account";
 import { ProductDetailPage } from "@/routes/product.$slug";
 import { RefundPolicyPage } from "@/routes/refund-policy";
+import { TermsPage } from "@/routes/terms";
+import { PrivacyPolicyPage } from "@/routes/privacy";
 import { ResearchArticlesPage } from "@/routes/research-articles";
 import { NotFoundPage } from "@/routes/$";
 
@@ -38,6 +40,8 @@ const routes: RouteDefinition[] = [
   { path: "/login", title: "ObeliskRX | Sign In", component: LoginPage },
   { path: "/account", title: "ObeliskRX | My Account", component: AccountPage },
   { path: "/product/$slug", title: "ObeliskRX | Product Detail", component: ProductDetailPage },
+  { path: "/terms", title: "ObeliskRX | Terms of Service", component: TermsPage },
+  { path: "/privacy-policy", title: "ObeliskRX | Privacy Policy", component: PrivacyPolicyPage },
 ];
 
 function RoutedPage() {
