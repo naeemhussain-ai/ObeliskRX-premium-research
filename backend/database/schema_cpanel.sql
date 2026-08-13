@@ -1,5 +1,5 @@
 -- ================================================
---  ObeliskRX Database Schema — cPanel Version
+--  ObeliskRX Database Schema - cPanel Version
 --  CREATE DATABASE/USE lines removed (cPanel handles this)
 -- ================================================
 

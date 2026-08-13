@@ -20,6 +20,7 @@ import { RefundPolicyPage } from "@/routes/refund-policy";
 import { TermsPage } from "@/routes/terms";
 import { PrivacyPolicyPage } from "@/routes/privacy";
 import { ResearchArticlesPage } from "@/routes/research-articles";
+import { CoaPage } from "@/routes/coa";
 import { NotFoundPage } from "@/routes/$";
 
 type RouteDefinition = {
@@ -36,6 +37,7 @@ const routes: RouteDefinition[] = [
   { path: "/faq", title: "ObeliskRX | FAQ", component: FaqPage },
   { path: "/refund-policy", title: "ObeliskRX | Refund Policy", component: RefundPolicyPage },
   { path: "/research-articles", title: "ObeliskRX | Research Articles", component: ResearchArticlesPage },
+  { path: "/coa", title: "ObeliskRX | Certificate of Analysis", component: CoaPage },
   { path: "/cart", title: "ObeliskRX | Shopping Cart", component: CartPage },
   { path: "/login", title: "ObeliskRX | Sign In", component: LoginPage },
   { path: "/account", title: "ObeliskRX | My Account", component: AccountPage },

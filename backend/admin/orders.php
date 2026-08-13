@@ -17,7 +17,7 @@ $pendingCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE status = 'app
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders — ObeliskRX Admin</title>
+    <title>Orders - ObeliskRX Admin</title>
     <link rel="stylesheet" href="assets/admin.css">
 </head>
 <body class="admin-layout">
@@ -83,7 +83,7 @@ $pendingCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE status = 'app
                         </td>
                         <td><?= count($items) ?> item(s)</td>
                         <td><strong>$<?= number_format($order['total'], 2) ?></strong></td>
-                        <td><?= htmlspecialchars(ucfirst($order['payment_method'] ?? '—')) ?></td>
+                        <td><?= htmlspecialchars(ucfirst($order['payment_method'] ?? '-')) ?></td>
                         <td><span class="badge <?= $statusClass ?>"><?= ucfirst($order['status']) ?></span></td>
                         <td><?= date('M d, Y', strtotime($order['created_at'])) ?></td>
                         <td>

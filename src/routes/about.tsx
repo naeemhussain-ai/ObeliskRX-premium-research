@@ -1,31 +1,11 @@
 import { useState } from "react";
 import { ChevronDown, Play } from "lucide-react";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
+import { CustomerReviews } from "@/components/CustomerReviews";
 
 // Import images from assets folder
 import vidOpt from "@/assets/about-pic/c2-abus-vid-opt.jpg";
 import membClub from "@/assets/about-pic/c2-abus-memb-club.jpg";
-import tm1 from "@/assets/about-pic/c2-tm-p-1-opt.png";
-import tm2 from "@/assets/about-pic/c2-tm-p-2-opt.png";
-import tm3 from "@/assets/about-pic/c2-tm-p-3-opt.png";
-import tm4 from "@/assets/about-pic/c2-tm-p-4-opt.png";
-import tm5 from "@/assets/about-pic/c2-tm-p-5-opt.png";
-import tm6 from "@/assets/about-pic/c2-tm-p-6-opt.png";
-import tm7 from "@/assets/about-pic/c2-tm-p-7-opt.png";
-import tm8 from "@/assets/about-pic/c2-tm-p-8-opt.png";
-import tm9 from "@/assets/about-pic/c2-tm-p-9-opt.png";
-
-const teamMembers = [
-  { id: 1, img: tm1, name: "Team Member 1" },
-  { id: 2, img: tm2, name: "Team Member 2" },
-  { id: 3, img: tm3, name: "Team Member 3" },
-  { id: 4, img: tm4, name: "Team Member 4" },
-  { id: 5, img: tm5, name: "Team Member 5" },
-  { id: 6, img: tm6, name: "Team Member 6" },
-  { id: 7, img: tm7, name: "Team Member 7" },
-  { id: 8, img: tm8, name: "Team Member 8" },
-  { id: 9, img: tm9, name: "Team Member 9" },
-];
 
 const aboutParagraphs = [
   "Welcome to ObeliskRX, your source for rigorously documented peptides for laboratory and research use. Our mission is simple   give researchers material they can trust, backed by proof, not claims.",
@@ -43,7 +23,7 @@ export function AboutPage() {
   // Animation hooks
   const [heroRef, heroVisible] = useStaggerAnimation<HTMLElement>();
   const [contentRef, contentVisible] = useStaggerAnimation<HTMLElement>();
-  const [teamRef, teamVisible] = useStaggerAnimation<HTMLElement>();
+  const [reviewsRef, reviewsVisible] = useStaggerAnimation<HTMLElement>();
   const [bottomRef, bottomVisible] = useStaggerAnimation<HTMLElement>();
 
   return (
@@ -84,37 +64,12 @@ export function AboutPage() {
         </button>
       </section>
 
-      {/* ===== MEET THE TEAM ===== */}
-      <section 
-        ref={teamRef}
-        className={`container-page pb-16 animate-on-scroll ${teamVisible ? "animate-visible" : ""}`}
+      {/* ===== CUSTOMER REVIEWS ===== */}
+      <section
+        ref={reviewsRef}
+        className={`container-page pb-16 animate-on-scroll animate-scale ${reviewsVisible ? "animate-visible" : ""}`}
       >
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-2 relative inline-block">
-            Meet The Team
-            <span className="absolute -bottom-2 left-1/4 h-1 w-1/2 rounded bg-primary" />
-          </h2>
-          <p className="text-muted-foreground mt-4 text-xs md:text-sm max-w-2xl mx-auto">
-            Each member excels both professionally and personally, contributing their unique talents
-            to create a harmonious and effective work environment.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-          {teamMembers.map((member, i) => (
-            <div 
-              key={member.id} 
-              className="flex-shrink-0 group anim-fade-in-up"
-              style={{ animationDelay: `${i * 100}ms` }}
-            >
-              <img
-                src={member.img}
-                alt={member.name}
-                className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-white shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:shadow-xl group-hover:border-primary"
-              />
-            </div>
-          ))}
-        </div>
+        <CustomerReviews slug="obeliskrx-company" />
       </section>
 
       {/* ===== BOTTOM CARDS ===== */}

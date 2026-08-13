@@ -70,7 +70,7 @@ export function PrivacyPolicyPage() {
         <div className="mx-auto max-w-5xl">
           <div className="flex gap-10 items-start">
 
-            {/* Table of Contents — sticky sidebar */}
+            {/* Table of Contents - sticky sidebar */}
             <aside className="hidden xl:block w-64 shrink-0 sticky top-24">
               <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Contents</p>

@@ -15,8 +15,10 @@ import vaccineImg from "@/assets/products/vacine.jpg";
 import heroVideo from "@/assets/products/video Herosection.mp4";
 
 function HeroVideoBackground() {
+  const [videoReady, setVideoReady] = useState(false);
+
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none bg-[rgb(94,113,128)]">
       <video
         src={heroVideo}
         autoPlay
@@ -24,8 +26,10 @@ function HeroVideoBackground() {
         muted
         playsInline
         preload="auto"
-        poster={vaccineImg}
-        className="absolute inset-0 h-full w-full object-cover"
+        onCanPlay={() => setVideoReady(true)}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+          videoReady ? "opacity-100" : "opacity-0"
+        }`}
       />
     </div>
   );
@@ -282,10 +286,7 @@ export function HomePage() {
                 key={title}
                 className="group relative flex flex-col rounded-2xl border border-gray-200/90 bg-white p-6 text-center shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl"
               >
-                {/* Number badge */}
-                <span className="absolute right-4 top-4 text-[11px] font-bold text-gray-300 transition-colors duration-300 group-hover:text-primary">
-                  0{idx + 1}
-                </span>
+                
 
                 {/* Icon Circle */}
                 <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full border border-gray-200 bg-gray-100/90 text-[rgb(94,113,128)] transition-all duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-[0_0_20px_rgba(233,30,99,0.25)]">

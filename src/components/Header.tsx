@@ -1,18 +1,63 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
+import { ChevronDown, Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { Logo } from "./ProductCard";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { formatPrice, products } from "@/lib/products";
 import { Link } from "@/lib/router";
 
-const nav = [
+type NavLink = { to: string; label: string };
+type NavItem = NavLink | { label: string; children: NavLink[] };
+
+const nav: NavItem[] = [
   { to: "/", label: "Home" },
   { to: "/catalog", label: "Catalog" },
-  { to: "/research-articles", label: "Research Articles" },
+  {
+    label: "Research",
+    children: [
+      { to: "/research-articles", label: "Articles" },
+      { to: "/coa", label: "COA" },
+    ],
+  },
   { to: "/contact", label: "Contact" },
-] as const;
+];
+
+function ResearchDropdown({ label, children }: { label: string; children: NavLink[] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="nav-link-animated flex items-center gap-1 text-sm font-medium text-foreground transition-colors hover:text-primary"
+      >
+        {label}
+        <ChevronDown size={14} className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 min-w-40 overflow-hidden rounded-xl border border-border bg-white py-2 shadow-xl">
+          {children.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/5 hover:text-primary"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
@@ -169,20 +214,24 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center justify-center gap-7 lg:flex">
-          {nav.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              activeOptions={{ exact: item.to === "/" }}
-              activeProps={{
-                className: "text-primary nav-link-animated active",
-              }}
-              inactiveProps={{ className: "text-foreground" }}
-              className="nav-link-animated text-sm font-medium transition-colors hover:text-primary"
-            >
-              {item.label}
-            </Link>
-          ))}
+          {nav.map((item) =>
+            "children" in item ? (
+              <ResearchDropdown key={item.label} label={item.label} children={item.children} />
+            ) : (
+              <Link
+                key={item.to}
+                to={item.to}
+                activeOptions={{ exact: item.to === "/" }}
+                activeProps={{
+                  className: "text-primary nav-link-animated active",
+                }}
+                inactiveProps={{ className: "text-foreground" }}
+                className="nav-link-animated text-sm font-medium transition-colors hover:text-primary"
+              >
+                {item.label}
+              </Link>
+            ),
+          )}
         </nav>
 
         <div className="flex items-center justify-end gap-3">
@@ -255,19 +304,40 @@ export function Header() {
               <X size={22} />
             </button>
             <div className="flex-1 overflow-y-auto">
-              {nav.map((item, i) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setOpen(false)}
-                  activeOptions={{ exact: item.to === "/" }}
-                  activeProps={{ className: "text-primary bg-primary/5" }}
-                  className="block rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
-                  style={{ animationDelay: `${i * 80}ms` }}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {nav.map((item, i) =>
+                "children" in item ? (
+                  <div key={item.label} className="anim-fade-in-up" style={{ animationDelay: `${i * 80}ms` }}>
+                    <span className="block px-4 py-3 text-base font-bold text-gray-800">
+                      {item.label}
+                    </span>
+                    <div className="ml-3 flex flex-col border-l border-gray-100 pl-3">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.to}
+                          to={child.to}
+                          onClick={() => setOpen(false)}
+                          activeProps={{ className: "text-primary bg-primary/5" }}
+                          className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50 hover:text-primary"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setOpen(false)}
+                    activeOptions={{ exact: item.to === "/" }}
+                    activeProps={{ className: "text-primary bg-primary/5" }}
+                    className="block rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
+                    style={{ animationDelay: `${i * 80}ms` }}
+                  >
+                    {item.label}
+                  </Link>
+                ),
+              )}
               <Link
                 to={isLoggedIn ? "/account" : "/login"}
                 onClick={() => setOpen(false)}

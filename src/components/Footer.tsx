@@ -57,7 +57,8 @@ export function Notice() {
 const quickLinks = [
   { label: "Home", to: "/" },
   { label: "Catalogue", to: "/catalog" },
-  { label: "Research Articles", to: "/research-articles" },
+  { label: "Articles", to: "/research-articles" },
+  { label: "COA", to: "/coa" },
   { label: "Contact Us", to: "/contact" },
 ] as const;
 

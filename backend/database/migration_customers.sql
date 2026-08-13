@@ -1,7 +1,7 @@
 -- ================================================
---  ObeliskRX — Customer Accounts Migration
+--  ObeliskRX - Customer Accounts Migration
 --  Run this in phpMyAdmin after main schema.sql
---  (Database pehle se select karo — USE line ki zaroorat nahi)
+--  (Database pehle se select karo - USE line ki zaroorat nahi)
 -- ================================================
 
 -- ── Customers ───────────────────────────────────────
@@ -35,7 +35,7 @@ ALTER TABLE customers
     ADD COLUMN zip           VARCHAR(20)  NULL,
     ADD COLUMN country       VARCHAR(100) NULL DEFAULT 'United States';
 
--- ── Link orders to customers (nullable — guest orders stay NULL) ─
+-- ── Link orders to customers (nullable - guest orders stay NULL) ─
 ALTER TABLE orders
     ADD COLUMN customer_id INT NULL AFTER id,
     ADD INDEX idx_customer_id (customer_id),

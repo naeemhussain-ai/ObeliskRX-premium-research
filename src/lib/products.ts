@@ -32,7 +32,7 @@ export type Product = {
 export const products: Product[] = [
   {
     slug: "2t-peptide",
-    name: "2(T) Peptide",
+    name: "GLP-2 (TR)",
     series: "Metabolic Series",
     image: p2t,
     price: 130,
@@ -50,7 +50,7 @@ export const products: Product[] = [
   },
   {
     slug: "3r-peptide",
-    name: "3(R) Peptide",
+    name: "GLP-3 (RT)",
     series: "Metabolic Series",
     image: p3r,
     price: 70,
@@ -68,7 +68,7 @@ export const products: Product[] = [
   },
   {
     slug: "bpc-157",
-    name: "BPC-157",
+    name: "BPC-157/TB-500 20mg (Wolverine)",
     series: "Recovery Series",
     image: bpc,
     price: 99,
@@ -308,3 +308,10 @@ export const formatPrice = (n: number) =>
 
 export const priceLabel = (p: Product) =>
   p.priceMax ? `${formatPrice(p.price)}   ${formatPrice(p.priceMax)}` : formatPrice(p.price);
+
+export const priceForSize = (p: Product, size: string) => {
+  if (!size || !p.priceMax) return null;
+  const idx = p.sizes.indexOf(size);
+  if (idx === -1) return null;
+  return idx === p.sizes.length - 1 ? p.priceMax : p.price;
+};

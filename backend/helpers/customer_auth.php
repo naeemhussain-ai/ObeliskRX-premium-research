@@ -5,7 +5,7 @@ function generateToken(): string {
 }
 
 function getAuthHeader(): string {
-    // Apache sometimes strips HTTP_AUTHORIZATION — try multiple sources
+    // Apache sometimes strips HTTP_AUTHORIZATION - try multiple sources
     if (!empty($_SERVER['HTTP_AUTHORIZATION']))          return $_SERVER['HTTP_AUTHORIZATION'];
     if (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) return $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
     if (function_exists('getallheaders')) {

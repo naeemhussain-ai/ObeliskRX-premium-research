@@ -149,7 +149,7 @@ export function AccountPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Left column — Orders */}
+        {/* Left column - Orders */}
         <div className="lg:col-span-2 space-y-8">
 
           {/* Upcoming Orders */}
@@ -198,7 +198,7 @@ export function AccountPage() {
           </section>
         </div>
 
-        {/* Right column — Wishlist + Cart */}
+        {/* Right column - Wishlist + Cart */}
         <div className="space-y-6">
 
           {/* Cart Summary */}

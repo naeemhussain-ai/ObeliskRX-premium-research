@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
   });
-  // Synchronous init — always ready on first render
+  // Synchronous init - always ready on first render
   const authReady = true;
 
   const login = useCallback((t: string, c: Customer) => {

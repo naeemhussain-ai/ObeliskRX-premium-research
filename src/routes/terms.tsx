@@ -96,7 +96,7 @@ export function TermsPage() {
         <div className="mx-auto max-w-5xl">
           <div className="flex gap-10 items-start">
 
-            {/* Table of Contents — sticky sidebar */}
+            {/* Table of Contents - sticky sidebar */}
             <aside className="hidden xl:block w-64 shrink-0 sticky top-24">
               <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Contents</p>
@@ -186,7 +186,7 @@ export function TermsPage() {
 
               <Section n={8} title="Intellectual Property">
                 <p>
-                  All material on the Website — including text, graphics, logos, product imagery, page layout, and software — is owned by ObeliskRX or its licensors and is protected by copyright, trademark, and other laws. You may not copy, reproduce, distribute, modify, or create derivative works from any part of it without our prior written consent. "ObeliskRX," the ObeliskRX logo, and our related branding are trademarks of ObeliskRX LLC and may not be used without our written permission.
+                  All material on the Website - including text, graphics, logos, product imagery, page layout, and software - is owned by ObeliskRX or its licensors and is protected by copyright, trademark, and other laws. You may not copy, reproduce, distribute, modify, or create derivative works from any part of it without our prior written consent. "ObeliskRX," the ObeliskRX logo, and our related branding are trademarks of ObeliskRX LLC and may not be used without our written permission.
                 </p>
               </Section>
 
@@ -204,7 +204,7 @@ export function TermsPage() {
                   "Market, label, or represent any ObeliskRX product as fit for human consumption, therapeutic use, or veterinary application.",
                 ]} />
                 <p className="mt-3 font-semibold text-gray-800">
-                  Any breach of this section — and in particular any discussion or practice of human or animal dosing — may result in immediate suspension or closure of your account, cancellation of open orders, and a permanent ban from ObeliskRX, at our sole discretion.
+                  Any breach of this section - and in particular any discussion or practice of human or animal dosing - may result in immediate suspension or closure of your account, cancellation of open orders, and a permanent ban from ObeliskRX, at our sole discretion.
                 </p>
               </Section>
 
@@ -259,7 +259,7 @@ export function TermsPage() {
 
               <LegalSection n={14} title="Limitation of Liability">
                 <p>
-                  TO THE MAXIMUM EXTENT PERMITTED BY LAW, OBELISKRX AND ITS OWNERS, OFFICERS, MEMBERS, EMPLOYEES, AGENTS, AND AFFILIATES WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATING TO YOUR USE OF THE WEBSITE, YOUR PURCHASE OR USE OF PRODUCTS, OR ANY ACTION TAKEN IN RELIANCE ON WEBSITE CONTENT — INCLUDING WITHOUT LIMITATION DAMAGES FOR PERSONAL INJURY, ILLNESS, DEATH, PROPERTY DAMAGE, LOST PROFITS, LOST DATA, OR BUSINESS INTERRUPTION. OUR TOTAL AGGREGATE LIABILITY FOR ALL CLAIMS RELATING TO THESE TERMS WILL NOT EXCEED THE AMOUNT YOU PAID TO OBELISKRX FOR THE SPECIFIC PRODUCT(S) GIVING RISE TO THE CLAIM. THIS LIMITATION APPLIES REGARDLESS OF THE LEGAL THEORY ASSERTED (CONTRACT, TORT, STRICT LIABILITY, OR OTHERWISE) AND EVEN IF OBELISKRX HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+                  TO THE MAXIMUM EXTENT PERMITTED BY LAW, OBELISKRX AND ITS OWNERS, OFFICERS, MEMBERS, EMPLOYEES, AGENTS, AND AFFILIATES WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATING TO YOUR USE OF THE WEBSITE, YOUR PURCHASE OR USE OF PRODUCTS, OR ANY ACTION TAKEN IN RELIANCE ON WEBSITE CONTENT - INCLUDING WITHOUT LIMITATION DAMAGES FOR PERSONAL INJURY, ILLNESS, DEATH, PROPERTY DAMAGE, LOST PROFITS, LOST DATA, OR BUSINESS INTERRUPTION. OUR TOTAL AGGREGATE LIABILITY FOR ALL CLAIMS RELATING TO THESE TERMS WILL NOT EXCEED THE AMOUNT YOU PAID TO OBELISKRX FOR THE SPECIFIC PRODUCT(S) GIVING RISE TO THE CLAIM. THIS LIMITATION APPLIES REGARDLESS OF THE LEGAL THEORY ASSERTED (CONTRACT, TORT, STRICT LIABILITY, OR OTHERWISE) AND EVEN IF OBELISKRX HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
                 </p>
               </LegalSection>
 
@@ -276,10 +276,10 @@ export function TermsPage() {
                 <p className="mt-3">This obligation survives termination of your account and these Terms. We may assume the exclusive defense and control of any matter subject to indemnification, at your expense, and you agree not to settle any such matter without our prior written consent.</p>
               </Section>
 
-              {/* Arbitration — special styling */}
+              {/* Arbitration - special styling */}
               <section id="section-16" className="rounded-2xl border border-amber-200 bg-amber-50/40 p-6 shadow-card sm:p-8">
                 <h2 className="text-lg font-bold text-amber-900 sm:text-xl">16. Dispute Resolution &amp; Arbitration</h2>
-                <p className="mt-2 text-xs font-bold uppercase tracking-wider text-amber-700">Please read this section carefully — it affects your legal rights.</p>
+                <p className="mt-2 text-xs font-bold uppercase tracking-wider text-amber-700">Please read this section carefully - it affects your legal rights.</p>
                 <div className="mt-4 space-y-3 text-sm leading-relaxed text-amber-900/85">
                   <div>
                     <p className="font-semibold text-amber-900">Binding Arbitration:</p>
@@ -331,7 +331,7 @@ export function TermsPage() {
                   <Link to="/privacy-policy" className="font-semibold text-primary underline">Privacy Policy</Link>,
                   any disclaimer, our{" "}
                   <Link to="/refund-policy" className="font-semibold text-primary underline">Returns &amp; Refunds policy</Link>,
-                  and any other policies referenced here, constitute the entire agreement between you and ObeliskRX regarding your use of the Website and your purchase of products, and supersede all prior or contemporaneous communications, whether oral or written. No statement or promise made by any ObeliskRX employee, agent, or representative — through customer support, email, social media, or any other channel — modifies these Terms unless set out in a written amendment signed by an authorized officer of ObeliskRX.
+                  and any other policies referenced here, constitute the entire agreement between you and ObeliskRX regarding your use of the Website and your purchase of products, and supersede all prior or contemporaneous communications, whether oral or written. No statement or promise made by any ObeliskRX employee, agent, or representative - through customer support, email, social media, or any other channel - modifies these Terms unless set out in a written amendment signed by an authorized officer of ObeliskRX.
                 </p>
               </Section>
 
@@ -341,7 +341,7 @@ export function TermsPage() {
                 <BulletList items={[
                   "Operating, securing, improving, and personalizing the Website, products, and services;",
                   "Fulfilling orders, processing payments, providing customer support, and meeting our legal obligations;",
-                  "Sending you transactional, account, service, and — where you have consented — marketing communications about ObeliskRX products and services;",
+                  "Sending you transactional, account, service, and - where you have consented - marketing communications about ObeliskRX products and services;",
                   "Creating aggregated, de-identified, or anonymized data sets, which ObeliskRX owns and may use without restriction;",
                   "Conducting research, analytics, forecasting, segmentation, fraud prevention, and risk-scoring; and",
                   "Transferring or assigning Your Information, along with your rights and obligations under these Terms, to any successor or acquirer in connection with a merger, acquisition, reorganization, sale of assets, financing, or similar transaction.",

@@ -23,7 +23,7 @@ if (!validateEmail($body['email'])) error('Invalid email address.', 422);
 if (empty($body['items']) || !is_array($body['items'])) error('Order must have at least one item.', 422);
 if ((float)$body['total'] <= 0) error('Invalid order total.', 422);
 
-// Validate each item (product_id optional — slug se lookup hoga)
+// Validate each item (product_id optional - slug se lookup hoga)
 foreach ($body['items'] as $item) {
     if (empty($item['product_name']) || empty($item['quantity']) || !isset($item['unit_price'])) {
         error('Invalid item data in order.', 422);
@@ -81,7 +81,7 @@ try {
 
     $orderId = (int)$db->lastInsertId();
 
-    // order_items insert — slug se product_id dhundho
+    // order_items insert - slug se product_id dhundho
     $itemStmt = $db->prepare("
         INSERT INTO order_items (order_id, product_id, product_name, size, quantity, unit_price, subtotal)
         VALUES (:order_id, :product_id, :product_name, :size, :quantity, :unit_price, :subtotal)
@@ -137,7 +137,7 @@ try {
         } catch (\Exception $e) {}
     }
 
-    // Admin ko email bhejo — naya order
+    // Admin ko email bhejo - naya order
     try {
         require_once __DIR__ . '/../../helpers/email.php';
         $newOrder = $db->query("SELECT * FROM orders WHERE id = $orderId")->fetch();

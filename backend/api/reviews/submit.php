@@ -24,7 +24,7 @@ if (strlen(strip_tags($text)) < 10) error('Review must be at least 10 characters
 
 $db = getDB();
 
-// Product lookup — optional, FK removed
+// Product lookup - optional, FK removed
 $prod = $db->prepare("SELECT id FROM products WHERE slug = ? AND is_active = 1");
 $prod->execute([$slug]);
 $product = $prod->fetch();

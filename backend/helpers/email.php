@@ -1,5 +1,5 @@
 <?php
-// helpers/email.php — PHPMailer wrapper
+// helpers/email.php - PHPMailer wrapper
 
 require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -77,10 +77,10 @@ function emailLayout(string $title, string $body): string {
 }
 
 // ────────────────────────────────────────────────────
-// 1. Admin ko — Naya order aaya
+// 1. Admin ko - Naya order aaya
 // ────────────────────────────────────────────────────
 function sendNewOrderEmail(array $order): void {
-    $subject = 'New Order #' . $order['order_number'] . ' — ' . SITE_NAME;
+    $subject = 'New Order #' . $order['order_number'] . ' - ' . SITE_NAME;
     $items   = is_string($order['items']) ? json_decode($order['items'], true) : $order['items'];
 
     $rows = '';
@@ -98,7 +98,7 @@ function sendNewOrderEmail(array $order): void {
     $total    = number_format($order['total'], 2);
     $name     = htmlspecialchars($order['first_name'] . ' ' . $order['last_name']);
     $email    = htmlspecialchars($order['email']);
-    $phone    = htmlspecialchars($order['phone'] ?? '—');
+    $phone    = htmlspecialchars($order['phone'] ?? '-');
     $address  = htmlspecialchars($order['address_line1'] . ', ' . $order['city'] . ', ' . $order['state'] . ' ' . $order['zip'] . ', ' . $order['country']);
     $adminUrl = ADMIN_PATH . '/order-detail.php?id=' . $order['id'];
 
@@ -125,7 +125,7 @@ function sendNewOrderEmail(array $order): void {
 }
 
 // ────────────────────────────────────────────────────
-// 2. Customer ko — Order ship ho gaya
+// 2. Customer ko - Order ship ho gaya
 // ────────────────────────────────────────────────────
 function sendOrderShippedEmail(array $order): void {
     $subject  = 'Your Order #' . $order['order_number'] . ' Has Been Shipped!';
@@ -150,7 +150,7 @@ function sendOrderShippedEmail(array $order): void {
 }
 
 // ────────────────────────────────────────────────────
-// 3. Customer ko — Order cancel ho gaya
+// 3. Customer ko - Order cancel ho gaya
 // ────────────────────────────────────────────────────
 function sendOrderCancelledEmail(array $order): void {
     $subject   = 'Your Order #' . $order['order_number'] . ' Has Been Cancelled';
@@ -175,13 +175,13 @@ function sendOrderCancelledEmail(array $order): void {
 }
 
 // ────────────────────────────────────────────────────
-// 4. Admin ko — Contact form message aaya
+// 4. Admin ko - Contact form message aaya
 // ────────────────────────────────────────────────────
 function sendContactNotificationEmail(array $msg): void {
     $subject     = 'New Contact Message: ' . ($msg['subject'] ?: 'No Subject');
     $senderName  = htmlspecialchars($msg['name']);
     $senderEmail = htmlspecialchars($msg['email']);
-    $msgSubject  = htmlspecialchars($msg['subject'] ?: '—');
+    $msgSubject  = htmlspecialchars($msg['subject'] ?: '-');
     $msgBody     = nl2br(htmlspecialchars($msg['message']));
     $siteName    = SITE_NAME;
 
