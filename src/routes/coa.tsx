@@ -1,19 +1,9 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Search, ShieldCheck } from "lucide-react";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 import { CoaDialog } from "@/components/CoaDialog";
-import { coaData } from "@/lib/coa";
-import { products } from "@/lib/products";
-
-const coaRecords = products
-  .filter((p) => coaData[p.slug])
-  .map((p) => ({
-    slug: p.slug,
-    compound: p.name,
-    purity: coaData[p.slug].purity,
-    tested: coaData[p.slug].tested,
-    images: coaData[p.slug].images,
-  }));
+import { getCoa } from "@/lib/coa";
+import { useProducts } from "@/lib/products";
 
 const testingMethods = [
   {
@@ -34,9 +24,17 @@ const testingMethods = [
 ];
 
 export function CoaPage() {
+  const products = useProducts();
   const [query, setQuery] = useState("");
-  const [openCert, setOpenCert] = useState<{ images: string[]; title: string } | null>(null);
+  const [openCert, setOpenCert] = useState<{ images: string[]; fileTypes?: string[]; title: string } | null>(null);
   const [heroRef, heroVisible] = useStaggerAnimation<HTMLElement>();
+
+  const coaRecords = products
+    .filter((p) => getCoa(p.slug))
+    .map((p) => {
+      const coa = getCoa(p.slug)!;
+      return { slug: p.slug, compound: p.name, purity: coa.purity, tested: coa.tested, images: coa.images, fileTypes: coa.fileTypes };
+    });
   const [tableRef, tableVisible] = useStaggerAnimation<HTMLElement>();
   const [methodsRef, methodsVisible] = useStaggerAnimation<HTMLElement>();
 
@@ -49,7 +47,8 @@ export function CoaPage() {
       {/* ===== HERO ===== */}
       <section
         ref={heroRef}
-        className={`bg-[rgb(94,113,128)] py-16 md:py-20 px-4 animate-on-scroll ${heroVisible ? "animate-visible" : ""}`}
+        className={`relative overflow-hidden py-20 md:py-24 px-4 animate-on-scroll ${heroVisible ? "animate-visible" : ""}`}
+        style={{ background: "linear-gradient(135deg, #0B1F3A 0%, #174A7E 100%)", minHeight: "380px" }}
       >
         <div className="container-page">
           <span className="anim-fade-in-up inline-block rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-white">
@@ -118,13 +117,17 @@ export function CoaPage() {
                     <td className="px-5 py-4 text-muted-foreground">{r.purity}</td>
                     <td className="px-5 py-4 text-muted-foreground">{r.tested}</td>
                     <td className="px-5 py-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => setOpenCert({ images: r.images, title: r.compound })}
-                        className="text-xs font-bold text-primary hover:underline"
-                      >
-                        View COA →
-                      </button>
+                      {r.images.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => setOpenCert({ images: r.images, fileTypes: r.fileTypes, title: r.compound })}
+                          className="text-xs font-bold text-primary hover:underline"
+                        >
+                          View COA →
+                        </button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Pending upload</span>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -173,8 +176,10 @@ export function CoaPage() {
         open={openCert !== null}
         onOpenChange={(open) => !open && setOpenCert(null)}
         images={openCert?.images ?? []}
+        fileTypes={openCert?.fileTypes}
         title={openCert?.title ?? ""}
       />
     </div>
   );
 }
+

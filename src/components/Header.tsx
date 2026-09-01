@@ -1,69 +1,31 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Menu, Search, ShoppingCart, User, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { Logo } from "./ProductCard";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
-import { formatPrice, products } from "@/lib/products";
+import { getProducts } from "@/lib/products";
 import { Link } from "@/lib/router";
+import { useScrolled } from "@/hooks/useScrolled";
+import { useCurrentPath } from "@/lib/router";
 
 type NavLink = { to: string; label: string };
-type NavItem = NavLink | { label: string; children: NavLink[] };
 
-const nav: NavItem[] = [
+const nav: NavLink[] = [
   { to: "/", label: "Home" },
-  { to: "/catalog", label: "Catalog" },
-  {
-    label: "Research",
-    children: [
-      { to: "/research-articles", label: "Articles" },
-      { to: "/coa", label: "COA" },
-    ],
-  },
+  { to: "/catalog", label: "Products" },
+  { to: "/about", label: "Quality" },
+  { to: "/research-articles", label: "Research" },
+  { to: "/coa", label: "COAs" },
   { to: "/contact", label: "Contact" },
 ];
-
-function ResearchDropdown({ label, children }: { label: string; children: NavLink[] }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="nav-link-animated flex items-center gap-1 text-sm font-medium text-foreground transition-colors hover:text-primary"
-      >
-        {label}
-        <ChevronDown size={14} className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 top-full z-50 min-w-40 overflow-hidden rounded-xl border border-border bg-white py-2 shadow-xl">
-          {children.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/5 hover:text-primary"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
 
   if (!open || typeof document === "undefined") return null;
 
+  const products = getProducts();
   const results = query.trim()
     ? products.filter(
         (p) =>
@@ -77,15 +39,11 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
 
   return createPortal(
     <div className="fixed inset-0 z-[99999] flex items-start justify-center px-4 pt-16 sm:pt-24">
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       />
-
-      {/* Search Container */}
       <div className="relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl animate-in zoom-in-95 duration-200">
-        {/* Search Input Header */}
         <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
           <Search size={20} className="shrink-0 text-gray-400" />
           <input
@@ -97,11 +55,7 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             className="w-full text-base font-medium text-gray-900 outline-none placeholder:text-gray-400"
           />
           {query && (
-            <button
-              type="button"
-              onClick={() => setQuery("")}
-              className="text-xs font-semibold text-gray-400 hover:text-gray-600"
-            >
+            <button type="button" onClick={() => setQuery("")} className="text-xs font-semibold text-gray-400 hover:text-gray-600">
               Clear
             </button>
           )}
@@ -110,18 +64,13 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             onClick={onClose}
             className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-600 transition-colors hover:bg-gray-200"
           >
-            <X size={14} />
-            ESC
+            <X size={14} /> ESC
           </button>
         </div>
-
-        {/* Content Body */}
         <div className="max-h-[60vh] overflow-y-auto p-5">
           {!query.trim() ? (
             <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
-                Popular Searches
-              </p>
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Popular Searches</p>
               <div className="flex flex-wrap gap-2">
                 {popularTags.map((tag) => (
                   <button
@@ -137,9 +86,7 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             </div>
           ) : results.length > 0 ? (
             <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
-                Products ({results.length})
-              </p>
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Products ({results.length})</p>
               <div className="grid gap-2">
                 {results.map((product) => (
                   <Link
@@ -149,26 +96,10 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                     onClick={onClose}
                     className="group flex items-center gap-4 rounded-xl border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 hover:bg-gray-50 hover:shadow-sm"
                   >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="size-12 shrink-0 rounded-lg bg-surface object-cover transition-transform duration-200 group-hover:scale-105"
-                    />
+                    <img src={product.image} alt={product.name} className="size-12 shrink-0 rounded-lg bg-surface object-cover" />
                     <div className="min-w-0 flex-1">
-                      <h4 className="truncate text-sm font-semibold text-gray-900 transition-colors group-hover:text-primary">
-                        {product.name}
-                      </h4>
+                      <h4 className="truncate text-sm font-semibold text-gray-900 group-hover:text-primary">{product.name}</h4>
                       <p className="text-xs text-gray-500">{product.series}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-bold text-gray-900">
-                        {formatPrice(product.price)}
-                      </span>
-                      {product.oldPrice && (
-                        <p className="text-[11px] text-gray-400 line-through">
-                          {formatPrice(product.oldPrice)}
-                        </p>
-                      )}
                     </div>
                   </Link>
                 ))}
@@ -177,9 +108,7 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
           ) : (
             <div className="py-8 text-center">
               <p className="text-sm font-semibold text-gray-900">No products found</p>
-              <p className="mt-1 text-xs text-gray-500">
-                No research compounds matched "{query}". Try another search term.
-              </p>
+              <p className="mt-1 text-xs text-gray-500">No compounds matched "{query}".</p>
             </div>
           )}
         </div>
@@ -192,98 +121,118 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
 export function Header() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { count, subtotal } = useCart();
+  const { count } = useCart();
   const { isLoggedIn, customer } = useAuth();
-  // Cart badge bounce animation
-  const [badgeBounce, setBadgeBounce] = useState(false);
-  const prevCount = useRef(count);
-  useEffect(() => {
-    if (count > prevCount.current) {
-      setBadgeBounce(true);
-      const t = setTimeout(() => setBadgeBounce(false), 500);
-      return () => clearTimeout(t);
-    }
-    prevCount.current = count;
-  }, [count]);
+  const scrolled = useScrolled(10);
+  const currentPath = useCurrentPath();
+  const isHome = currentPath === "/";
+  const isTransparent = isHome && !scrolled;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-white shadow-sm">
-      <div className="container-page grid h-[70px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:grid-cols-3">
+    <header
+      className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
+        isTransparent
+          ? "bg-transparent border-b border-white/10"
+          : "bg-white/95 backdrop-blur-sm border-b border-border shadow-sm"
+      }`}
+    >
+      <div className="container-page grid h-[68px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
+
+        {/* Logo */}
         <Link to="/" className="flex min-w-0 items-center">
-          <Logo className="h-10 sm:h-12" />
+          <Logo className="h-10 sm:h-11" light={isTransparent} />
         </Link>
 
-        <nav className="hidden items-center justify-center gap-7 lg:flex">
-          {nav.map((item) =>
-            "children" in item ? (
-              <ResearchDropdown key={item.label} label={item.label} children={item.children} />
-            ) : (
-              <Link
-                key={item.to}
-                to={item.to}
-                activeOptions={{ exact: item.to === "/" }}
-                activeProps={{
-                  className: "text-primary nav-link-animated active",
-                }}
-                inactiveProps={{ className: "text-foreground" }}
-                className="nav-link-animated text-sm font-medium transition-colors hover:text-primary"
-              >
-                {item.label}
-              </Link>
-            ),
-          )}
+        {/* Desktop Nav — centered */}
+        <nav className="hidden items-center justify-center gap-6 lg:flex">
+          {nav.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              activeOptions={{ exact: item.to === "/" }}
+              activeProps={{ className: isTransparent ? "text-white font-semibold" : "text-primary font-semibold" }}
+              inactiveProps={{ className: isTransparent ? "text-white/85" : "text-foreground" }}
+              className={`text-sm font-medium transition-colors duration-200 ${
+                isTransparent ? "hover:text-white" : "hover:text-primary"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        <div className="flex items-center justify-end gap-3">
-          {/* Account icon */}
-          <Link
-            to={isLoggedIn ? "/account" : "/login"}
-            className="group hidden items-center justify-center md:flex"
-            aria-label={isLoggedIn ? "My Account" : "Sign In"}
-          >
-            <span
-              title={isLoggedIn ? customer?.name : "Sign In"}
-              className="relative grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-[#1B3A5C] group-hover:text-white group-hover:scale-110"
-            >
-              {isLoggedIn ? (
-                <span className="text-[11px] font-bold">{customer?.name?.[0]?.toUpperCase()}</span>
-              ) : (
-                <User size={16} />
-              )}
-              {isLoggedIn && (
-                <span className="absolute -right-1 -top-1 size-2.5 rounded-full bg-emerald-500 border-2 border-white" />
-              )}
-            </span>
-          </Link>
-
+        {/* Right side — View Catalog + small icons */}
+        <div className="flex items-center justify-end gap-2">
+          {/* Search icon */}
           <button
             type="button"
             aria-label="Search"
             onClick={() => setSearchOpen(true)}
-            className="group hidden items-center justify-center md:flex"
+            className={`hidden md:grid size-9 place-items-center rounded-full transition-all duration-200 ${
+              isTransparent
+                ? "text-white/80 hover:text-white hover:bg-white/10"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
+            }`}
           >
-            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
-              <Search size={16} />
-            </span>
+            <Search size={16} />
           </button>
-          <Link to="/cart" className="group flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary">
-            <span className="relative grid size-9 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
-              <ShoppingCart size={16} />
-              <span
-                className={`absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground ${
-                  badgeBounce ? "anim-badge-bounce" : ""
-                }`}
-              >
+
+          {/* Account icon */}
+          <Link
+            to={isLoggedIn ? "/account" : "/login"}
+            aria-label={isLoggedIn ? "My Account" : "Sign In"}
+            className={`hidden md:grid size-9 place-items-center rounded-full transition-all duration-200 relative ${
+              isTransparent
+                ? "text-white/80 hover:text-white hover:bg-white/10"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
+            }`}
+          >
+            {isLoggedIn ? (
+              <span className="text-[11px] font-bold">{customer?.name?.[0]?.toUpperCase()}</span>
+            ) : (
+              <User size={16} />
+            )}
+            {isLoggedIn && (
+              <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-emerald-500 border border-white" />
+            )}
+          </Link>
+
+          {/* Cart icon */}
+          <Link
+            to="/cart"
+            aria-label="Cart"
+            className={`hidden md:grid size-9 place-items-center rounded-full transition-all duration-200 relative ${
+              isTransparent
+                ? "text-white/80 hover:text-white hover:bg-white/10"
+                : "text-foreground hover:bg-primary/10 hover:text-primary"
+            }`}
+          >
+            <ShoppingCart size={16} />
+            {count > 0 && (
+              <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
                 {count}
               </span>
-            </span>
-            {formatPrice(subtotal)}
+            )}
           </Link>
+
+          {/* View Catalog CTA — outline only, no background */}
+          <Link
+            to="/catalog"
+            className={`hidden md:inline-flex items-center px-4 py-2 text-sm font-semibold border transition-all duration-200 rounded-none ${
+              isTransparent
+                ? "border-white text-white hover:bg-white/10"
+                : "border-[#0B1F3A] text-[#0B1F3A] hover:bg-[#0B1F3A] hover:text-white"
+            }`}
+          >
+            View Catalog
+          </Link>
+
+          {/* Mobile hamburger */}
           <button
             type="button"
             aria-label="Open menu"
             onClick={() => setOpen(true)}
-            className="lg:hidden"
+            className={`lg:hidden transition-colors ${isTransparent ? "text-white" : "text-foreground"}`}
           >
             <Menu size={22} />
           </button>
@@ -293,69 +242,42 @@ export function Header() {
       {/* Mobile Drawer */}
       {open && typeof document !== "undefined" && createPortal(
         <div className="fixed inset-0 z-[99999] lg:hidden flex justify-end">
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={() => setOpen(false)} />
-          <div className="relative z-10 flex h-full w-72 flex-col gap-2 bg-white p-6 shadow-2xl animate-in slide-in-from-right duration-300">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <div className="relative z-10 flex h-full w-72 flex-col bg-white p-6 shadow-2xl animate-in slide-in-from-right duration-300">
             <button
               type="button"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
-              className="mb-4 self-end rounded-full p-2 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900 hover:rotate-90 duration-300"
+              className="mb-6 self-end rounded-full p-2 text-gray-500 hover:bg-gray-100"
             >
               <X size={22} />
             </button>
-            <div className="flex-1 overflow-y-auto">
-              {nav.map((item, i) =>
-                "children" in item ? (
-                  <div key={item.label} className="anim-fade-in-up" style={{ animationDelay: `${i * 80}ms` }}>
-                    <span className="block px-4 py-3 text-base font-bold text-gray-800">
-                      {item.label}
-                    </span>
-                    <div className="ml-3 flex flex-col border-l border-gray-100 pl-3">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.to}
-                          to={child.to}
-                          onClick={() => setOpen(false)}
-                          activeProps={{ className: "text-primary bg-primary/5" }}
-                          className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50 hover:text-primary"
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setOpen(false)}
-                    activeOptions={{ exact: item.to === "/" }}
-                    activeProps={{ className: "text-primary bg-primary/5" }}
-                    className="block rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
-                    style={{ animationDelay: `${i * 80}ms` }}
-                  >
-                    {item.label}
-                  </Link>
-                ),
-              )}
+            <div className="flex-1 space-y-1 overflow-y-auto">
+              {nav.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  activeOptions={{ exact: item.to === "/" }}
+                  activeProps={{ className: "text-primary bg-primary/5" }}
+                  className="block rounded-lg px-4 py-3 text-base font-semibold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="my-3 h-px bg-gray-100" />
               <Link
                 to={isLoggedIn ? "/account" : "/login"}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
-                style={{ animationDelay: "160ms" }}
+                className="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-semibold text-gray-800 hover:bg-gray-50 hover:text-primary"
               >
                 <User size={18} />
                 {isLoggedIn ? `My Account (${customer?.name})` : "Sign In / Register"}
               </Link>
-              <div className="my-4 h-px w-full bg-gray-100" />
               <button
                 type="button"
-                onClick={() => {
-                  setOpen(false);
-                  setSearchOpen(true);
-                }}
-                className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-bold text-gray-800 transition-colors hover:bg-gray-50 hover:text-primary anim-fade-in-up"
-                style={{ animationDelay: "240ms" }}
+                onClick={() => { setOpen(false); setSearchOpen(true); }}
+                className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-semibold text-gray-800 hover:bg-gray-50 hover:text-primary"
               >
                 <Search size={18} />
                 Search
@@ -363,16 +285,15 @@ export function Header() {
               <Link
                 to="/cart"
                 onClick={() => setOpen(false)}
-                className="mt-4 flex w-full items-center justify-between rounded-xl bg-primary px-4 py-3 text-base font-bold text-white shadow-md transition-all hover:bg-primary/90 hover:shadow-lg anim-fade-in-up"
-                style={{ animationDelay: "400ms" }}
+                className="mt-2 flex w-full items-center justify-between rounded-xl bg-primary px-4 py-3 text-base font-bold text-primary-foreground shadow-md hover:bg-[#D96529]"
               >
                 <span className="flex items-center gap-2">
                   <ShoppingCart size={18} />
                   Cart
                 </span>
-                <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
-                  {count}
-                </span>
+                {count > 0 && (
+                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{count}</span>
+                )}
               </Link>
             </div>
           </div>
@@ -380,7 +301,6 @@ export function Header() {
         document.body
       )}
 
-      {/* Search Modal */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );

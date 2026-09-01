@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState, useEffect } from "react";
 import {
   BadgeCheck,
   Check,
@@ -23,7 +23,7 @@ import { Link, useRouteParams } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 import { getCoa } from "@/lib/coa";
-import { formatPrice, getProduct, priceForSize, priceLabel, products } from "@/lib/products";
+import { formatPrice, useProducts, priceForSize, priceLabel } from "@/lib/products";
 
 function ProductNotFound() {
   return (
@@ -39,22 +39,26 @@ function ProductNotFound() {
 const shareIcons = [Facebook, Twitter, Star, Linkedin, Link2];
 
 function ProductDetail() {
+  const products = useProducts();
   const { slug } = useRouteParams<{ slug: string }>();
-  const product = getProduct(slug);
-
-  if (!product) {
-    return <ProductNotFound />;
-  }
+  const product = products.find((p) => p.slug === slug);
 
   const { add } = useCart();
   const { addToast } = useToast();
-  const [size, setSize] = useState(product.sizes[0] ?? "");
+  const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [coaOpen, setCoaOpen] = useState(false);
-
   const [heroRef, heroVisible] = useStaggerAnimation<HTMLDivElement>();
+
+  useEffect(() => {
+    if (product?.sizes[0] && !size) setSize(product.sizes[0]);
+  }, [product?.slug]);
+
+  if (!product) {
+    return <ProductNotFound />;
+  }
 
   const sizedPrice = priceForSize(product, size);
   const coa = getCoa(product.slug);
@@ -277,7 +281,7 @@ function ProductDetail() {
               to="/cart"
               className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary py-3 text-sm font-bold text-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:-translate-y-0.5 active:scale-[0.98]"
             >
-              Proceed to Checkout →
+              Proceed to Checkout ←’
             </Link>
           )}
 
@@ -287,17 +291,17 @@ function ProductDetail() {
 
           <div className="mt-5 grid grid-cols-3 gap-3 rounded-xl border border-border bg-surface p-4 text-center">
             <div>
-              <Truck size={18} className="mx-auto text-[rgb(94,113,128)]" />
+              <Truck size={18} className="mx-auto text-[#6FA9D8]" />
               <p className="mt-1.5 text-[11px] font-bold text-foreground">Same-Day Shipping</p>
               <p className="text-[10px] text-muted-foreground">Order before 2pm</p>
             </div>
             <div>
-              <BadgeCheck size={18} className="mx-auto text-[rgb(94,113,128)]" />
+              <BadgeCheck size={18} className="mx-auto text-[#6FA9D8]" />
               <p className="mt-1.5 text-[11px] font-bold text-foreground">COA Verified</p>
               <p className="text-[10px] text-muted-foreground">Every batch tested</p>
             </div>
             <div>
-              <Lock size={18} className="mx-auto text-[rgb(94,113,128)]" />
+              <Lock size={18} className="mx-auto text-[#6FA9D8]" />
               <p className="mt-1.5 text-[11px] font-bold text-foreground">Secure Checkout</p>
               <p className="text-[10px] text-muted-foreground">Encrypted payment</p>
             </div>
@@ -358,6 +362,7 @@ function ProductDetail() {
           open={coaOpen}
           onOpenChange={setCoaOpen}
           images={coa.images}
+          fileTypes={coa.fileTypes}
           title={product.name}
         />
       )}
@@ -404,3 +409,4 @@ export function ProductDetailPage() {
   const { slug } = useRouteParams<{ slug: string }>();
   return <ProductDetail key={slug} />;
 }
+

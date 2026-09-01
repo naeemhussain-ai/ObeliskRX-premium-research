@@ -184,23 +184,26 @@ const sections: Section[] = [
 export function ResearchArticlesPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Header */}
-      <div className="border-b border-border bg-card py-14">
-        <div className="container-page text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
+      {/* Hero Header — muted blue-violet to peach */}
+      <div
+        className="relative overflow-hidden py-20 md:py-24 px-4"
+        style={{ background: "linear-gradient(135deg, #1B2545 0%, #3A4A8B 40%, #7A5E8A 70%, #D4907A 100%)", minHeight: "380px" }}
+      >
+        <div className="container-page text-center flex flex-col items-center justify-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[11px] font-bold tracking-widest text-white/90 uppercase backdrop-blur-sm">
             <FlaskConical size={12} />
             Independent Research Data
           </span>
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl" style={{ fontFamily: "Manrope, sans-serif" }}>
             Peptide Research Reference Library
           </h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Independent research data page   verified direct links only
+          <p className="mt-3 text-sm text-white/80 max-w-xl">
+            Independent research data — verified direct links only
           </p>
-          <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <Link to="/" className="transition-colors hover:text-primary">Home</Link>
+          <div className="mt-5 flex items-center justify-center gap-2 text-xs text-white/60">
+            <Link to="/" className="transition-colors hover:text-white">Home</Link>
             <span>/</span>
-            <span className="font-medium text-foreground">Research Articles</span>
+            <span className="font-medium text-white/90">Research Articles</span>
           </div>
         </div>
       </div>

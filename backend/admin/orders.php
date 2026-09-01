@@ -9,8 +9,12 @@ $where  = $filter !== 'all' ? "WHERE status = " . $db->quote($filter) : '';
 
 $orders = $db->query("SELECT * FROM orders $where ORDER BY created_at DESC")->fetchAll();
 
-// New orders count for badge
-$pendingCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE status = 'approved'")->fetchColumn();
+// Count per status
+$statusCounts = [];
+foreach ($db->query("SELECT status, COUNT(*) AS cnt FROM orders GROUP BY status")->fetchAll() as $r)
+    $statusCounts[$r['status']] = (int)$r['cnt'];
+$totalOrders  = array_sum($statusCounts);
+$pendingCount = ($statusCounts['pending'] ?? 0) + ($statusCounts['approved'] ?? 0);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,11 +36,21 @@ $pendingCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE status = 'app
         <!-- Filter Tabs -->
         <div class="filter-tabs">
             <?php
-            $tabs = ['all' => 'All', 'approved' => 'New Orders', 'shipped' => 'Shipped', 'delivered' => 'Delivered', 'rejected' => 'Cancelled'];
-            foreach ($tabs as $key => $label):
+            $tabs = [
+                'all'       => ['All',        $totalOrders],
+                'approved'  => ['New Orders', $statusCounts['approved']  ?? 0],
+                'pending'   => ['Pending',    $statusCounts['pending']   ?? 0],
+                'shipped'   => ['Shipped',    $statusCounts['shipped']   ?? 0],
+                'delivered' => ['Delivered',  $statusCounts['delivered'] ?? 0],
+                'rejected'  => ['Cancelled',  $statusCounts['rejected']  ?? 0],
+            ];
+            foreach ($tabs as $key => [$label, $count]):
             ?>
                 <a href="?status=<?= $key ?>" class="tab <?= $filter === $key ? 'active' : '' ?>">
                     <?= $label ?>
+                    <?php if ($count > 0): ?>
+                        <span class="tab-count"><?= $count ?></span>
+                    <?php endif; ?>
                 </a>
             <?php endforeach; ?>
         </div>

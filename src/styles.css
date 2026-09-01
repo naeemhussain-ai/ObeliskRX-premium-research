@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -5,8 +6,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * ObeliskRX design system.
- * Primary: #E91E63 pink/magenta. Ink: #1A1A1A. Surfaces: white / #F8F9FA.
+ * ObeliskRX Brand System — Sunset Precision
+ * Midnight:#0B1F3A  ClinicalBlue:#174A7E  HorizonBlue:#6FA9D8
+ * VictoryOrange:#F47A38  SunsetAmber:#FFB15A
+ * WarmIvory:#F7F3EC  Ink:#17212B
  */
 
 @theme inline {
@@ -17,6 +20,7 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --font-sans: var(--font-body);
+  --font-heading: var(--font-display);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -42,65 +46,77 @@
   --color-surface: var(--surface);
   --color-discount: var(--discount);
   --color-discount-foreground: var(--discount-foreground);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-sky: var(--brand-sky);
+  --color-brand-amber: var(--brand-amber);
   --shadow-card: var(--shadow-card);
   --shadow-card-hover: var(--shadow-card-hover);
 }
 
 :root {
-  --radius: 0.5rem;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* ── Fonts ─────────────────────────────────────────── */
+  --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter",   ui-sans-serif, system-ui, sans-serif;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.21 0.034 264.4);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.034 264.4);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.034 264.4);
+  /* ── Radii ─────────────────────────────────────────── */
+  --radius: 0.688rem; /* 11px — buttons */
+  --radius-card: 1rem; /* 16px — cards */
 
-  --primary: oklch(0.596 0.213 8.2);
-  --primary-foreground: oklch(1 0 0);
-  --primary-soft: oklch(0.965 0.021 8.2);
+  /* ── Brand palette ─────────────────────────────────── */
+  --orx-midnight: #0B1F3A;
+  --orx-blue:     #174A7E;
+  --orx-sky:      #6FA9D8;
+  --orx-orange:   #F47A38;
+  --orx-amber:    #FFB15A;
+  --orx-ivory:    #F7F3EC;
+  --orx-white:    #FFFFFF;
+  --orx-ink:      #17212B;
+  --orx-muted:    #5F6B76;
+  --orx-line:     #D9E0E7;
+  --orx-gradient: linear-gradient(115deg, #0B1F3A 0%, #174A7E 38%, #F47A38 76%, #FFB15A 100%);
+  --orx-hero-fade: linear-gradient(to bottom, rgba(247,243,236,0) 0%, #F7F3EC 100%);
 
-  --secondary: oklch(0.968 0.003 264.5);
-  --secondary-foreground: oklch(0.21 0.034 264.4);
-  --muted: oklch(0.976 0.002 264.5);
-  --muted-foreground: oklch(0.556 0.017 264.4);
-  --accent: oklch(0.968 0.003 264.5);
-  --accent-foreground: oklch(0.21 0.034 264.4);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
+  /* ── Tailwind semantic tokens ──────────────────────── */
+  --background: #F7F3EC;
+  --foreground: #17212B;
+  --card:       #FFFFFF;
+  --card-foreground: #17212B;
+  --popover:    #FFFFFF;
+  --popover-foreground: #17212B;
 
-  --border: oklch(0.928 0.004 264.5);
-  --input: oklch(0.928 0.004 264.5);
-  --ring: oklch(0.596 0.213 8.2);
+  /* Primary = Victory Orange */
+  --primary:            #F47A38;
+  --primary-foreground: #0B1F3A;
+  --primary-soft:       #FEF0E7;
 
-  --ink: oklch(0.201 0 0);
-  --ink-foreground: oklch(0.985 0 0);
-  --surface: oklch(0.978 0.002 264.5);
+  /* Brand blues */
+  --brand-blue: #174A7E;
+  --brand-sky:  #6FA9D8;
+  --brand-amber: #FFB15A;
 
-  --discount: oklch(0.86 0.09 130);
-  --discount-foreground: oklch(0.32 0.05 130);
+  --secondary:            #EEF5FA;
+  --secondary-foreground: #0B1F3A;
+  --muted:                #EEF5FA;
+  --muted-foreground:     #5F6B76;
+  --accent:               #EEF5FA;
+  --accent-foreground:    #0B1F3A;
+  --destructive:          #DC2626;
+  --destructive-foreground: #FFFFFF;
 
-  --shadow-card: 0 1px 2px 0 oklch(0.21 0.034 264.4 / 0.06);
-  --shadow-card-hover: 0 12px 28px -12px oklch(0.21 0.034 264.4 / 0.25);
-}
+  --border: #D9E0E7;
+  --input:  #D9E0E7;
+  --ring:   #F47A38;
 
-.dark {
-  --background: oklch(0.18 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.22 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.22 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.27 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.27 0 0);
-  --muted-foreground: oklch(0.72 0 0);
-  --accent: oklch(0.27 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 15%);
-  --surface: oklch(0.22 0 0);
+  /* Ink = Midnight navy */
+  --ink:            #0B1F3A;
+  --ink-foreground: #FFFFFF;
+  --surface:        #F7F3EC;
+
+  --discount:            #d1fae5;
+  --discount-foreground: #065f46;
+
+  --shadow-card:       0 10px 30px rgba(11,31,58,.08);
+  --shadow-card-hover: 0 16px 40px rgba(11,31,58,.14);
 }
 
 @layer base {
@@ -118,6 +134,12 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
   }
+
+  /* Manrope for all headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    color: var(--orx-midnight);
+  }
 }
 
 @utility container-page {
@@ -125,4 +147,86 @@
   width: 100%;
   max-width: 80rem;
   padding-inline: 1rem;
+}
+
+/* Hero → cream atmospheric fade */
+.hero-section {
+  overflow: hidden;
+  border: 0;
+  box-shadow: none;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 190px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(247, 243, 236, 0)    0%,
+    rgba(247, 243, 236, 0.04) 12%,
+    rgba(247, 243, 236, 0.12) 25%,
+    rgba(247, 243, 236, 0.28) 40%,
+    rgba(247, 243, 236, 0.52) 56%,
+    rgba(247, 243, 236, 0.76) 70%,
+    rgba(247, 243, 236, 0.94) 86%,
+    #F7F3EC                   96%,
+    #F7F3EC                   100%
+  );
+}
+
+/* Trust bar — above cream fade, sharp and dark */
+.hero-features {
+  position: relative;
+  z-index: 3;
+  isolation: isolate;
+  max-width: 1030px;
+  margin: 0 auto;
+  padding: 26px 40px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.48);
+  border-radius: 10px;
+  background: rgba(7, 31, 58, 0.55);
+  box-shadow: none;
+  transform: translateY(-50px);
+}
+
+/* Soft shadow below card — sits in the fade area, not on the card */
+.hero-features::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 5%;
+  right: 5%;
+  bottom: -30px;
+  height: 55px;
+  border-radius: 50%;
+  background: rgba(7, 24, 43, 0.38);
+  filter: blur(24px);
+  pointer-events: none;
+}
+
+/* Card content above the shadow pseudo-element */
+.hero-features > * {
+  position: relative;
+  z-index: 2;
+}
+
+@layer base {
+  /* Keyboard focus ring — Clinical Blue 3px */
+  :focus-visible {
+    outline: 3px solid #174A7E;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Primary button hover — darken to #D96529 per brand doc */
+  .hover\:bg-primary\/90:hover {
+    background-color: #D96529 !important;
+    opacity: 1 !important;
+  }
 }

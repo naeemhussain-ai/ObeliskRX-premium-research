@@ -1,4 +1,4 @@
-import { Link } from "@/lib/router";
+﻿import { Link } from "@/lib/router";
 
 const toc = [
   "Acceptance of Terms",
@@ -42,11 +42,11 @@ function Section({ n, title, children }: { n: number; title: string; children: R
 
 function LegalSection({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
-    <section id={`section-${n}`} className="rounded-2xl border border-[#1B3A5C]/20 bg-[#1B3A5C]/5 p-6 shadow-card sm:p-8">
-      <h2 className="text-lg font-bold text-[#1B3A5C] sm:text-xl">
+    <section id={`section-${n}`} className="rounded-2xl border border-[#0B1F3A]/20 bg-[#0B1F3A]/5 p-6 shadow-card sm:p-8">
+      <h2 className="text-lg font-bold text-[#0B1F3A] sm:text-xl">
         {n}. {title}
       </h2>
-      <div className="mt-4 space-y-3 text-sm leading-relaxed text-[#1B3A5C]/80">
+      <div className="mt-4 space-y-3 text-sm leading-relaxed text-[#0B1F3A]/80">
         {children}
       </div>
     </section>
@@ -394,7 +394,7 @@ export function TermsPage() {
                       Contact@ObeliskRX.com
                     </a>
                   </p>
-                  <p className="mt-1 text-sm text-gray-600">Business Hours: Monday – Friday, 9:00 AM – 5:00 PM EST</p>
+                  <p className="mt-1 text-sm text-gray-600">Business Hours: Monday "“ Friday, 9:00 AM "“ 5:00 PM EST</p>
                 </div>
               </section>
 
@@ -405,3 +405,5 @@ export function TermsPage() {
     </div>
   );
 }
+
+

@@ -4,9 +4,10 @@ $localConfig = __DIR__ . '/local.php';
 if (!file_exists($localConfig)) {
     // ── Production (cPanel) Constants ───────────────
     define('SITE_NAME',       'ObeliskRX');
-    define('SITE_URL',        'http://axistechstaging.com/obeliskrx');
-    define('ADMIN_PATH',      'http://axistechstaging.com/obeliskrx/backend/admin');
-    define('IMAGES_BASE_URL', 'http://axistechstaging.com/obeliskrx/backend/images/products/');
+    define('SITE_URL',        'https://axistechstaging.com/obeliskrx');
+    define('ADMIN_PATH',      'https://axistechstaging.com/obeliskrx/backend/admin');
+    define('IMAGES_BASE_URL', 'https://axistechstaging.com/obeliskrx/backend/images/products/');
+    define('COA_BASE_URL',   'https://axistechstaging.com/obeliskrx/backend/images/coa/');
 
     define('SMTP_HOST',   'mail.axistechstaging.com');
     define('SMTP_PORT',   465);

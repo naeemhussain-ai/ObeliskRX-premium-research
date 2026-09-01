@@ -1,44 +1,24 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import {
   ArrowRight,
-  BadgeCheck,
   Beaker,
+  ClipboardList,
   Headphones,
   Lock,
   ShieldCheck,
+  Target,
   Truck,
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { Link } from "@/lib/router";
-import { products } from "@/lib/products";
+import { useProducts } from "@/lib/products";
 import vaccineImg from "@/assets/products/vacine.jpg";
-import heroVideo from "@/assets/products/video Herosection.mp4";
+import heroBg from "@/assets/hero-bg.jpg";
 
-function HeroVideoBackground() {
-  const [videoReady, setVideoReady] = useState(false);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none bg-[rgb(94,113,128)]">
-      <video
-        src={heroVideo}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        onCanPlay={() => setVideoReady(true)}
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-          videoReady ? "opacity-100" : "opacity-0"
-        }`}
-      />
-    </div>
-  );
-}
-
-const trustCards = [
-  { icon: ShieldCheck, title: "99%+ Purity", sub: "Lab Verified" },
-  { icon: BadgeCheck, title: "Independently Tested", sub: "COA Verified" },
-  { icon: Truck, title: "Fast USA Shipping", sub: "Same Day Shipping" },
+const whyCards = [
+  { icon: ShieldCheck, title: "Verified Quality", sub: "Independent analytical testing." },
+  { icon: ClipboardList, title: "Clear Documentation", sub: "Batch-specific records and COAs." },
+  { icon: Target, title: "Reliable Standards", sub: "Consistent research-focused practices." },
 ];
 
 const features = [
@@ -70,6 +50,7 @@ const features = [
 ];
 
 export function HomePage() {
+  const products = useProducts();
   const [filterCategory, setFilterCategory] = useState("All");
   const [filterPrice, setFilterPrice] = useState("All");
 
@@ -91,51 +72,92 @@ export function HomePage() {
 
   return (
     <>
-      {/* ===== HERO ===== */}
-      <section className="relative w-full h-screen overflow-hidden">
-        <div className="relative h-full w-full">
-          {/* HERO YOUTUBE BACKGROUND VIDEO */}
-          <HeroVideoBackground />
-          {/* SLATE GRAY OVERLAY RGB(94, 113, 128) */}
-          <div className="absolute inset-0 bg-[rgb(94,113,128)]/30 backdrop-blur-[1px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30" />
+      {/* ===== HERO + TRUST BAR (integrated) ===== */}
+      <section className="hero-section relative w-full -mt-[68px]" style={{ minHeight: "720px", height: "100vh", maxHeight: "900px" }}>
+        {/* Hero background */}
+        <div
+          className="absolute inset-0 bg-cover bg-no-repeat"
+          style={{ backgroundImage: `url(${heroBg})`, backgroundPosition: "center right" }}
+        />
+        {/* Light navy overlay */}
+        <div className="absolute inset-0 bg-[#0B1F3A]/30" />
+        {/* Dark fade at bottom for trust bar */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-44 pointer-events-none"
+          style={{ background: "linear-gradient(to bottom, rgba(11,31,58,0) 0%, rgba(11,31,58,0.95) 100%)" }}
+        />
 
-          <div className="relative flex h-full flex-col items-center justify-center px-4 py-16 text-center">
-            <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl lg:text-6xl tracking-tight">
-             Premium research compounds 
-              <span className="mt-1 block text-primary">Synthesized with precision</span>
-            </h1>
-            <p className="mt-5 max-w-2xl text-sm font-semibold text-white sm:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">
-              The highest quality peptides, backed by science. Every batch is independently tested
-              and verified to 99%+ purity before it ever reaches you.
-            </p>
+        {/* Hero content */}
+        <div className="relative z-[2] flex h-full flex-col justify-center px-6 pt-[68px] pb-28 container-page">
+          {/* Badge */}
+          <div className="mb-6">
+            <span className="text-[11px] font-bold tracking-widest text-[#F47A38] uppercase">
+              Precision for Discovery
+            </span>
+            <div className="mt-1.5 h-0.5 w-10 bg-[#F47A38]" />
+          </div>
 
-            <div className="mt-10 grid w-full max-w-3xl gap-4 sm:grid-cols-3">
-              {trustCards.map(({ icon: Icon, title, sub }) => (
-                <div
-                  key={title}
-                  className="group flex items-center gap-3.5 rounded-xl border-2 border-[rgb(94,113,128)]/40 bg-white/90 p-4 text-left shadow-sm backdrop-blur transition-all duration-300 hover:border-primary hover:shadow-md"
-                >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[rgb(94,113,128)]/20 text-[rgb(94,113,128)] transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
-                    <Icon size={18} />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-bold text-gray-900 transition-colors duration-300 group-hover:text-primary">
-                      {title}
-                    </span>
-                    <span className="block text-xs font-medium text-gray-600">{sub}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
+          <h1
+            className="max-w-2xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[52px]"
+            style={{ fontFamily: "Manrope, sans-serif", textShadow: "0 2px 20px rgba(11,31,58,.4)" }}
+          >
+            Research begins with<br />better standards.
+          </h1>
 
+          <p className="mt-5 max-w-lg text-base leading-relaxed text-white/80 sm:text-lg">
+            High-purity research compounds supported by transparent testing and accessible documentation.
+          </p>
+
+          <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link
               to="/catalog"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:opacity-90 hover:shadow-lg"
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold text-[#0B1F3A] transition-all duration-300 hover:brightness-110 active:scale-[0.98]"
+              style={{ background: "#F47A38", borderRadius: "0" }}
             >
-              Shop Now <ArrowRight size={16} />
+              Explore Products
+            </Link>
+            <Link
+              to="/coa"
+              className="inline-flex items-center gap-2 px-2 py-3.5 text-sm font-semibold text-white transition-all duration-300 border-b-2 border-[#F47A38] hover:text-[#F47A38]"
+            >
+              View COAs
             </Link>
           </div>
+        </div>
+
+        {/* Trust bar — frosted glass container */}
+        <div className="absolute bottom-0 left-0 right-0 z-[2] px-4 pb-10">
+          <div className="hero-features flex flex-wrap items-center justify-center divide-x divide-white/20">
+            {["Independent Testing", "Batch Documentation", "Research Use Only"].map((item) => (
+              <span key={item} className="px-8 py-1 text-sm font-medium text-white/80 tracking-wide">
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== WHY OBELISKRX ===== */}
+      <section className="relative pt-16 pb-20 text-center" style={{ marginTop: "-1px", backgroundColor: "#F7F3EC", border: 0, boxShadow: "none" }}>
+        <div className="container-page">
+        <span className="text-[11px] font-bold tracking-widest text-[#F47A38] uppercase">Why ObeliskRX</span>
+        <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#0B1F3A] sm:text-4xl" style={{ fontFamily: "Manrope, sans-serif" }}>
+          Clarity at every stage of research.
+        </h2>
+        <div className="mt-12 grid gap-6 sm:grid-cols-3">
+          {whyCards.map(({ icon: Icon, title, sub }) => (
+            <div
+              key={title}
+              className="flex flex-col items-center rounded-2xl border border-[#D9E0E7] bg-white p-8 text-center shadow-[0_10px_30px_rgba(11,31,58,.06)]"
+            >
+              <span className="mb-5 grid size-14 place-items-center rounded-full border-2 border-[#D9E0E7]">
+                <Icon size={22} className="text-[#174A7E]" />
+              </span>
+              <p className="text-base font-bold text-[#0B1F3A]">{title}</p>
+              <p className="mt-2 text-sm text-[#5F6B76]">{sub}</p>
+            </div>
+          ))}
+        </div>
         </div>
       </section>
 
@@ -289,7 +311,7 @@ export function HomePage() {
                 
 
                 {/* Icon Circle */}
-                <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full border border-gray-200 bg-gray-100/90 text-[rgb(94,113,128)] transition-all duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-[0_0_20px_rgba(233,30,99,0.25)]">
+                <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full border border-gray-200 bg-gray-100/90 text-[#6FA9D8] transition-all duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-[0_0_20px_rgba(244,122,56,0.25)]">
                   <Icon size={22} />
                 </div>
 
@@ -310,3 +332,4 @@ export function HomePage() {
     </>
   );
 }
+

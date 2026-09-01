@@ -5,14 +5,20 @@ require_once __DIR__ . '/../../config/cors.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../helpers/response.php';
 require_once __DIR__ . '/../../helpers/validator.php';
+require_once __DIR__ . '/../../helpers/customer_auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') error('Method not allowed', 405);
 
 $body = getJsonBody();
+$db   = getDB();
+
+// Optional: logged-in customer se name/email auto-fill
+$customer   = getCustomerFromRequest($db);
+$customerId = $customer ? (int)$customer['id'] : null;
 
 $slug   = sanitizeString($body['product_slug'] ?? '');
-$name   = sanitizeString($body['name'] ?? '');
-$email  = strtolower(trim($body['email'] ?? ''));
+$name   = sanitizeString($body['name'] ?? ($customer['name'] ?? ''));
+$email  = strtolower(trim($body['email'] ?? ($customer['email'] ?? '')));
 $rating = (int)($body['rating'] ?? 0);
 $text   = sanitizeString($body['review_text'] ?? '');
 
@@ -22,12 +28,10 @@ if (empty($email) || !validateEmail($email)) error('Valid email is required.', 4
 if ($rating < 1 || $rating > 5) error('Rating must be between 1 and 5.', 422);
 if (strlen(strip_tags($text)) < 10) error('Review must be at least 10 characters.', 422);
 
-$db = getDB();
-
-// Product lookup - optional, FK removed
+// Product lookup
 $prod = $db->prepare("SELECT id FROM products WHERE slug = ? AND is_active = 1");
 $prod->execute([$slug]);
-$product = $prod->fetch();
+$product   = $prod->fetch();
 $productId = $product ? (int)$product['id'] : null;
 
 // Duplicate: same email + same product within 24h
@@ -41,10 +45,19 @@ if ($dup->fetch()) {
     error('You have already submitted a review for this product recently.', 429);
 }
 
-$stmt = $db->prepare("
-    INSERT INTO reviews (product_id, product_slug, name, email, rating, review_text, status)
-    VALUES (?, ?, ?, ?, ?, ?, 'pending')
-");
-$stmt->execute([$productId, $slug, $name, $email, $rating, $text]);
+// Try with customer_id first; if column doesn't exist yet, insert without it
+try {
+    $stmt = $db->prepare("
+        INSERT INTO reviews (customer_id, product_id, product_slug, name, email, rating, review_text, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
+    ");
+    $stmt->execute([$customerId, $productId, $slug, $name, $email, $rating, $text]);
+} catch (Exception $e) {
+    $stmt = $db->prepare("
+        INSERT INTO reviews (product_id, product_slug, name, email, rating, review_text, status)
+        VALUES (?, ?, ?, ?, ?, ?, 'pending')
+    ");
+    $stmt->execute([$productId, $slug, $name, $email, $rating, $text]);
+}
 
 success([], 'Your review has been submitted and is pending approval. Thank you!');

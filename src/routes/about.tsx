@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { ChevronDown, Play } from "lucide-react";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 import { CustomerReviews } from "@/components/CustomerReviews";
@@ -29,9 +29,10 @@ export function AboutPage() {
   return (
     <div className="min-h-screen bg-background font-sans text-foreground pb-8">
       {/* ===== HERO SECTION ===== */}
-      <section 
+      <section
         ref={heroRef}
-        className={`bg-[rgb(94,113,128)] py-16 md:py-20 px-4 animate-on-scroll ${heroVisible ? "animate-visible" : ""}`}
+        className={`relative overflow-hidden py-20 md:py-24 px-4 animate-on-scroll ${heroVisible ? "animate-visible" : ""}`}
+        style={{ background: "linear-gradient(135deg, #174A7E 0%, #3A7BC8 45%, #F47A38 80%, #FFB15A 100%)", minHeight: "380px" }}
       >
         <div className="container-page">
           <h1 className="anim-fade-in-up text-4xl md:text-5xl font-bold text-white mb-6">Who We Are</h1>
@@ -117,7 +118,7 @@ export function AboutPage() {
           <div className="relative rounded-xl overflow-hidden bg-primary h-72 flex items-center shadow-card hover:shadow-card-hover transition-shadow hover-glow">
             <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0" />
             <div className="relative z-10 p-8 md:p-10 max-w-[60%]">
-              <h3 className="text-white text-xl md:text-2xl font-bold leading-snug">
+              <h3 className="text-primary-foreground text-xl md:text-2xl font-bold leading-snug">
                 Become a Member<br />of the Club
               </h3>
             </div>
@@ -133,3 +134,4 @@ export function AboutPage() {
     </div>
   );
 }
+

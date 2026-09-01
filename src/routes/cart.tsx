@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Minus, Plus, X, Package, CheckCircle2, LogIn, UserPlus, UserCheck } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { Link, navigateTo } from "@/lib/router";
-import { formatPrice, products } from "@/lib/products";
+import { formatPrice, getProducts } from "@/lib/products";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 
@@ -39,6 +39,7 @@ const EMPTY: CheckoutForm = {
 };
 
 export function CartPage() {
+  const products = getProducts();
   const { items, remove, setQty, subtotal, clear } = useCart();
   const { customer, isLoggedIn, token } = useAuth();
   const [coupon, setCoupon] = useState("");
@@ -123,7 +124,7 @@ export function CartPage() {
     }
   };
 
-  // ── Success ──────────────────────────────────────────
+  // ── Success ──────────────────────────────────────────────────────────────
   if (step === "success") {
     return (
       <div className="container-page py-24">
@@ -153,7 +154,7 @@ export function CartPage() {
     );
   }
 
-  // ── Auth Choice Step ─────────────────────────────────
+  // ── Auth Choice Step ──────────────────────────────────────────────────────
   if (step === "auth") {
     return (
       <div className="container-page py-8">
@@ -161,9 +162,9 @@ export function CartPage() {
           <button type="button" onClick={() => setStep("cart")} className="hover:text-primary transition-colors">
             Shopping cart
           </button>
-          <span>→</span>
+          <span>&rsaquo;</span>
           <span className="font-semibold text-foreground underline underline-offset-8">Checkout</span>
-          <span>→</span>
+          <span>&rsaquo;</span>
           <span>Order complete</span>
         </nav>
 
@@ -171,8 +172,8 @@ export function CartPage() {
           <h2 className="mb-6 text-xl font-bold text-center">How would you like to continue?</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Sign in / Account option */}
-            <div className="rounded-2xl border-2 border-[#1B3A5C]/30 bg-card p-6 flex flex-col gap-4 shadow-sm hover:border-[#1B3A5C] transition-colors">
-              <div className="grid size-11 place-items-center rounded-full bg-[#1B3A5C]/10 text-[#1B3A5C]">
+            <div className="rounded-2xl border-2 border-[#0B1F3A]/30 bg-card p-6 flex flex-col gap-4 shadow-sm hover:border-[#0B1F3A] transition-colors">
+              <div className="grid size-11 place-items-center rounded-full bg-[#0B1F3A]/10 text-[#0B1F3A]">
                 {isLoggedIn ? <UserCheck size={22} /> : <LogIn size={22} />}
               </div>
               {isLoggedIn ? (
@@ -182,14 +183,14 @@ export function CartPage() {
                     <p className="text-xs text-muted-foreground mt-1">{customer?.email}</p>
                   </div>
                   <ul className="text-xs text-muted-foreground space-y-1">
-                    <li>✓ Order linked to your account</li>
-                    <li>✓ Track status in My Account</li>
-                    <li>✓ View full order history</li>
+                    <li>&#10003; Order linked to your account</li>
+                    <li>&#10003; Track status in My Account</li>
+                    <li>&#10003; View full order history</li>
                   </ul>
                   <button
                     type="button"
                     onClick={() => setStep("checkout")}
-                    className="mt-auto w-full rounded-full bg-[#1B3A5C] py-3 text-sm font-bold text-white shadow transition-all hover:bg-[#163251]"
+                    className="mt-auto w-full rounded-full bg-[#0B1F3A] py-3 text-sm font-bold text-white shadow transition-all hover:bg-[#0d1631]"
                   >
                     Continue to Checkout
                   </button>
@@ -201,14 +202,14 @@ export function CartPage() {
                     <p className="text-xs text-muted-foreground mt-1">Track your orders &amp; save history</p>
                   </div>
                   <ul className="text-xs text-muted-foreground space-y-1">
-                    <li>✓ View past &amp; upcoming orders</li>
-                    <li>✓ Save your wishlist</li>
-                    <li>✓ Faster future checkouts</li>
+                    <li>&#10003; View past &amp; upcoming orders</li>
+                    <li>&#10003; Save your wishlist</li>
+                    <li>&#10003; Faster future checkouts</li>
                   </ul>
                   <button
                     type="button"
                     onClick={() => navigateTo("/login")}
-                    className="mt-auto w-full rounded-full bg-[#1B3A5C] py-3 text-sm font-bold text-white shadow transition-all hover:bg-[#163251]"
+                    className="mt-auto w-full rounded-full bg-[#0B1F3A] py-3 text-sm font-bold text-white shadow transition-all hover:bg-[#0d1631]"
                   >
                     <span className="flex items-center justify-center gap-2">
                       <LogIn size={15} /> Sign In / Register
@@ -228,9 +229,9 @@ export function CartPage() {
                 <p className="text-xs text-muted-foreground mt-1">No account needed</p>
               </div>
               <ul className="text-xs text-muted-foreground space-y-1">
-                <li>✓ Quick &amp; easy checkout</li>
-                <li>✓ No registration required</li>
-                <li className="text-gray-400">✗ Can't track order in account</li>
+                <li>&#10003; Quick &amp; easy checkout</li>
+                <li>&#10003; No registration required</li>
+                <li className="text-gray-400">&#10007; Can't track order in account</li>
               </ul>
               <button
                 type="button"
@@ -247,14 +248,14 @@ export function CartPage() {
             onClick={() => setStep("cart")}
             className="mt-6 w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors"
           >
-            ← Back to cart
+            ← Back to cart
           </button>
         </div>
       </div>
     );
   }
 
-  // ── Checkout Form ────────────────────────────────────
+  // ── Checkout Form ─────────────────────────────────────────────────────────
   if (step === "checkout") {
     return (
       <div className="container-page py-8">
@@ -266,11 +267,11 @@ export function CartPage() {
           >
             Shopping cart
           </button>
-          <span>→</span>
+          <span>&rsaquo;</span>
           <span className="font-semibold text-foreground underline underline-offset-8">
             Checkout
           </span>
-          <span>→</span>
+          <span>&rsaquo;</span>
           <span>Order complete</span>
         </nav>
 
@@ -328,7 +329,7 @@ export function CartPage() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-foreground">{i.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {i.size} × {i.qty}
+                      {i.size} &times; {i.qty}
                     </p>
                   </div>
                   <span className="font-semibold">{formatPrice(i.price * i.qty)}</span>
@@ -360,7 +361,7 @@ export function CartPage() {
               onClick={() => setStep("cart")}
               className="w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              ← Back to cart
+              ← Back to cart
             </button>
           </aside>
         </form>
@@ -368,21 +369,21 @@ export function CartPage() {
     );
   }
 
-  // ── Cart View ────────────────────────────────────────
+  // ── Cart View ─────────────────────────────────────────────────────────────
   return (
-    <div className="container-page py-8">
+    <div className="container-page py-8 overflow-x-hidden">
       <nav className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
         <span className="font-semibold text-foreground underline underline-offset-8">
           Shopping cart
         </span>
-        <span>→</span>
+        <span>&rsaquo;</span>
         <span>Checkout</span>
-        <span>→</span>
+        <span>&rsaquo;</span>
         <span>Order complete</span>
       </nav>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[7fr_3fr]">
-        <div className="rounded-2xl bg-card p-4 shadow-card sm:p-8">
+        <div className="min-w-0 overflow-hidden rounded-2xl bg-card p-4 shadow-card sm:p-8">
           {items.length === 0 ? (
             <div className="py-16 text-center">
               <p className="text-base text-muted-foreground">Your cart is currently empty.</p>
@@ -395,8 +396,9 @@ export function CartPage() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-125 text-sm">
+              {/* Desktop table */}
+              <div className="hidden sm:block overflow-x-auto w-full">
+                <table className="w-full min-w-[500px] text-sm">
                   <thead>
                     <tr className="border-b border-border text-left text-muted-foreground">
                       <th className="pb-4 font-semibold uppercase tracking-wider text-xs" colSpan={2}>
@@ -458,12 +460,48 @@ export function CartPage() {
                 </table>
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              {/* Mobile list */}
+              <div className="flex flex-col divide-y divide-border sm:hidden">
+                {items.map((item) => (
+                  <div key={`${item.slug}-${item.size}`} className="py-4 flex items-start gap-3">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="size-14 shrink-0 rounded-lg bg-surface object-cover shadow-sm"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate font-semibold text-gray-900 text-sm">{item.name}</p>
+                      <span className="text-xs text-muted-foreground border border-border rounded-full px-2 py-0.5">
+                        {item.size}
+                      </span>
+                      <div className="mt-2 flex items-center gap-3">
+                        <QtyInput
+                          value={item.qty}
+                          onChange={(q) => setQty(item.slug, item.size, q)}
+                        />
+                        <span className="text-sm font-bold text-gray-900">
+                          {formatPrice(item.price * item.qty)}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="Remove item"
+                      onClick={() => remove(item.slug, item.size)}
+                      className="grid size-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <input
                   value={coupon}
                   onChange={(e) => setCoupon(e.target.value)}
-                  placeholder="Coupon code"
-                  className="w-64 rounded-full border border-border bg-surface px-5 py-3 text-sm outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_rgba(var(--primary),0.1)]"
+                  placeholder="Code"
+                  className="w-full sm:w-64 rounded-full border border-border bg-surface px-5 py-3 text-sm outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_rgba(var(--primary),0.1)]"
                 />
                 <button
                   type="button"
@@ -476,7 +514,7 @@ export function CartPage() {
           )}
         </div>
 
-        <aside className="h-fit rounded-2xl bg-card p-6 shadow-card sm:p-8 lg:sticky lg:top-24 border border-primary/10">
+        <aside className="min-w-0 h-fit rounded-2xl bg-card p-6 shadow-card sm:p-8 lg:sticky lg:top-24 border border-primary/10">
           <h2 className="mb-6 text-xl font-bold">Cart Totals</h2>
           <div className="flex items-center justify-between border-b border-border py-4 text-sm">
             <span className="font-medium text-gray-600">Subtotal</span>
@@ -490,7 +528,7 @@ export function CartPage() {
             type="button"
             onClick={() => items.length > 0 && setStep(isLoggedIn ? "checkout" : "auth")}
             disabled={items.length === 0}
-            className="mt-6 w-full rounded-full bg-primary py-4 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-6 w-auto rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Proceed To Checkout
           </button>
@@ -562,3 +600,5 @@ function InputField({
     </div>
   );
 }
+
+

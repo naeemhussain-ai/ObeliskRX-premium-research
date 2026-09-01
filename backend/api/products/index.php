@@ -16,7 +16,7 @@ $minPrice = $_GET['min_price'] ?? null;
 $maxPrice = $_GET['max_price'] ?? null;
 $page     = max(1, (int)($_GET['page'] ?? 1));
 $limit    = (int)($_GET['limit'] ?? 12);
-$limit    = min($limit, 50); // max 50 per page
+$limit    = min($limit, 200); // max 200 per page
 $offset   = ($page - 1) * $limit;
 
 $where  = ['p.is_active = 1'];

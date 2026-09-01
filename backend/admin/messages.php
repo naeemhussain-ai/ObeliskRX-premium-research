@@ -7,8 +7,14 @@ $db     = getDB();
 $filter = $_GET['status'] ?? 'new';
 $where  = $filter !== 'all' ? "WHERE status = " . $db->quote($filter) : '';
 
-$messages   = $db->query("SELECT * FROM contact_messages $where ORDER BY created_at DESC")->fetchAll();
-$newCount   = (int)$db->query("SELECT COUNT(*) FROM contact_messages WHERE status = 'new'")->fetchColumn();
+$messages = $db->query("SELECT * FROM contact_messages $where ORDER BY created_at DESC")->fetchAll();
+
+// Count per status
+$statusCounts = [];
+foreach ($db->query("SELECT status, COUNT(*) AS cnt FROM contact_messages GROUP BY status")->fetchAll() as $r)
+    $statusCounts[$r['status']] = (int)$r['cnt'];
+$totalMessages = array_sum($statusCounts);
+$newCount      = $statusCounts['new'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,8 +34,21 @@ $newCount   = (int)$db->query("SELECT COUNT(*) FROM contact_messages WHERE statu
         </div>
 
         <div class="filter-tabs">
-            <?php foreach (['new' => 'New', 'read' => 'Read', 'replied' => 'Replied', 'all' => 'All'] as $key => $label): ?>
-                <a href="?status=<?= $key ?>" class="tab <?= $filter === $key ? 'active' : '' ?>"><?= $label ?></a>
+            <?php
+            $tabs = [
+                'new'     => ['New',     $statusCounts['new']     ?? 0],
+                'read'    => ['Read',    $statusCounts['read']    ?? 0],
+                'replied' => ['Replied', $statusCounts['replied'] ?? 0],
+                'all'     => ['All',     $totalMessages],
+            ];
+            foreach ($tabs as $key => [$label, $count]):
+            ?>
+                <a href="?status=<?= $key ?>" class="tab <?= $filter === $key ? 'active' : '' ?>">
+                    <?= $label ?>
+                    <?php if ($count > 0): ?>
+                        <span class="tab-count <?= $key === 'new' ? 'tab-count-warn' : '' ?>"><?= $count ?></span>
+                    <?php endif; ?>
+                </a>
             <?php endforeach; ?>
         </div>
 

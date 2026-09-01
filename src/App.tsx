@@ -82,20 +82,28 @@ function DocumentTitle({ title }: { title: string }) {
   return null;
 }
 
+function AppShell() {
+  const currentPath = useCurrentPath();
+
+  return (
+    <div className="flex min-h-screen flex-col bg-surface">
+      <Header />
+      <main className="flex-1 pt-[68px]">
+        <RoutedPage />
+      </main>
+      <Notice />
+      <Footer />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <AuthProvider>
     <CartProvider>
       <ToastProvider>
-        <div className="flex min-h-screen flex-col bg-surface">
-          <Header />
-          <main className="flex-1">
-            <RoutedPage />
-          </main>
-          <Notice />
-          <Footer />
-          <ToastContainer />
-        </div>
+        <AppShell />
+        <ToastContainer />
       </ToastProvider>
     </CartProvider>
     </AuthProvider>

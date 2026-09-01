@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, Mail, CheckCircle2 } from "lucide-react";
+import { Clock, Mail, MapPin, Phone, CheckCircle2 } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Link } from "@/lib/router";
 
@@ -63,22 +63,48 @@ export function ContactPage() {
           <h2 className="mb-8 text-2xl font-bold">Get in Touch</h2>
           <div className="space-y-6">
             <div className="flex items-start gap-5">
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-md transition-transform hover:scale-110">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform hover:scale-110">
+                <MapPin size={20} />
+              </span>
+              <div className="min-w-0">
+                <p className="text-base font-semibold">Address</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  ObeliskRX LLC<br />
+                  1489 W. Palmetto Park Rd. Suite 500<br />
+                  Boca Raton, FL 33486 US
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-5">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform hover:scale-110">
+                <Phone size={20} />
+              </span>
+              <div className="min-w-0">
+                <p className="text-base font-semibold">Phone</p>
+                <a href="tel:+15615718899" className="mt-1 block text-sm text-muted-foreground hover:text-primary transition-colors">
+                  (561) 571-8899
+                </a>
+              </div>
+            </div>
+            <div className="flex items-start gap-5">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform hover:scale-110">
                 <Mail size={20} />
               </span>
               <div className="min-w-0">
                 <p className="text-base font-semibold">Email</p>
-                <p className="mt-1 text-sm text-muted-foreground">Contact@Obeliskrx.com</p>
+                <a href="mailto:Contact@ObeliskRX.com" className="mt-1 block text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Contact@ObeliskRX.com
+                </a>
               </div>
             </div>
             <div className="flex items-start gap-5">
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-md transition-transform hover:scale-110">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform hover:scale-110">
                 <Clock size={20} />
               </span>
               <div className="min-w-0">
                 <p className="text-base font-semibold">Business Hours</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Monday - Friday 9:00 AM - 5:00 PM EST
+                  Monday – Friday<br />9:00 AM – 5:00 PM EST
                 </p>
               </div>
             </div>

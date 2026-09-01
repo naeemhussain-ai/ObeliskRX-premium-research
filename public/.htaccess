@@ -1,6 +1,14 @@
+Options -MultiViews
 RewriteEngine On
-RewriteBase /obeliskrx/
-RewriteRule ^index\.html$ - [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /obeliskrx/index.html [L]
+
+# Backend PHP files — Apache directly serve kare, SPA intercept na kare
+RewriteCond %{REQUEST_URI} ^/obeliskrx/backend/ [NC]
+RewriteRule ^ - [L]
+
+# Existing files aur directories seedha serve karo
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Baqi sab routes → SPA index.html
+RewriteRule ^ index.html [L]

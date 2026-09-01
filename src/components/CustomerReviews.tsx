@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Star } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 
-const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
+const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/backend/api";
 
 type Review = {
   name: string;

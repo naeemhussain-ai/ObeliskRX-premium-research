@@ -10,7 +10,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/lib/products";
+import { useProducts } from "@/lib/products";
 import { Link } from "@/lib/router";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 
@@ -40,6 +40,7 @@ function FilterSidebar({
   onPriceRangeChange,
   onClear,
   activeCount,
+  products,
 }: {
   selectedSeries: string[];
   onSeriesChange: (s: string) => void;
@@ -47,6 +48,7 @@ function FilterSidebar({
   onPriceRangeChange: (i: number) => void;
   onClear: () => void;
   activeCount: number;
+  products: { series: string }[];
 }) {
   const [seriesOpen, setSeriesOpen] = useState(true);
   const [priceOpen, setPriceOpen] = useState(true);
@@ -60,7 +62,7 @@ function FilterSidebar({
             <SlidersHorizontal size={16} className="text-primary" />
             <span className="text-sm font-bold text-gray-900">Filters</span>
             {activeCount > 0 && (
-              <span className="grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-white">
+              <span className="grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                 {activeCount}
               </span>
             )}
@@ -184,6 +186,7 @@ function FilterSidebar({
 }
 
 export function CatalogPage() {
+  const products = useProducts();
   const [show, setShow] = useState(12);
   const [cols, setCols] = useState(4);
   const [page, setPage] = useState(1);
@@ -254,6 +257,7 @@ export function CatalogPage() {
     onPriceRangeChange: handlePriceRangeChange,
     onClear: handleClearFilters,
     activeCount: activeFilterCount,
+    products,
   };
 
   return (
@@ -283,7 +287,7 @@ export function CatalogPage() {
             <SlidersHorizontal size={15} />
             Filters
             {activeFilterCount > 0 && (
-              <span className="grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-white">
+              <span className="grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                 {activeFilterCount}
               </span>
             )}

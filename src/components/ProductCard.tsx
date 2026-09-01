@@ -1,18 +1,48 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Heart, Search, ShoppingCart, X, Check } from "lucide-react";
-import logo from "@/assets/Obelisk-Logo-Design-02-1024x154.png";
 import { useCart } from "@/lib/cart";
 import { Link } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
 import { formatPrice, priceLabel, type Product } from "@/lib/products";
 
 export function Logo({ className = "h-8", light = false }: { className?: string; light?: boolean }) {
+  const textColor = light ? "#ffffff" : "#0B1F3A";
   return (
-    <img
-      src={logo}
-      alt="ObeliskRX"
-      className={`${className} w-auto ${light ? "brightness-0 invert" : ""}`}
-    />
+    <svg
+      viewBox="0 0 312 56"
+      className={`${className} w-auto`}
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="ObeliskRX"
+      role="img"
+    >
+      <defs>
+        <linearGradient id="__obrxGrad" x1="0.3" y1="0" x2="0.7" y2="1">
+          <stop offset="0%" stopColor="#5b8fd4" />
+          <stop offset="45%" stopColor="#3a4878" />
+          <stop offset="100%" stopColor="#7a3218" />
+        </linearGradient>
+      </defs>
+      {/* Blue arc "“ left */}
+      <path d="M 28,8 A 20,22 0 0,0 28,52"
+        fill="none" stroke="#174A7E" strokeWidth="5.5" strokeLinecap="round" />
+      {/* Orange arc "“ right */}
+      <path d="M 28,8 A 20,22 0 0,1 28,52"
+        fill="none" stroke="#F47A38" strokeWidth="5.5" strokeLinecap="round" />
+      {/* Obelisk */}
+      <polygon points="28,1 30.5,13 34,53 22,53 25.5,13" fill="url(#__obrxGrad)" />
+      {/* OBELISK */}
+      <text x="66" y="41"
+        fontFamily="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+        fontWeight="900" fontSize="36" fill={textColor} letterSpacing="1.5">
+        OBELISK
+      </text>
+      {/* Rx */}
+      <text x="262" y="41"
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontWeight="700" fontSize="29" fill="#F47A38">
+        Rx
+      </text>
+    </svg>
   );
 }
 
@@ -201,13 +231,13 @@ export function ProductCard({ product, compact = false }: { product: Product; co
             <Link
               to="/product/$slug"
               params={{ slug: product.slug }}
-              className="grid size-9 shrink-0 place-items-center rounded-full bg-white text-gray-700 shadow-md transition-all duration-300 hover:bg-primary hover:text-white hover:scale-110 hover:shadow-lg active:scale-95"
+              className="grid size-9 shrink-0 place-items-center rounded-full bg-white text-gray-700 shadow-md transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110 hover:shadow-lg active:scale-95"
             >
               <Search size={14} />
             </Link>
           </div>
         </div>
-        <div className={`bg-[#1B3A5C] transition-colors duration-300 group-hover:bg-[#163251] ${compact ? "p-3" : "p-4"}`}>
+        <div className={`bg-[#0B1F3A] transition-colors duration-300 group-hover:bg-[#0d1631] ${compact ? "p-3" : "p-4"}`}>
           <Link
             to="/product/$slug"
             params={{ slug: product.slug }}
@@ -234,3 +264,5 @@ export function ProductCard({ product, compact = false }: { product: Product; co
     </>
   );
 }
+
+

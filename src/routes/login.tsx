@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
 import { useAuth, AUTH_API } from "@/lib/auth";
 import { Link, navigateTo } from "@/lib/router";
@@ -128,7 +128,7 @@ export function LoginPage() {
               onClick={() => { setTab(t); setError(""); setSuccess(""); }}
               className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-200 ${
                 tab === t
-                  ? "bg-[#1B3A5C] text-white shadow-sm"
+                  ? "bg-[#0B1F3A] text-white shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -141,7 +141,7 @@ export function LoginPage() {
           {tab === "login" ? (
             <>
               <div className="mb-6 flex items-center gap-3">
-                <div className="grid size-10 place-items-center rounded-full bg-[#1B3A5C]/10 text-[#1B3A5C]">
+                <div className="grid size-10 place-items-center rounded-full bg-[#0B1F3A]/10 text-[#0B1F3A]">
                   <LogIn size={20} />
                 </div>
                 <div>
@@ -162,7 +162,7 @@ export function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-full bg-[#1B3A5C] py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-[#163251] hover:-translate-y-0.5 disabled:opacity-60"
+                  className="w-full rounded-full bg-[#0B1F3A] py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0d1631] hover:-translate-y-0.5 disabled:opacity-60"
                 >
                   {loading ? "Signing in…" : "Sign In"}
                 </button>
@@ -178,7 +178,7 @@ export function LoginPage() {
           ) : (
             <>
               <div className="mb-6 flex items-center gap-3">
-                <div className="grid size-10 place-items-center rounded-full bg-[#1B3A5C]/10 text-[#1B3A5C]">
+                <div className="grid size-10 place-items-center rounded-full bg-[#0B1F3A]/10 text-[#0B1F3A]">
                   <UserPlus size={20} />
                 </div>
                 <div>
@@ -206,7 +206,7 @@ export function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-full bg-[#1B3A5C] py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-[#163251] hover:-translate-y-0.5 disabled:opacity-60"
+                  className="w-full rounded-full bg-[#0B1F3A] py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0d1631] hover:-translate-y-0.5 disabled:opacity-60"
                 >
                   {loading ? "Creating account…" : "Create Account"}
                 </button>
@@ -225,10 +225,12 @@ export function LoginPage() {
         <p className="mt-6 text-center text-xs text-muted-foreground">
           Want to order without an account?{" "}
           <Link to="/cart" className="font-semibold text-primary hover:underline">
-            Continue as Guest →
+            Continue as Guest ←’
           </Link>
         </p>
       </div>
     </div>
   );
 }
+
+

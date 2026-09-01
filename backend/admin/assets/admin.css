@@ -133,6 +133,238 @@ body.admin-layout {
     border-left: 3px solid var(--accent);
 }
 
+/* ── Sidebar nav badge ───────────────────────────── */
+.nav-badge {
+    margin-left: auto;
+    background: var(--danger);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 99px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    line-height: 1;
+}
+
+/* ── Notification bell ───────────────────────────── */
+.notif-bell {
+    position: relative;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+.notif-bell:hover { background: rgba(255,255,255,0.2); }
+.notif-total-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 99px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    border: 2px solid var(--primary);
+}
+
+/* ── Notification overlay ────────────────────────── */
+.notif-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 199;
+}
+.notif-overlay.open { display: block; }
+
+/* ── Notification panel ──────────────────────────── */
+.notif-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: -4px 0 32px rgba(0,0,0,0.14);
+    z-index: 200;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    flex-direction: column;
+}
+.notif-panel.open { transform: translateX(0); }
+
+.notif-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 14px;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+}
+.notif-close {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 12px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    transition: background 0.15s;
+}
+.notif-close:hover { background: var(--border); color: var(--text); }
+
+.notif-section {
+    padding: 14px 20px 6px;
+    border-bottom: 1px solid var(--border);
+}
+.notif-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.notif-count-badge {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 99px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+.notif-count-yellow { background: #fef3c7; color: #92400e; }
+.notif-count-blue   { background: #dbeafe; color: #1e40af; }
+
+.notif-status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.notif-stat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 99px;
+    border: 1px solid;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    background: #fff;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+}
+.notif-stat-chip:hover { opacity: 0.75; }
+.notif-stat-chip strong { font-weight: 800; }
+
+.notif-items { display: flex; flex-direction: column; gap: 1px; margin-bottom: 6px; }
+.notif-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.12s;
+}
+.notif-item:hover { background: var(--bg); }
+.notif-item-main { flex: 1; min-width: 0; }
+.notif-item-title {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.notif-item-sub {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.notif-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    flex-shrink: 0;
+}
+.notif-item-amount { font-size: 12px; font-weight: 700; color: var(--primary); }
+
+.notif-status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-pending   { background: #f59e0b; }
+.status-approved  { background: #3b82f6; }
+.status-shipped   { background: #8b5cf6; }
+.status-delivered { background: #16a34a; }
+.status-rejected  { background: #ef4444; }
+
+.notif-view-all {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+    padding: 7px;
+    border-radius: 6px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    background: var(--bg);
+    transition: background 0.15s;
+}
+.notif-view-all:hover { background: var(--border); }
+
+.notif-empty {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    padding: 10px 0 14px;
+}
+
 .sidebar-footer {
     padding: 16px 20px;
     border-top: 1px solid rgba(255,255,255,0.1);
@@ -264,7 +496,10 @@ address { font-style: normal; line-height: 1.8; }
     padding-bottom: 0;
 }
 .tab {
-    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
     font-size: 13px;
     font-weight: 500;
     color: var(--muted);
@@ -272,9 +507,40 @@ address { font-style: normal; line-height: 1.8; }
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
     transition: color 0.15s;
+    white-space: nowrap;
 }
 .tab:hover { color: var(--primary); }
 .tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+
+/* count pill inside a tab */
+.tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 99px;
+    font-size: 10px;
+    font-weight: 700;
+    background: #e2e8f0;
+    color: #475569;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+}
+.tab.active .tab-count {
+    background: var(--primary);
+    color: #fff;
+}
+/* warning variant (pending / new) */
+.tab-count-warn {
+    background: #fef3c7;
+    color: #92400e;
+}
+.tab.active .tab-count-warn {
+    background: var(--danger);
+    color: #fff;
+}
 
 /* ── Badges ──────────────────────────────────────── */
 .badge {

@@ -29,10 +29,12 @@ export type Product = {
   specs: { label: string; value: string }[];
 };
 
-export const products: Product[] = [
+// Order matches DB seed insertion order (same as API ORDER BY id ASC)
+const _staticProducts: Product[] = [
+  // ── Metabolic Series ──────────────────────────────────
   {
     slug: "2t-peptide",
-    name: "GLP-2 (TR)",
+    name: "2(T) Peptide",
     series: "Metabolic Series",
     image: p2t,
     price: 130,
@@ -50,7 +52,7 @@ export const products: Product[] = [
   },
   {
     slug: "3r-peptide",
-    name: "GLP-3 (RT)",
+    name: "3(R) Peptide",
     series: "Metabolic Series",
     image: p3r,
     price: 70,
@@ -67,8 +69,33 @@ export const products: Product[] = [
     ],
   },
   {
+    slug: "igf-lr3",
+    name: "IGF-LR3",
+    series: "Metabolic Series",
+    image: igf,
+    price: 69,
+    oldPrice: 107.99,
+    discount: 36,
+    sizes: ["1mg"],
+    description: "",
+    specs: [],
+  },
+  {
+    slug: "ipamorelin",
+    name: "Ipamorelin",
+    series: "Metabolic Series",
+    image: ipa,
+    price: 56,
+    oldPrice: 85.99,
+    discount: 35,
+    sizes: ["5mg"],
+    description: "",
+    specs: [],
+  },
+  // ── Recovery Series ───────────────────────────────────
+  {
     slug: "bpc-157",
-    name: "BPC-157/TB-500 20mg (Wolverine)",
+    name: "BPC-157",
     series: "Recovery Series",
     image: bpc,
     price: 99,
@@ -84,20 +111,55 @@ export const products: Product[] = [
     ],
   },
   {
-    slug: "cjc-1295-no-dac",
-    name: "CJC-1295 No DAC",
-    series: "Growth Series",
-    image: cjc,
+    slug: "tb-500",
+    name: "TB-500",
+    series: "Recovery Series",
+    image: tb500,
     price: 49.99,
     oldPrice: 76.99,
     discount: 35,
-    sizes: ["5mg"],
+    sizes: ["10mg"],
     description:
-      "A 29-amino-acid synthetic analog of growth hormone-releasing hormone (Mod GRF 1-29), studied for its role in growth hormone signaling research.",
+      "A 43-amino-acid peptide corresponding to Thymosin Beta-4, studied for its role in actin regulation, cellular migration, and tissue repair signaling in laboratory models.",
     specs: [
-      { label: "Molecular Formula", value: "C152H252N44O42" },
-      { label: "Molecular Weight", value: "~3,367 g/mol" },
-      { label: "Amino Acids", value: "29" },
+      { label: "CAS Number", value: "77591-33-4" },
+      { label: "Molecular Formula", value: "C212H350N56O78S" },
+      { label: "Molecular Weight", value: "4,963.44 g/mol" },
+      { label: "Amino Acids", value: "43" },
+    ],
+  },
+  {
+    slug: "bpc-157-tb-500-blend",
+    name: "BPC-157 / TB-500 Blend",
+    series: "Recovery Series",
+    image: bpctb,
+    price: 129.99,
+    oldPrice: 199.99,
+    discount: 35,
+    sizes: ["20mg"],
+    description:
+      "A combined formulation of BPC-157 and TB-500 in equal proportion, supplied for laboratory research examining their overlapping roles in tissue repair and cellular signaling pathways.",
+    specs: [
+      { label: "Composition", value: "BPC-157 (CAS 137525-51-0) + TB-500 (CAS 77591-33-4)" },
+      { label: "Ratio", value: "1:1" },
+    ],
+  },
+  // ── Longevity Series ──────────────────────────────────
+  {
+    slug: "nad",
+    name: "NAD+",
+    series: "Longevity Series",
+    image: nad,
+    price: 69.99,
+    priceMax: 100,
+    discount: 35,
+    sizes: ["500mg", "1000mg"],
+    description:
+      "A naturally occurring coenzyme central to cellular energy metabolism and redox reactions, studied in laboratory research for its role in mitochondrial function and cellular aging pathways. Available in 500mg and 1000mg.",
+    specs: [
+      { label: "CAS Number", value: "53-84-9" },
+      { label: "Molecular Formula", value: "C21H27N7O14P2" },
+      { label: "Molecular Weight", value: "663.43 g/mol" },
     ],
   },
   {
@@ -135,44 +197,38 @@ export const products: Product[] = [
       { label: "Molecular Weight", value: "340.38 g/mol (tripeptide)" },
     ],
   },
+  // ── Growth Series ─────────────────────────────────────
   {
-    slug: "igf-lr3",
-    name: "IGF-LR3",
-    series: "Metabolic Series",
-    image: igf,
-    price: 69,
-    oldPrice: 107.99,
-    discount: 36,
-    sizes: ["1mg"],
-    description: "",
-    specs: [],
-  },
-  {
-    slug: "ipamorelin",
-    name: "Ipamorelin",
-    series: "Metabolic Series",
-    image: ipa,
-    price: 56,
-    oldPrice: 85.99,
+    slug: "cjc-1295-no-dac",
+    name: "CJC-1295 No DAC",
+    series: "Growth Series",
+    image: cjc,
+    price: 49.99,
+    oldPrice: 76.99,
     discount: 35,
     sizes: ["5mg"],
-    description: "",
-    specs: [],
+    description:
+      "A 29-amino-acid synthetic analog of growth hormone-releasing hormone (Mod GRF 1-29), studied for its role in growth hormone signaling research.",
+    specs: [
+      { label: "Molecular Formula", value: "C152H252N44O42" },
+      { label: "Molecular Weight", value: "~3,367 g/mol" },
+      { label: "Amino Acids", value: "29" },
+    ],
   },
   {
-    slug: "klow-blend",
-    name: "KLOW Blend",
-    series: "Signature Blends",
-    image: klow,
-    price: 100.99,
-    oldPrice: 153.99,
-    discount: 34,
-    sizes: ["80mg"],
+    slug: "tesamorelin",
+    name: "Tesamorelin",
+    series: "Growth Series",
+    image: tesa,
+    price: 69.99,
+    oldPrice: 107.99,
+    discount: 35,
+    sizes: ["10mg"],
     description:
-      "A four-compound research formulation combining GHK-Cu (50mg), BPC-157 (10mg), TB-500 (10mg), and KPV (10mg), supplied for laboratory studies examining tissue repair, cellular signaling, and regenerative research pathways.",
+      "A 44-amino-acid synthetic analog of growth hormone-releasing hormone, modified for enhanced stability, studied for its role in growth hormone secretion research.",
     specs: [
-      { label: "Composition", value: "GHK-Cu (CAS 89030-95-5) + BPC-157 (CAS 137525-51-0) + TB-500 (CAS 77591-33-4) + KPV (CAS 75435-82-2)" },
-      { label: "Total", value: "80mg" },
+      { label: "CAS Number", value: "218949-48-5" },
+      { label: "Amino Acids", value: "44" },
     ],
   },
   {
@@ -192,23 +248,7 @@ export const products: Product[] = [
       { label: "Amino Acids", value: "16" },
     ],
   },
-  {
-    slug: "nad",
-    name: "NAD+",
-    series: "Longevity Series",
-    image: nad,
-    price: 69.99,
-    priceMax: 100,
-    discount: 35,
-    sizes: ["500mg", "1000mg"],
-    description:
-      "A naturally occurring coenzyme central to cellular energy metabolism and redox reactions, studied in laboratory research for its role in mitochondrial function and cellular aging pathways. Available in 500mg and 1000mg.",
-    specs: [
-      { label: "CAS Number", value: "53-84-9" },
-      { label: "Molecular Formula", value: "C21H27N7O14P2" },
-      { label: "Molecular Weight", value: "663.43 g/mol" },
-    ],
-  },
+  // ── Neuro Series ──────────────────────────────────────
   {
     slug: "selank",
     name: "Selank",
@@ -246,62 +286,114 @@ export const products: Product[] = [
       { label: "Amino Acids", value: "7" },
     ],
   },
+  // ── Signature Blends ──────────────────────────────────
   {
-    slug: "tb-500",
-    name: "TB-500",
-    series: "Recovery Series",
-    image: tb500,
-    price: 49.99,
-    oldPrice: 76.99,
-    discount: 35,
-    sizes: ["10mg"],
+    slug: "klow-blend",
+    name: "KLOW Blend",
+    series: "Signature Blends",
+    image: klow,
+    price: 100.99,
+    oldPrice: 153.99,
+    discount: 34,
+    sizes: ["80mg"],
     description:
-      "A 43-amino-acid peptide corresponding to Thymosin Beta-4, studied for its role in actin regulation, cellular migration, and tissue repair signaling in laboratory models.",
+      "A four-compound research formulation combining GHK-Cu (50mg), BPC-157 (10mg), TB-500 (10mg), and KPV (10mg), supplied for laboratory studies examining tissue repair, cellular signaling, and regenerative research pathways.",
     specs: [
-      { label: "CAS Number", value: "77591-33-4" },
-      { label: "Molecular Formula", value: "C212H350N56O78S" },
-      { label: "Molecular Weight", value: "4,963.44 g/mol" },
-      { label: "Amino Acids", value: "43" },
-    ],
-  },
-  {
-    slug: "bpc-157-tb-500-blend",
-    name: "BPC-157 / TB-500 Blend",
-    series: "Recovery Series",
-    image: bpctb,
-    price: 129.99,
-    oldPrice: 199.99,
-    discount: 35,
-    sizes: ["20mg"],
-    description:
-      "A combined formulation of BPC-157 and TB-500 in equal proportion, supplied for laboratory research examining their overlapping roles in tissue repair and cellular signaling pathways.",
-    specs: [
-      { label: "Composition", value: "BPC-157 (CAS 137525-51-0) + TB-500 (CAS 77591-33-4)" },
-      { label: "Ratio", value: "1:1" },
-    ],
-  },
-  {
-    slug: "tesamorelin",
-    name: "Tesamorelin",
-    series: "Growth Series",
-    image: tesa,
-    price: 69.99,
-    oldPrice: 107.99,
-    discount: 35,
-    sizes: ["10mg"],
-    description:
-      "A 44-amino-acid synthetic analog of growth hormone-releasing hormone, modified for enhanced stability, studied for its role in growth hormone secretion research.",
-    specs: [
-      { label: "CAS Number", value: "218949-48-5" },
-      { label: "Amino Acids", value: "44" },
+      { label: "Composition", value: "GHK-Cu (CAS 89030-95-5) + BPC-157 (CAS 137525-51-0) + TB-500 (CAS 77591-33-4) + KPV (CAS 75435-82-2)" },
+      { label: "Total", value: "80mg" },
     ],
   },
 ];
 
-export const catalogPageOne = products.slice(0, 12);
-export const featuredProducts = products.slice(0, 7);
+const PRODUCTS_KEY = "obeliskrx-products";
+const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/backend/api";
 
-export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
+type ApiProduct = {
+  slug: string; name: string; series: string; description: string;
+  price: string; price_max: string | null; old_price: string | null;
+  discount: number; sizes: string[]; specs: { label: string; value: string }[];
+  image_url: string;
+};
+
+function mapApiProduct(p: ApiProduct): Product {
+  return {
+    slug: p.slug,
+    name: p.name,
+    series: p.series,
+    image: p.image_url,
+    price: parseFloat(p.price),
+    priceMax: p.price_max ? parseFloat(p.price_max) : undefined,
+    oldPrice: p.old_price ? parseFloat(p.old_price) : undefined,
+    discount: p.discount,
+    sizes: p.sizes ?? [],
+    description: p.description ?? "",
+    specs: p.specs ?? [],
+  };
+}
+
+export async function syncProductsFromAPI(): Promise<void> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(`${API}/products/?limit=100`, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) return;
+    const json = (await res.json()) as { data?: { products: ApiProduct[] }; products?: ApiProduct[] };
+    const products = json.data?.products ?? (json as any).products;
+    if (!Array.isArray(products) || products.length === 0) return;
+    const mapped = products.map(mapApiProduct);
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(mapped));
+  } catch {
+    // Server unreachable — localStorage/static data use hoga
+  }
+}
+
+export function getProducts(): Product[] {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Product[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch {
+    // JSON parse error or localStorage unavailable — fall through to seed
+  }
+  // Seed with static products
+  try {
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(_staticProducts));
+  } catch {
+    // Storage quota exceeded or unavailable
+  }
+  return _staticProducts;
+}
+
+export function saveProduct(product: Product): void {
+  const products = getProducts();
+  const idx = products.findIndex((p) => p.slug === product.slug);
+  if (idx >= 0) {
+    products[idx] = product;
+  } else {
+    products.push(product);
+  }
+  try {
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+  } catch {
+    // Storage quota exceeded
+  }
+}
+
+export function deleteProduct(slug: string): void {
+  const products = getProducts().filter((p) => p.slug !== slug);
+  try {
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+  } catch {
+    // Storage quota exceeded
+  }
+}
+
+export const getProduct = (slug: string) => getProducts().find((p) => p.slug === slug);
 
 export const formatPrice = (n: number) =>
   `$${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
@@ -315,3 +407,16 @@ export const priceForSize = (p: Product, size: string) => {
   if (idx === -1) return null;
   return idx === p.sizes.length - 1 ? p.priceMax : p.price;
 };
+
+// React hook — products + COA dono API se sync karta hai
+import { useState, useEffect } from "react";
+import { syncCoaFromAPI } from "@/lib/coa";
+export function useProducts(): Product[] {
+  const [products, setProducts] = useState<Product[]>(getProducts);
+  useEffect(() => {
+    Promise.all([syncProductsFromAPI(), syncCoaFromAPI()]).then(() =>
+      setProducts(getProducts())
+    );
+  }, []);
+  return products;
+}

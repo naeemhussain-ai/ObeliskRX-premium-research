@@ -76,7 +76,7 @@ INSERT INTO products (slug, name, series, description, price, price_max, old_pri
   129.99, NULL, 199.99, 35,
   '["20mg"]',
   '[{"label":"Composition","value":"BPC-157 (CAS 137525-51-0) + TB-500 (CAS 77591-33-4)"},{"label":"Ratio","value":"1:1"}]',
-  'BPC-TB-Blend-20mg.jpg'
+  'BPC-157-TB500-10mg.jpg'
 ),
 
 -- ── Longevity Series ─────────────────────────────────
@@ -120,7 +120,7 @@ INSERT INTO products (slug, name, series, description, price, price_max, old_pri
   49.99, NULL, 76.99, 35,
   '["5mg"]',
   '[{"label":"Molecular Formula","value":"C152H252N44O42"},{"label":"Molecular Weight","value":"~3,367 g/mol"},{"label":"Amino Acids","value":"29"}]',
-  'CJC-1295-No-DAC-5mg.jpg'
+  'CJC-1295-NO-DAC-5mg.jpg'
 ),
 (
   'tesamorelin',
@@ -140,7 +140,7 @@ INSERT INTO products (slug, name, series, description, price, price_max, old_pri
   80.99, NULL, 122.99, 34,
   '["20mg"]',
   '[{"label":"Molecular Formula","value":"C101H152N28O22S2"},{"label":"Molecular Weight","value":"2,174.64 g/mol"},{"label":"Amino Acids","value":"16"}]',
-  'MOTS-c-20mg.jpg'
+  'MOTSC-20mg.jpg'
 ),
 
 -- ── Neuro Series ─────────────────────────────────────
@@ -174,5 +174,5 @@ INSERT INTO products (slug, name, series, description, price, price_max, old_pri
   100.99, NULL, 153.99, 34,
   '["80mg"]',
   '[{"label":"Composition","value":"GHK-Cu (CAS 89030-95-5) + BPC-157 (CAS 137525-51-0) + TB-500 (CAS 77591-33-4) + KPV (CAS 75435-82-2)"},{"label":"Total","value":"80mg"}]',
-  'KLOW-Blend-80mg.jpg'
+  'KLOW-80mg.jpg'
 );

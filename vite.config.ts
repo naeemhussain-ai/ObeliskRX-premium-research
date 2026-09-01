@@ -8,5 +8,14 @@ export default defineConfig(({ mode }) => {
   return {
     base: env.VITE_BASE_URL ?? "/obeliskrx/",
     plugins: [react(), tailwindcss(), tsconfigPaths()],
+    server: {
+      proxy: {
+        "/backend": {
+          target: "http://localhost",
+          changeOrigin: true,
+          rewrite: (path) => `/obeliskrx${path}`,
+        },
+      },
+    },
   };
 });

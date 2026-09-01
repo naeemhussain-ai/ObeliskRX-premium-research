@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import {
   ClockIcon,
   Heart,
@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useAuth, AUTH_API } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
-import { formatPrice, products as allProducts } from "@/lib/products";
+import { formatPrice, getProducts } from "@/lib/products";
 import { Link, navigateTo } from "@/lib/router";
 
 type OrderItem = { product_name: string; size: string; quantity: number; unit_price: number };
@@ -62,7 +62,7 @@ function OrderCard({ order }: { order: Order }) {
             {STATUS_LABEL[order.status] ?? order.status}
           </span>
           <span className="font-bold text-sm text-primary">{formatPrice(Number(order.total))}</span>
-          <span className="text-xs text-muted-foreground">{open ? "▲" : "▼"}</span>
+          <span className="text-xs text-muted-foreground">{open ? "–²" : "–¼"}</span>
         </div>
       </button>
 
@@ -73,7 +73,7 @@ function OrderCard({ order }: { order: Order }) {
               <span className="text-foreground">
                 {item.product_name}
                 {item.size && <span className="ml-1 text-xs text-muted-foreground">({item.size})</span>}
-                {" ×"}{item.quantity}
+                {" Ã—"}{item.quantity}
               </span>
               <span className="font-semibold">{formatPrice(Number(item.unit_price) * item.quantity)}</span>
             </div>
@@ -85,6 +85,7 @@ function OrderCard({ order }: { order: Order }) {
 }
 
 export function AccountPage() {
+  const allProducts = getProducts();
   const { customer, logout, token, isLoggedIn } = useAuth();
   const { items, count, subtotal, wishlist } = useCart();
 
@@ -130,7 +131,7 @@ export function AccountPage() {
       {/* Header */}
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="grid size-12 place-items-center rounded-full bg-[#1B3A5C] text-white text-lg font-bold">
+          <div className="grid size-12 place-items-center rounded-full bg-[#0B1F3A] text-white text-lg font-bold">
             {customer?.name?.[0]?.toUpperCase() ?? "U"}
           </div>
           <div>
@@ -155,10 +156,10 @@ export function AccountPage() {
           {/* Upcoming Orders */}
           <section>
             <div className="mb-3 flex items-center gap-2">
-              <ClockIcon size={18} className="text-[#1B3A5C]" />
+              <ClockIcon size={18} className="text-[#0B1F3A]" />
               <h2 className="text-base font-bold">Upcoming Orders</h2>
               {upcoming.length > 0 && (
-                <span className="ml-1 rounded-full bg-[#1B3A5C] px-2 py-0.5 text-[11px] font-bold text-white">
+                <span className="ml-1 rounded-full bg-[#0B1F3A] px-2 py-0.5 text-[11px] font-bold text-white">
                   {upcoming.length}
                 </span>
               )}
@@ -181,7 +182,7 @@ export function AccountPage() {
           {/* Past Orders */}
           <section>
             <div className="mb-3 flex items-center gap-2">
-              <Package size={18} className="text-[#1B3A5C]" />
+              <Package size={18} className="text-[#0B1F3A]" />
               <h2 className="text-base font-bold">Order History</h2>
             </div>
             {ordersLoading ? (
@@ -205,11 +206,11 @@ export function AccountPage() {
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShoppingCart size={17} className="text-[#1B3A5C]" />
+                <ShoppingCart size={17} className="text-[#0B1F3A]" />
                 <h2 className="text-sm font-bold">My Cart</h2>
               </div>
               {count > 0 && (
-                <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-white">
+                <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
                   {count}
                 </span>
               )}
@@ -223,7 +224,7 @@ export function AccountPage() {
                     <img src={i.image} alt={i.name} className="size-9 rounded-lg object-cover bg-surface shrink-0" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{i.name}</p>
-                      <p className="text-muted-foreground">{i.size} × {i.qty}</p>
+                      <p className="text-muted-foreground">{i.size} Ã— {i.qty}</p>
                     </div>
                     <span className="font-semibold shrink-0">{formatPrice(i.price * i.qty)}</span>
                   </div>
@@ -234,7 +235,7 @@ export function AccountPage() {
                 </div>
                 <Link
                   to="/cart"
-                  className="block w-full rounded-full bg-primary py-2.5 text-center text-xs font-bold text-white shadow transition-all hover:opacity-90"
+                  className="block w-full rounded-full bg-primary py-2.5 text-center text-xs font-bold text-primary-foreground shadow transition-all hover:opacity-90"
                 >
                   Go to Cart
                 </Link>
@@ -245,10 +246,10 @@ export function AccountPage() {
           {/* Wishlist */}
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div className="mb-3 flex items-center gap-2">
-              <Heart size={17} className="text-[#1B3A5C]" />
+              <Heart size={17} className="text-[#0B1F3A]" />
               <h2 className="text-sm font-bold">Wishlist</h2>
               {wishlist.length > 0 && (
-                <span className="rounded-full bg-[#1B3A5C] px-2 py-0.5 text-[11px] font-bold text-white">
+                <span className="rounded-full bg-[#0B1F3A] px-2 py-0.5 text-[11px] font-bold text-white">
                   {wishlist.length}
                 </span>
               )}
@@ -278,7 +279,7 @@ export function AccountPage() {
           {/* Account Info */}
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div className="mb-3 flex items-center gap-2">
-              <User size={17} className="text-[#1B3A5C]" />
+              <User size={17} className="text-[#0B1F3A]" />
               <h2 className="text-sm font-bold">Account</h2>
             </div>
             <div className="space-y-1 text-xs text-muted-foreground">
@@ -291,3 +292,5 @@ export function AccountPage() {
     </div>
   );
 }
+
+
