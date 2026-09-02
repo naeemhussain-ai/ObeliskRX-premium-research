@@ -6,7 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * ObeliskRX Brand System — Sunset Precision
+ * ObeliskRX Brand System   Sunset Precision
  * Midnight:#0B1F3A  ClinicalBlue:#174A7E  HorizonBlue:#6FA9D8
  * VictoryOrange:#F47A38  SunsetAmber:#FFB15A
  * WarmIvory:#F7F3EC  Ink:#17212B
@@ -59,8 +59,8 @@
   --font-body:    "Inter",   ui-sans-serif, system-ui, sans-serif;
 
   /* ── Radii ─────────────────────────────────────────── */
-  --radius: 0.688rem; /* 11px — buttons */
-  --radius-card: 1rem; /* 16px — cards */
+  --radius: 0.688rem; /* 11px   buttons */
+  --radius-card: 1rem; /* 16px   cards */
 
   /* ── Brand palette ─────────────────────────────────── */
   --orx-midnight: #0B1F3A;
@@ -179,7 +179,7 @@
   );
 }
 
-/* Trust bar — above cream fade, sharp and dark */
+/* Trust bar   above cream fade, sharp and dark */
 .hero-features {
   position: relative;
   z-index: 3;
@@ -195,7 +195,7 @@
   transform: translateY(-50px);
 }
 
-/* Soft shadow below card — sits in the fade area, not on the card */
+/* Soft shadow below card   sits in the fade area, not on the card */
 .hero-features::before {
   content: "";
   position: absolute;
@@ -217,14 +217,14 @@
 }
 
 @layer base {
-  /* Keyboard focus ring — Clinical Blue 3px */
+  /* Keyboard focus ring   Clinical Blue 3px */
   :focus-visible {
     outline: 3px solid #174A7E;
     outline-offset: 2px;
     border-radius: 4px;
   }
 
-  /* Primary button hover — darken to #D96529 per brand doc */
+  /* Primary button hover   darken to #D96529 per brand doc */
   .hover\:bg-primary\/90:hover {
     background-color: #D96529 !important;
     opacity: 1 !important;

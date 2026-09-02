@@ -1,11 +1,7 @@
 ﻿import { useState } from "react";
-import { ChevronDown, Play } from "lucide-react";
+import { ChevronDown, ArrowRight, FlaskConical } from "lucide-react";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
-import { CustomerReviews } from "@/components/CustomerReviews";
-
-// Import images from assets folder
-import vidOpt from "@/assets/about-pic/c2-abus-vid-opt.jpg";
-import membClub from "@/assets/about-pic/c2-abus-memb-club.jpg";
+import { navigateTo } from "@/lib/router";
 
 const aboutParagraphs = [
   "Welcome to ObeliskRX, your source for rigorously documented peptides for laboratory and research use. Our mission is simple   give researchers material they can trust, backed by proof, not claims.",
@@ -18,13 +14,11 @@ const aboutParagraphs = [
 
 export function AboutPage() {
   const [expanded, setExpanded] = useState(false);
-  const [isVideoOpen, setIsVideoOpen] = useState(false);
-  
+
   // Animation hooks
   const [heroRef, heroVisible] = useStaggerAnimation<HTMLElement>();
   const [contentRef, contentVisible] = useStaggerAnimation<HTMLElement>();
-  const [reviewsRef, reviewsVisible] = useStaggerAnimation<HTMLElement>();
-  const [bottomRef, bottomVisible] = useStaggerAnimation<HTMLElement>();
+  const [ctaRef, ctaVisible] = useStaggerAnimation<HTMLElement>();
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground pb-8">
@@ -65,70 +59,36 @@ export function AboutPage() {
         </button>
       </section>
 
-      {/* ===== CUSTOMER REVIEWS ===== */}
+      {/* ===== CTA   SHOP PRODUCTS ===== */}
       <section
-        ref={reviewsRef}
-        className={`container-page pb-16 animate-on-scroll animate-scale ${reviewsVisible ? "animate-visible" : ""}`}
+        ref={ctaRef}
+        className={`container-page pb-16 animate-on-scroll animate-scale ${ctaVisible ? "animate-visible" : ""}`}
       >
-        <CustomerReviews slug="obeliskrx-company" />
-      </section>
-
-      {/* ===== BOTTOM CARDS ===== */}
-      <section 
-        ref={bottomRef}
-        className={`container-page pb-16 animate-on-scroll ${bottomVisible ? "animate-visible" : ""}`}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Video Card */}
-          <div className="relative rounded-xl overflow-hidden aspect-[4/3] md:aspect-auto md:h-72 group cursor-pointer shadow-card hover:shadow-card-hover transition-shadow">
-            {isVideoOpen ? (
-              <iframe 
-                width="100%" 
-                height="100%" 
-                src="https://www.youtube.com/embed/hCdF4adrbCA?autoplay=1" 
-                title="YouTube video player" 
-                frameBorder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                referrerPolicy="strict-origin-when-cross-origin" 
-                allowFullScreen
-                className="absolute inset-0"
-              />
-            ) : (
-              <div className="w-full h-full relative" onClick={() => setIsVideoOpen(true)}>
-                <img
-                  src={vidOpt}
-                  alt="How We Start Our Business"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/90 flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.4)] group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(233,30,99,0.6)] transition-all duration-300">
-                    <Play size={24} className="text-gray-800 ml-1 group-hover:text-primary transition-colors" fill="currentColor" />
-                  </div>
-                </div>
-                <div className="absolute bottom-0 left-0 p-6 z-10">
-                  <h3 className="text-white text-lg md:text-xl font-semibold">How We Start Our Business</h3>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Member Club Card */}
-          <div className="relative rounded-xl overflow-hidden bg-primary h-72 flex items-center shadow-card hover:shadow-card-hover transition-shadow hover-glow">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0" />
-            <div className="relative z-10 p-8 md:p-10 max-w-[60%]">
-              <h3 className="text-primary-foreground text-xl md:text-2xl font-bold leading-snug">
-                Become a Member<br />of the Club
-              </h3>
+        <div
+          className="relative rounded-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 p-10 md:p-14 shadow-card"
+          style={{ background: "linear-gradient(135deg, #0B1F3A 0%, #174A7E 100%)" }}
+        >
+          <div className="flex items-center gap-5">
+            <div className="flex-shrink-0 w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+              <FlaskConical size={28} className="text-white" />
             </div>
-            <img
-              src={membClub}
-              alt="Become a Member"
-              className="absolute right-0 bottom-0 h-full w-1/2 object-cover object-top transition-transform duration-700 hover:scale-110 opacity-90 z-10"
-            />
+            <div>
+              <h3 className="text-white text-2xl md:text-3xl font-bold leading-tight">
+                Explore Our Research Compounds
+              </h3>
+              <p className="mt-1 text-white/70 text-sm md:text-base max-w-md">
+                Browse our full catalog of third-party tested peptides   each with a published Certificate of Analysis.
+              </p>
+            </div>
           </div>
-
+          <button
+            type="button"
+            onClick={() => navigateTo("/catalog")}
+            className="flex-shrink-0 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-bold text-[#0B1F3A] shadow-lg hover:bg-white/90 transition-colors duration-200"
+          >
+            Shop Products
+            <ArrowRight size={16} />
+          </button>
         </div>
       </section>
     </div>

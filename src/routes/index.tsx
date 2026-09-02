@@ -125,7 +125,7 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* Trust bar — frosted glass container */}
+        {/* Trust bar   frosted glass container */}
         <div className="absolute bottom-0 left-0 right-0 z-[2] px-4 pb-10">
           <div className="hero-features flex flex-wrap items-center justify-center divide-x divide-white/20">
             {["Independent Testing", "Batch Documentation", "Research Use Only"].map((item) => (

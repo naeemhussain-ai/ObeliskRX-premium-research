@@ -143,7 +143,7 @@ export function Header() {
           <Logo className="h-10 sm:h-11" light={isTransparent} />
         </Link>
 
-        {/* Desktop Nav — centered */}
+        {/* Desktop Nav   centered */}
         <nav className="hidden items-center justify-center gap-6 lg:flex">
           {nav.map((item) => (
             <Link
@@ -161,7 +161,7 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Right side — View Catalog + small icons */}
+        {/* Right side   View Catalog + small icons */}
         <div className="flex items-center justify-end gap-2">
           {/* Search icon */}
           <button
@@ -215,7 +215,7 @@ export function Header() {
             )}
           </Link>
 
-          {/* View Catalog CTA — outline only, no background */}
+          {/* View Catalog CTA   outline only, no background */}
           <Link
             to="/catalog"
             className={`hidden md:inline-flex items-center px-4 py-2 text-sm font-semibold border transition-all duration-200 rounded-none ${

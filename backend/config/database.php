@@ -5,10 +5,12 @@ if (file_exists($localConfig)) {
     require_once $localConfig;
 } else {
     // ── Production (cPanel) Credentials ─────────────
+    // Real values live only on the server. Keep them in an untracked
+    // backend/config/local.php (git-ignored) so they never enter the repo.
     define('DB_HOST', 'localhost');
     define('DB_NAME', 'axistechstaging_obeliskrx');
     define('DB_USER', 'axistechstaging_obeliskrx');
-    define('DB_PASS', 'qH)63o)tuLjM?G8c');
+    define('DB_PASS', getenv('OBELISK_DB_PASS') ?: 'SET_IN_local.php_OR_ENV');
 }
 
 function getDB(): PDO {

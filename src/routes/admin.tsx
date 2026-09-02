@@ -883,7 +883,7 @@ function UploadModal({ open, onClose, slug, productName, existing, onSaved }: Up
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="flex max-h-[90vh] w-[95vw] max-w-xl flex-col gap-0 overflow-hidden p-0 sm:rounded-2xl">
         <DialogHeader className="border-b border-border p-5">
-          <DialogTitle>{existing ? "Edit COA" : "Upload COA"} — {productName}</DialogTitle>
+          <DialogTitle>{existing ? "Edit COA" : "Upload COA"}   {productName}</DialogTitle>
           <DialogDescription>
             Upload image(s) or PDF. These will override any built-in COA for this product.
           </DialogDescription>

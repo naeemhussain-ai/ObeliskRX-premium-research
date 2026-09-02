@@ -224,7 +224,7 @@ export function AccountPage() {
                     <img src={i.image} alt={i.name} className="size-9 rounded-lg object-cover bg-surface shrink-0" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{i.name}</p>
-                      <p className="text-muted-foreground">{i.size} Ã— {i.qty}</p>
+                      <p className="text-muted-foreground">{i.size} Ã  {i.qty}</p>
                     </div>
                     <span className="font-semibold shrink-0">{formatPrice(i.price * i.qty)}</span>
                   </div>

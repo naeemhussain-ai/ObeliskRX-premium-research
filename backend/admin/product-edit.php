@@ -385,8 +385,12 @@ var coaFiles = [];
 
 function updateCoaFileList(input) {
     Array.from(input.files).forEach(function(f) { coaFiles.push(f); });
-    renderCoaList();
+    // Clear the native selection FIRST, then rebuild the input's FileList from
+    // our tracked array inside renderCoaList(). Doing input.value = '' after
+    // renderCoaList() wiped the freshly-rebuilt FileList, so nothing was ever
+    // submitted and COA uploads (PDF and images) silently failed.
     input.value = '';
+    renderCoaList();
 }
 
 function removeCoaFile(idx) {

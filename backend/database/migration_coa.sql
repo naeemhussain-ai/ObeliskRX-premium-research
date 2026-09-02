@@ -5,9 +5,9 @@
 CREATE TABLE IF NOT EXISTS product_coa (
     id           INT AUTO_INCREMENT PRIMARY KEY,
     product_slug VARCHAR(255) NOT NULL UNIQUE,
-    purity       VARCHAR(50)  NOT NULL,
-    lot_number   VARCHAR(100) NOT NULL,
-    tested_date  VARCHAR(100) NOT NULL,
+    purity       VARCHAR(50)  NOT NULL DEFAULT '',
+    lot_number   VARCHAR(100) NOT NULL DEFAULT '',
+    tested_date  VARCHAR(100) NOT NULL DEFAULT '',
     created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_slug (product_slug)

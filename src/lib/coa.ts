@@ -81,7 +81,7 @@ export async function syncCoaFromAPI(): Promise<void> {
       localStorage.setItem(API_COA_KEY, JSON.stringify(coa));
     }
   } catch {
-    // Server unreachable — cache/static fallback use hoga
+    // Server unreachable   cache/static fallback use hoga
   }
 }
 
@@ -89,7 +89,7 @@ export async function syncCoaFromAPI(): Promise<void> {
 export const getCoa = (slug: string): CoaEntry | undefined => {
   // 1. Check API-synced data (PHP admin uploads)
   const apiCache = getApiCoaCache();
-  if (apiCache[slug] && (apiCache[slug].purity || apiCache[slug].lot || apiCache[slug].tested)) {
+  if (apiCache[slug] && (apiCache[slug].purity || apiCache[slug].lot || apiCache[slug].tested || (apiCache[slug].files?.length ?? 0) > 0)) {
     const e = apiCache[slug];
     return {
       purity: e.purity,

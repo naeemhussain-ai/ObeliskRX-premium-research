@@ -344,7 +344,7 @@ export async function syncProductsFromAPI(): Promise<void> {
     const mapped = products.map(mapApiProduct);
     localStorage.setItem(PRODUCTS_KEY, JSON.stringify(mapped));
   } catch {
-    // Server unreachable — localStorage/static data use hoga
+    // Server unreachable   localStorage/static data use hoga
   }
 }
 
@@ -358,7 +358,7 @@ export function getProducts(): Product[] {
       }
     }
   } catch {
-    // JSON parse error or localStorage unavailable — fall through to seed
+    // JSON parse error or localStorage unavailable   fall through to seed
   }
   // Seed with static products
   try {
@@ -408,7 +408,7 @@ export const priceForSize = (p: Product, size: string) => {
   return idx === p.sizes.length - 1 ? p.priceMax : p.price;
 };
 
-// React hook — products + COA dono API se sync karta hai
+// React hook   products + COA dono API se sync karta hai
 import { useState, useEffect } from "react";
 import { syncCoaFromAPI } from "@/lib/coa";
 export function useProducts(): Product[] {

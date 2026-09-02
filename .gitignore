@@ -43,5 +43,9 @@ test-api.php
 backend-plan/
 .claude/
 
+# Runtime uploads (admin panel writes these) — not part of the source
+backend/images/products/prod_*
+backend/images/coa/coa_*
+
 # Screenshots
 image copy*.png

@@ -184,7 +184,7 @@ const sections: Section[] = [
 export function ResearchArticlesPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Header — muted blue-violet to peach */}
+      {/* Hero Header   muted blue-violet to peach */}
       <div
         className="relative overflow-hidden py-20 md:py-24 px-4"
         style={{ background: "linear-gradient(135deg, #1B2545 0%, #3A4A8B 40%, #7A5E8A 70%, #D4907A 100%)", minHeight: "380px" }}
@@ -198,7 +198,7 @@ export function ResearchArticlesPage() {
             Peptide Research Reference Library
           </h1>
           <p className="mt-3 text-sm text-white/80 max-w-xl">
-            Independent research data — verified direct links only
+            Independent research data   verified direct links only
           </p>
           <div className="mt-5 flex items-center justify-center gap-2 text-xs text-white/60">
             <Link to="/" className="transition-colors hover:text-white">Home</Link>

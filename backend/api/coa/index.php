@@ -1,5 +1,5 @@
 <?php
-// GET /api/coa/  — returns all published COA entries with file URLs
+// GET /api/coa/    returns all published COA entries with file URLs
 
 require_once __DIR__ . '/../../config/cors.php';
 require_once __DIR__ . '/../../config/database.php';

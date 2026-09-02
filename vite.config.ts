@@ -9,6 +9,11 @@ export default defineConfig(({ mode }) => {
     base: env.VITE_BASE_URL ?? "/obeliskrx/",
     plugins: [react(), tailwindcss(), tsconfigPaths()],
     server: {
+      // Don't watch build output / the deploy bundle — a locked deploy.zip
+      // being written crashes the dev server's file watcher (EBUSY on Windows).
+      watch: {
+        ignored: ["**/dist/**", "**/deploy.zip"],
+      },
       proxy: {
         "/backend": {
           target: "http://localhost",

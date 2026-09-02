@@ -247,24 +247,39 @@ if ($action === 'edit') {
         // Upload new COA files
         if (!empty($_FILES['coa_files']['name'][0])) {
             $coaDir = __DIR__ . '/../images/coa/';
-            if (!is_dir($coaDir)) mkdir($coaDir, 0755, true);
+            if (!is_dir($coaDir) && !mkdir($coaDir, 0755, true)) {
+                header("Location: product-edit.php?id=$productId&error=" . urlencode('COA metadata saved but file upload failed: could not create upload directory. Set backend/images/coa/ permissions to 755 on the server.'));
+                exit();
+            }
+            if (!is_writable($coaDir)) {
+                header("Location: product-edit.php?id=$productId&error=" . urlencode('COA metadata saved but file upload failed: upload directory is not writable. Set backend/images/coa/ permissions to 755 on the server.'));
+                exit();
+            }
 
             $allowedCoa = ['image/jpeg','image/png','image/webp','image/gif','application/pdf'];
+            $uploadFailed = 0;
 
             $count = count($_FILES['coa_files']['name']);
             for ($i = 0; $i < $count; $i++) {
-                if ($_FILES['coa_files']['error'][$i] !== UPLOAD_ERR_OK) continue;
+                if ($_FILES['coa_files']['error'][$i] !== UPLOAD_ERR_OK) { $uploadFailed++; continue; }
                 $tmpName  = $_FILES['coa_files']['tmp_name'][$i];
                 $origName = basename($_FILES['coa_files']['name'][$i]);
                 $mimeType = mime_content_type($tmpName);
-                if (!in_array($mimeType, $allowedCoa, true)) continue;
+                if (!in_array($mimeType, $allowedCoa, true)) { $uploadFailed++; continue; }
 
                 $ext      = strtolower(pathinfo($origName, PATHINFO_EXTENSION)) ?: 'bin';
                 $filename = uniqid('coa_') . '.' . $ext;
                 if (move_uploaded_file($tmpName, $coaDir . $filename)) {
                     $db->prepare("INSERT INTO product_coa_files (coa_id, file_path, original_name, file_type) VALUES (?,?,?,?)")
                        ->execute([$coaId, $filename, $origName, $mimeType]);
+                } else {
+                    $uploadFailed++;
                 }
+            }
+
+            if ($uploadFailed > 0) {
+                header("Location: product-edit.php?id=$productId&error=" . urlencode("COA metadata saved but $uploadFailed file(s) failed to upload. Check server upload settings."));
+                exit();
             }
         }
     }
@@ -304,7 +319,7 @@ if ($action === 'delete') {
     exit();
 }
 
-// Unknown action — redirect back
+// Unknown action   redirect back
 header('Location: products.php');
 exit();
 

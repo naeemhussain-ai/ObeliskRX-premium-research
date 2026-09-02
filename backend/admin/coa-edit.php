@@ -84,7 +84,7 @@ if (!empty($_GET['error'])) {
         <div class="page-header">
             <div>
                 <a href="coa.php" class="back-link">← Back to COA Management</a>
-                <h1><?= $coa ? 'Edit' : 'Upload' ?> COA — <?= htmlspecialchars($product['name']) ?></h1>
+                <h1><?= $coa ? 'Edit' : 'Upload' ?> COA   <?= htmlspecialchars($product['name']) ?></h1>
             </div>
         </div>
 
