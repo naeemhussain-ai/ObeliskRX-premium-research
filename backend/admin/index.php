@@ -47,8 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="login-page">
     <div class="login-card">
         <div class="login-logo">
-            <img src="assets/logo.png" alt="ObeliskRX" onerror="this.style.display='none'">
-            <h1>ObeliskRX</h1>
+            <img src="assets/logo.svg" alt="ObeliskRX" onerror="this.style.display='none'">
             <p>Admin Panel</p>
         </div>
         <div class="login-divider"></div>

@@ -33,7 +33,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <img src="assets/logo.png" alt="ObeliskRX" style="width:100%;max-width:160px;display:block;margin:0 auto 6px;">
+        <img src="assets/logo.svg" alt="ObeliskRX" style="width:100%;max-width:160px;display:block;margin:0 auto 6px;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
             <p style="margin:0;">Admin Panel</p>
             <button class="notif-bell" onclick="toggleNotifPanel()" title="Notifications">
