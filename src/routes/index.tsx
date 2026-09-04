@@ -12,7 +12,7 @@ import {
 import { ProductCard } from "@/components/ProductCard";
 import { Link } from "@/lib/router";
 import { useProducts } from "@/lib/products";
-import vaccineImg from "@/assets/products/vacine.jpg";
+import Aboutus from "@/assets/products/Aboutus.png";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const whyCards = [
@@ -272,7 +272,7 @@ export function HomePage() {
           </div>
           <div className="overflow-hidden rounded-xl border border-border shadow-md">
             <img
-              src={vaccineImg}
+              src={Aboutus}
               alt="About ObeliskRX Research"
               className="aspect-[4/3] w-full object-cover transition-transform duration-500 hover:scale-105"
             />

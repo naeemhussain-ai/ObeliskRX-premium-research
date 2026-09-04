@@ -214,7 +214,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
               alt={`${product.name} research peptide vial`}
               loading="lazy"
               decoding="async"
-              className="aspect-square w-full bg-surface object-cover transition-transform duration-500 group-hover:scale-110"
+              className="aspect-[2/3] w-full bg-surface object-cover transition-transform duration-500 group-hover:scale-110"
             />
           </Link>
 
