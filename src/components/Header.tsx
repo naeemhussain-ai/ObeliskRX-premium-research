@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
-import { Logo } from "./ProductCard";
+import logoImg from "@/assets/obeliskrx-logo.png";
+import logoImgWhite from "@/assets/obeliskrx-logo-white.png";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { getProducts } from "@/lib/products";
@@ -130,17 +131,21 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-[34px] left-0 right-0 w-full z-50 transition-all duration-300 ${
         isTransparent
           ? "bg-transparent border-b border-white/10"
           : "bg-white/95 backdrop-blur-sm border-b border-border shadow-sm"
       }`}
     >
-      <div className="container-page grid h-[68px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
+      <div className="container-page grid h-[80px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
 
         {/* Logo */}
         <Link to="/" className="flex min-w-0 items-center">
-          <Logo className="h-10 sm:h-11" light={isTransparent} />
+          <img
+            src={isTransparent ? logoImgWhite : logoImg}
+            alt="ObeliskRX"
+            className="h-11 w-auto sm:h-12"
+          />
         </Link>
 
         {/* Desktop Nav   centered */}

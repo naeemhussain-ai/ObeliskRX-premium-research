@@ -216,6 +216,20 @@
   z-index: 2;
 }
 
+/* Announcement bar   continuous right-to-left marquee */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee-scroll 48s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
 @layer base {
   /* Keyboard focus ring   Clinical Blue 3px */
   :focus-visible {

@@ -1,5 +1,6 @@
 import { useEffect, type ComponentType } from "react";
 
+import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Footer, Notice } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ToastContainer } from "@/components/Toast";
@@ -87,8 +88,9 @@ function AppShell() {
 
   return (
     <div className="flex min-h-screen flex-col bg-surface">
+      <AnnouncementBar />
       <Header />
-      <main className="flex-1 pt-[68px]">
+      <main className="flex-1 pt-[114px]">
         <RoutedPage />
       </main>
       <Notice />

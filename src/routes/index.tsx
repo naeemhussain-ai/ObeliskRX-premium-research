@@ -73,7 +73,7 @@ export function HomePage() {
   return (
     <>
       {/* ===== HERO + TRUST BAR (integrated) ===== */}
-      <section className="hero-section relative w-full -mt-[68px]" style={{ minHeight: "720px", height: "100vh", maxHeight: "900px" }}>
+      <section className="hero-section relative w-full -mt-[114px]" style={{ minHeight: "720px", height: "100vh", maxHeight: "900px" }}>
         {/* Hero background */}
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
@@ -88,7 +88,7 @@ export function HomePage() {
         />
 
         {/* Hero content */}
-        <div className="relative z-[2] flex h-full flex-col justify-center px-6 pt-[68px] pb-28 container-page">
+        <div className="relative z-[2] flex h-full flex-col justify-center px-6 pt-[114px] pb-28 container-page">
           {/* Badge */}
           <div className="mb-6">
             <span className="text-[11px] font-bold tracking-widest text-[#F47A38] uppercase">

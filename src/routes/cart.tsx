@@ -8,6 +8,9 @@ import { formatPrice, getProducts } from "@/lib/products";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 
+const FREE_SHIPPING_THRESHOLD = 250;
+const SHIPPING_FEE = 150;
+
 type Step = "cart" | "auth" | "checkout" | "success";
 
 type CheckoutForm = {
@@ -42,6 +45,8 @@ export function CartPage() {
   const products = getProducts();
   const { items, remove, setQty, subtotal, clear } = useCart();
   const { customer, isLoggedIn, token } = useAuth();
+  const shippingFee = subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD ? SHIPPING_FEE : 0;
+  const orderTotal = subtotal + shippingFee;
   const [coupon, setCoupon] = useState("");
   const [step, setStep] = useState<Step>("cart");
   const [form, setForm] = useState<CheckoutForm>(EMPTY);
@@ -105,7 +110,8 @@ export function CartPage() {
             size: i.size,
           })),
           subtotal,
-          total: subtotal,
+          shipping_fee: shippingFee,
+          total: orderTotal,
           payment_method: "alipay",
         }),
       });
@@ -337,10 +343,22 @@ export function CartPage() {
               ))}
             </div>
 
-            <div className="border-t border-border pt-4">
-              <div className="flex items-center justify-between">
+            <div className="border-t border-border pt-4 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-semibold text-foreground">{formatPrice(subtotal)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Shipping</span>
+                {shippingFee === 0 ? (
+                  <span className="font-semibold text-emerald-600">Free</span>
+                ) : (
+                  <span className="font-semibold text-foreground">{formatPrice(shippingFee)}</span>
+                )}
+              </div>
+              <div className="flex items-center justify-between border-t border-border pt-3">
                 <span className="text-sm text-muted-foreground">Total</span>
-                <span className="text-2xl font-black text-primary">{formatPrice(subtotal)}</span>
+                <span className="text-2xl font-black text-primary">{formatPrice(orderTotal)}</span>
               </div>
               <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
                 <Package size={14} className="shrink-0 text-primary" />
@@ -520,9 +538,23 @@ export function CartPage() {
             <span className="font-medium text-gray-600">Subtotal</span>
             <span className="font-semibold text-gray-900">{formatPrice(subtotal)}</span>
           </div>
+          <div className="flex items-center justify-between border-b border-border py-4 text-sm">
+            <span className="font-medium text-gray-600">Shipping</span>
+            {shippingFee === 0 ? (
+              <span className="font-semibold text-emerald-600">Free</span>
+            ) : (
+              <span className="font-semibold text-gray-900">{formatPrice(shippingFee)}</span>
+            )}
+          </div>
+          {items.length > 0 && shippingFee > 0 && (
+            <p className="pt-3 text-xs text-muted-foreground">
+              Add <span className="font-semibold text-primary">{formatPrice(FREE_SHIPPING_THRESHOLD - subtotal)}</span> more to get{" "}
+              <span className="font-semibold text-emerald-600">free shipping</span>.
+            </p>
+          )}
           <div className="flex items-center justify-between py-4 text-sm">
             <span className="font-medium text-gray-600">Total</span>
-            <span className="text-2xl font-black text-primary">{formatPrice(subtotal)}</span>
+            <span className="text-2xl font-black text-primary">{formatPrice(orderTotal)}</span>
           </div>
           <button
             type="button"
