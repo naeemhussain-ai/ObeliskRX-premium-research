@@ -144,7 +144,7 @@ export function Header() {
           <img
             src={isTransparent ? logoImgWhite : logoImg}
             alt="ObeliskRX"
-            className="h-11 w-auto sm:h-12"
+            className="h-14 w-auto sm:h-16"
           />
         </Link>
 

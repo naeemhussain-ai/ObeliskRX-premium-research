@@ -1,6 +1,6 @@
 import { Facebook, Instagram } from "lucide-react";
 import { Link } from "@/lib/router";
-import { Logo } from "./ProductCard";
+import logoImgWhite from "@/assets/obeliskrx-logo-white.png";
 
 function TikTokIcon({ size = 15 }: { size?: number }) {
   return (
@@ -86,7 +86,7 @@ export function Footer() {
         <div className="grid gap-10 border-b border-ink-foreground/10 pb-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link to="/" className="inline-block">
-              <Logo className="h-10" light={true} />
+              <img src={logoImgWhite} alt="ObeliskRX" className="h-14 w-auto sm:h-16" />
             </Link>
             <p className="mt-4 max-w-64 text-sm text-ink-foreground/70">
               Research-grade peptides, verified for precision and integrity.

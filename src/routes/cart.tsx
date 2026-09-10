@@ -9,7 +9,7 @@ import { formatPrice, getProducts } from "@/lib/products";
 const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 
 const FREE_SHIPPING_THRESHOLD = 250;
-const SHIPPING_FEE = 150;
+const SHIPPING_FEE = 15;
 
 type Step = "cart" | "auth" | "checkout" | "success";
 
