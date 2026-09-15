@@ -1,6 +1,8 @@
 ﻿import { useState, useEffect } from "react";
-import { Minus, Plus, X, Package, CheckCircle2, LogIn, UserPlus, UserCheck } from "lucide-react";
+import { Minus, Plus, X, Wallet, CheckCircle2, Tag } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
+import { PaymentInstructions } from "@/components/PaymentInstructions";
+import { PaymentProofForm } from "@/components/PaymentProofForm";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { Link, navigateTo } from "@/lib/router";
@@ -11,7 +13,9 @@ const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 const FREE_SHIPPING_THRESHOLD = 250;
 const SHIPPING_FEE = 15;
 
-type Step = "cart" | "auth" | "checkout" | "success";
+type Step = "cart" | "checkout" | "success";
+
+type AppliedCoupon = { code: string; discountPercent: number };
 
 type CheckoutForm = {
   first_name: string;
@@ -46,14 +50,23 @@ export function CartPage() {
   const { items, remove, setQty, subtotal, clear } = useCart();
   const { customer, isLoggedIn, token } = useAuth();
   const shippingFee = subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD ? SHIPPING_FEE : 0;
-  const orderTotal = subtotal + shippingFee;
   const [coupon, setCoupon] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponChecking, setCouponChecking] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const discountAmount = appliedCoupon ? Math.round(subtotal * appliedCoupon.discountPercent) / 100 : 0;
+  const orderTotal = subtotal - discountAmount + shippingFee;
   const [step, setStep] = useState<Step>("cart");
   const [form, setForm] = useState<CheckoutForm>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
   const suggestions = products.slice(0, 5);
+
+  // Checkout sirf logged-in customers ke liye hai - guest ko login par bhej do
+  useEffect(() => {
+    if (step === "checkout" && !isLoggedIn) navigateTo("/login");
+  }, [step, isLoggedIn]);
 
   // Jab checkout step pe aao aur logged in ho, profile se form pre-fill karo
   useEffect(() => {
@@ -85,6 +98,37 @@ export function CartPage() {
       .catch(() => {});
   }, [step, isLoggedIn, token]);
 
+  const handleApplyCoupon = async () => {
+    const code = coupon.trim();
+    if (!code) { setCouponError("Please enter a coupon code."); return; }
+    setCouponChecking(true);
+    setCouponError("");
+    try {
+      const res = await fetch(`${API}/coupons/validate.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppliedCoupon({ code: data.data.code, discountPercent: data.data.discount_percent });
+      } else {
+        setAppliedCoupon(null);
+        setCouponError(data.message || "Invalid coupon code.");
+      }
+    } catch {
+      setCouponError("Could not connect to server. Please try again.");
+    } finally {
+      setCouponChecking(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCoupon("");
+    setCouponError("");
+  };
+
   const handleField = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -112,7 +156,8 @@ export function CartPage() {
           subtotal,
           shipping_fee: shippingFee,
           total: orderTotal,
-          payment_method: "alipay",
+          payment_method: "zelle_cashapp",
+          coupon_code: appliedCoupon?.code ?? "",
         }),
       });
       const data = await res.json();
@@ -130,132 +175,45 @@ export function CartPage() {
     }
   };
 
-  // ── Success ──────────────────────────────────────────────────────────────
+  // ── Success / Payment ───────────────────────────────────────────────────
   if (step === "success") {
     return (
-      <div className="container-page py-24">
-        <div className="mx-auto max-w-md text-center">
-          <CheckCircle2 className="mx-auto text-emerald-500" size={72} />
-          <h1 className="mt-6 text-3xl font-bold">Order Placed!</h1>
+      <div className="container-page py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <CheckCircle2 className="mx-auto text-emerald-500" size={64} />
+          <h1 className="mt-6 text-3xl font-bold">Order Received!</h1>
           <p className="mt-2 text-muted-foreground">
-            Thank you! Your order has been received and will be processed shortly.
+            Please complete your payment below and submit proof to confirm your order.
           </p>
           <div className="mt-8 rounded-2xl bg-card p-6 shadow-card border border-primary/10">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Order Number
             </p>
             <p className="mt-2 text-3xl font-black text-primary">{orderNumber}</p>
+            <span className="mt-3 inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-800">
+              Status: Pending
+            </span>
             <p className="mt-2 text-sm text-muted-foreground">
-              Save this number to track your order.
+              Save this number to track your order. We'll confirm your payment, and then your order will be approved.
             </p>
           </div>
+        </div>
+
+        <div className="mx-auto mt-8 max-w-2xl space-y-8">
+          <PaymentInstructions />
+          <PaymentProofForm
+            orderNumber={orderNumber}
+            defaultFullName={`${form.first_name} ${form.last_name}`.trim()}
+          />
+        </div>
+
+        <div className="mx-auto mt-8 max-w-2xl text-center">
           <Link
             to="/catalog"
-            className="mt-8 inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 hover:-translate-y-0.5"
+            className="inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 hover:-translate-y-0.5"
           >
             Continue Shopping
           </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Auth Choice Step ──────────────────────────────────────────────────────
-  if (step === "auth") {
-    return (
-      <div className="container-page py-8">
-        <nav className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          <button type="button" onClick={() => setStep("cart")} className="hover:text-primary transition-colors">
-            Shopping cart
-          </button>
-          <span>&rsaquo;</span>
-          <span className="font-semibold text-foreground underline underline-offset-8">Checkout</span>
-          <span>&rsaquo;</span>
-          <span>Order complete</span>
-        </nav>
-
-        <div className="mt-10 mx-auto max-w-2xl">
-          <h2 className="mb-6 text-xl font-bold text-center">How would you like to continue?</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {/* Sign in / Account option */}
-            <div className="rounded-2xl border-2 border-[#0B1F3A]/30 bg-card p-6 flex flex-col gap-4 shadow-sm hover:border-[#0B1F3A] transition-colors">
-              <div className="grid size-11 place-items-center rounded-full bg-[#0B1F3A]/10 text-[#0B1F3A]">
-                {isLoggedIn ? <UserCheck size={22} /> : <LogIn size={22} />}
-              </div>
-              {isLoggedIn ? (
-                <>
-                  <div>
-                    <p className="font-bold text-base">Continue as {customer?.name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{customer?.email}</p>
-                  </div>
-                  <ul className="text-xs text-muted-foreground space-y-1">
-                    <li>&#10003; Order linked to your account</li>
-                    <li>&#10003; Track status in My Account</li>
-                    <li>&#10003; View full order history</li>
-                  </ul>
-                  <button
-                    type="button"
-                    onClick={() => setStep("checkout")}
-                    className="mt-auto w-full rounded-full bg-[#0B1F3A] py-3 text-sm font-bold text-white shadow transition-all hover:bg-[#0d1631]"
-                  >
-                    Continue to Checkout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <p className="font-bold text-base">Sign in / Create Account</p>
-                    <p className="text-xs text-muted-foreground mt-1">Track your orders &amp; save history</p>
-                  </div>
-                  <ul className="text-xs text-muted-foreground space-y-1">
-                    <li>&#10003; View past &amp; upcoming orders</li>
-                    <li>&#10003; Save your wishlist</li>
-                    <li>&#10003; Faster future checkouts</li>
-                  </ul>
-                  <button
-                    type="button"
-                    onClick={() => navigateTo("/login")}
-                    className="mt-auto w-full rounded-full bg-[#0B1F3A] py-3 text-sm font-bold text-white shadow transition-all hover:bg-[#0d1631]"
-                  >
-                    <span className="flex items-center justify-center gap-2">
-                      <LogIn size={15} /> Sign In / Register
-                    </span>
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Guest option */}
-            <div className="rounded-2xl border-2 border-border bg-card p-6 flex flex-col gap-4 shadow-sm hover:border-gray-400 transition-colors">
-              <div className="grid size-11 place-items-center rounded-full bg-gray-100 text-gray-500">
-                <UserPlus size={22} />
-              </div>
-              <div>
-                <p className="font-bold text-base">Continue as Guest</p>
-                <p className="text-xs text-muted-foreground mt-1">No account needed</p>
-              </div>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li>&#10003; Quick &amp; easy checkout</li>
-                <li>&#10003; No registration required</li>
-                <li className="text-gray-400">&#10007; Can't track order in account</li>
-              </ul>
-              <button
-                type="button"
-                onClick={() => setStep("checkout")}
-                className="mt-auto w-full rounded-full border-2 border-border py-3 text-sm font-bold text-foreground transition-all hover:border-gray-400"
-              >
-                Continue as Guest
-              </button>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setStep("cart")}
-            className="mt-6 w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            ← Back to cart
-          </button>
         </div>
       </div>
     );
@@ -343,11 +301,55 @@ export function CartPage() {
               ))}
             </div>
 
+            <div className="border-t border-border pt-4">
+              {appliedCoupon ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs">
+                  <span className="flex items-center gap-1.5 font-semibold text-emerald-700">
+                    <Tag size={13} />
+                    {appliedCoupon.code} applied ({appliedCoupon.discountPercent}% off)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="font-medium text-emerald-700 underline hover:text-emerald-900"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex gap-2">
+                    <input
+                      value={coupon}
+                      onChange={(e) => { setCoupon(e.target.value.toUpperCase()); setCouponError(""); }}
+                      placeholder="Coupon code"
+                      className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={couponChecking}
+                      className="shrink-0 rounded-lg bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black disabled:opacity-60"
+                    >
+                      {couponChecking ? "Checking…" : "Apply"}
+                    </button>
+                  </div>
+                  {couponError && <p className="mt-1.5 text-xs text-red-600">{couponError}</p>}
+                </div>
+              )}
+            </div>
+
             <div className="border-t border-border pt-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="font-semibold text-foreground">{formatPrice(subtotal)}</span>
               </div>
+              {appliedCoupon && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Discount ({appliedCoupon.discountPercent}%)</span>
+                  <span className="font-semibold text-emerald-600">-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
                 {shippingFee === 0 ? (
@@ -361,8 +363,8 @@ export function CartPage() {
                 <span className="text-2xl font-black text-primary">{formatPrice(orderTotal)}</span>
               </div>
               <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
-                <Package size={14} className="shrink-0 text-primary" />
-                Payment via AliPay on delivery
+                <Wallet size={14} className="shrink-0 text-primary" />
+                Pay via Zelle or Cash App after placing your order
               </div>
             </div>
 
@@ -514,19 +516,40 @@ export function CartPage() {
                 ))}
               </div>
 
-              <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-                <input
-                  value={coupon}
-                  onChange={(e) => setCoupon(e.target.value)}
-                  placeholder="Code"
-                  className="w-full sm:w-64 rounded-full border border-border bg-surface px-5 py-3 text-sm outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_rgba(var(--primary),0.1)]"
-                />
-                <button
-                  type="button"
-                  className="rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white shadow-md transition-all duration-300 hover:bg-black hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
-                >
-                  Apply Coupon
-                </button>
+              <div className="mt-8">
+                {appliedCoupon ? (
+                  <div className="inline-flex flex-wrap items-center gap-3 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm">
+                    <Tag size={14} className="text-emerald-600" />
+                    <span className="font-semibold text-emerald-700">
+                      {appliedCoupon.code} applied &mdash; {appliedCoupon.discountPercent}% off
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="text-xs font-medium text-emerald-700 underline hover:text-emerald-900"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                    <input
+                      value={coupon}
+                      onChange={(e) => { setCoupon(e.target.value.toUpperCase()); setCouponError(""); }}
+                      placeholder="Coupon code"
+                      className="w-full sm:w-64 rounded-full border border-border bg-surface px-5 py-3 text-sm outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_rgba(var(--primary),0.1)]"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={couponChecking}
+                      className="rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white shadow-md transition-all duration-300 hover:bg-black hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60"
+                    >
+                      {couponChecking ? "Checking…" : "Apply Coupon"}
+                    </button>
+                  </div>
+                )}
+                {couponError && <p className="mt-2 text-xs text-red-600">{couponError}</p>}
               </div>
             </>
           )}
@@ -538,6 +561,12 @@ export function CartPage() {
             <span className="font-medium text-gray-600">Subtotal</span>
             <span className="font-semibold text-gray-900">{formatPrice(subtotal)}</span>
           </div>
+          {appliedCoupon && (
+            <div className="flex items-center justify-between border-b border-border py-4 text-sm">
+              <span className="font-medium text-gray-600">Discount ({appliedCoupon.discountPercent}%)</span>
+              <span className="font-semibold text-emerald-600">-{formatPrice(discountAmount)}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between border-b border-border py-4 text-sm">
             <span className="font-medium text-gray-600">Shipping</span>
             {shippingFee === 0 ? (
@@ -558,7 +587,9 @@ export function CartPage() {
           </div>
           <button
             type="button"
-            onClick={() => items.length > 0 && setStep(isLoggedIn ? "checkout" : "auth")}
+            onClick={() =>
+              items.length > 0 && (isLoggedIn ? setStep("checkout") : navigateTo("/login"))
+            }
             disabled={items.length === 0}
             className="mt-6 w-auto rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >

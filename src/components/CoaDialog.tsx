@@ -91,7 +91,7 @@ function CoaPdf({ src, alt }: { src: string; alt: string }) {
           canvas.style.width = "100%";
           canvas.style.height = "auto";
           canvas.setAttribute("role", "img");
-          canvas.setAttribute("aria-label", `${alt} — page ${pageNum}`);
+          canvas.setAttribute("aria-label", `${alt} - page ${pageNum}`);
           container.appendChild(canvas);
 
           const ctx = canvas.getContext("2d");

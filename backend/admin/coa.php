@@ -115,13 +115,13 @@ if (!empty($_GET['error'])) {
                         </td>
 
                         <!-- Purity -->
-                        <td><?= $p['purity'] ? htmlspecialchars($p['purity']) : '<span class="text-muted">—</span>' ?></td>
+                        <td><?= $p['purity'] ? htmlspecialchars($p['purity']) : '<span class="text-muted">-</span>' ?></td>
 
                         <!-- Lot Number -->
-                        <td><?= $p['lot_number'] ? htmlspecialchars($p['lot_number']) : '<span class="text-muted">—</span>' ?></td>
+                        <td><?= $p['lot_number'] ? htmlspecialchars($p['lot_number']) : '<span class="text-muted">-</span>' ?></td>
 
                         <!-- Test Date -->
-                        <td><?= $p['tested_date'] ? htmlspecialchars($p['tested_date']) : '<span class="text-muted">—</span>' ?></td>
+                        <td><?= $p['tested_date'] ? htmlspecialchars($p['tested_date']) : '<span class="text-muted">-</span>' ?></td>
 
                         <!-- Actions -->
                         <td>

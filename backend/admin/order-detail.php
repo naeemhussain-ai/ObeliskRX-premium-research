@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/constants.php';
 requireAdmin();
 
 $id = (int)($_GET['id'] ?? 0);
@@ -81,6 +82,29 @@ $statusClass = [
 
         </div>
 
+        <!-- Payment Proof -->
+        <div class="card mt-4">
+            <h2>Payment Proof</h2>
+            <?php if ($order['payment_proof_file']): ?>
+                <dl>
+                    <dt>Name on Payment</dt>
+                    <dd><?= htmlspecialchars($order['payment_proof_name'] ?: '-') ?></dd>
+                    <dt>Submitted</dt>
+                    <dd><?= $order['payment_proof_submitted_at'] ? date('M d, Y H:i', strtotime($order['payment_proof_submitted_at'])) : '-' ?></dd>
+                </dl>
+                <?php $proofUrl = PAYMENT_PROOF_BASE_URL . htmlspecialchars($order['payment_proof_file']); ?>
+                <?php if (str_ends_with(strtolower($order['payment_proof_file']), '.pdf')): ?>
+                    <a href="<?= $proofUrl ?>" target="_blank" rel="noopener" class="btn btn-secondary">Open Payment Proof (PDF)</a>
+                <?php else: ?>
+                    <a href="<?= $proofUrl ?>" target="_blank" rel="noopener">
+                        <img src="<?= $proofUrl ?>" alt="Payment proof" style="max-width:320px; border-radius:8px; border:1px solid #e2e2e2; margin-top:8px;">
+                    </a>
+                <?php endif; ?>
+            <?php else: ?>
+                <p class="text-muted">No payment proof submitted yet.</p>
+            <?php endif; ?>
+        </div>
+
         <!-- Order Items -->
         <div class="card mt-4">
             <h2>Items Ordered</h2>
@@ -110,6 +134,15 @@ $statusClass = [
                         <td colspan="4" class="text-right"><strong>Subtotal:</strong></td>
                         <td>$<?= number_format($order['subtotal'], 2) ?></td>
                     </tr>
+                    <?php if (!empty($order['coupon_code'])): ?>
+                    <tr>
+                        <td colspan="4" class="text-right">
+                            <strong>Coupon <span style="font-family:monospace;font-weight:700;letter-spacing:1px;"><?= htmlspecialchars($order['coupon_code']) ?></span>
+                                (-<?= rtrim(rtrim(number_format($order['discount_percent'], 2), '0'), '.') ?>%):</strong>
+                        </td>
+                        <td>-$<?= number_format($order['discount_amount'], 2) ?></td>
+                    </tr>
+                    <?php endif; ?>
                     <tr>
                         <td colspan="4" class="text-right"><strong>Shipping:</strong></td>
                         <td><?= $order['shipping_fee'] > 0 ? '$' . number_format($order['shipping_fee'], 2) : 'Free' ?></td>
@@ -123,7 +156,37 @@ $statusClass = [
         </div>
 
         <!-- Actions -->
-        <?php if ($order['status'] === 'approved'): ?>
+        <?php if ($order['status'] === 'pending'): ?>
+        <div class="card mt-4 actions-card">
+            <h2>Actions</h2>
+            <p class="text-muted" style="margin-bottom:12px;">Verify the payment proof above before approving this order.</p>
+            <div class="action-buttons">
+                <form method="POST" action="action-order.php">
+                    <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                    <input type="hidden" name="action" value="approved">
+                    <button type="submit" class="btn btn-primary btn-lg"
+                        onclick="return confirm('Confirm payment received and approve this order?')">
+                        ✅ Approve Order (Payment Confirmed)
+                    </button>
+                </form>
+                <form method="POST" action="action-order.php" class="action-form">
+                    <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                    <input type="hidden" name="action" value="rejected">
+                    <div class="form-group">
+                        <label>Cancel Reason <span class="required">*</span></label>
+                        <textarea name="rejection_reason" rows="2"
+                            placeholder="e.g. Payment not received, invalid proof..."
+                            class="form-control" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Cancel this order?')">
+                        ❌ Cancel Order
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <?php elseif ($order['status'] === 'approved'): ?>
         <div class="card mt-4 actions-card">
             <h2>Actions</h2>
             <div class="action-buttons">

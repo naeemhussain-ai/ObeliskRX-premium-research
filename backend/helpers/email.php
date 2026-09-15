@@ -9,17 +9,28 @@ use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 // ── Core mailer factory ──────────────────────────────
+// MAIL_METHOD = 'local' -> server ka apna mail transport (Exim/sendmail) use karo,
+// kisi bahar ki SMTP mailbox/password ki zaroorat nahi. Shared cPanel hosting par
+// ye hamesha available hota hai. MAIL_METHOD = 'smtp' -> external authenticated
+// SMTP (SMTP_HOST/USER/PASS constants se) - sirf tab use karo jab wo mailbox
+// waqai us hosting account par exist karti ho.
 function makeMailer(): PHPMailer {
     $mail = new PHPMailer(true);
-    $mail->isSMTP();
-    $mail->Host       = SMTP_HOST;
-    $mail->SMTPAuth   = true;
-    $mail->Username   = SMTP_USER;
-    $mail->Password   = SMTP_PASS;
-    $mail->SMTPSecure = SMTP_SECURE === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = SMTP_PORT;
-    $mail->Timeout    = 5;
-    $mail->CharSet    = 'UTF-8';
+
+    if (defined('MAIL_METHOD') && MAIL_METHOD === 'smtp') {
+        $mail->isSMTP();
+        $mail->Host       = SMTP_HOST;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = SMTP_USER;
+        $mail->Password   = SMTP_PASS;
+        $mail->SMTPSecure = SMTP_SECURE === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = SMTP_PORT;
+        $mail->Timeout    = 5;
+    } else {
+        $mail->isMail();
+    }
+
+    $mail->CharSet = 'UTF-8';
     $mail->setFrom(FROM_EMAIL, FROM_NAME);
     $mail->isHTML(true);
     return $mail;
@@ -125,6 +136,30 @@ function sendNewOrderEmail(array $order): void {
 }
 
 // ────────────────────────────────────────────────────
+// 2b. Customer ko - Payment confirm ho gayi, order approved
+// ────────────────────────────────────────────────────
+function sendOrderApprovedEmail(array $order): void {
+    $subject  = 'Payment Confirmed - Order #' . $order['order_number'];
+    $name     = htmlspecialchars($order['first_name']);
+    $orderNo  = htmlspecialchars($order['order_number']);
+    $siteName = SITE_NAME;
+
+    $body = <<<HTML
+    <p>Hi <strong>$name</strong>,</p>
+    <p>We've confirmed your payment for order <strong>#$orderNo</strong>. Your order is now approved and will be prepared for shipment.</p>
+
+    <div class="info-box">
+      <p><strong>Order Number:</strong> $orderNo</p>
+      <p><strong>Status:</strong> Approved</p>
+    </div>
+
+    <p>Thank you for choosing <strong>$siteName</strong>!</p>
+    HTML;
+
+    _send($order['email'], $order['first_name'] . ' ' . $order['last_name'], $subject, $body, 'order_approved');
+}
+
+// ────────────────────────────────────────────────────
 // 2. Customer ko - Order ship ho gaya
 // ────────────────────────────────────────────────────
 function sendOrderShippedEmail(array $order): void {
@@ -199,6 +234,56 @@ function sendContactNotificationEmail(array $msg): void {
     HTML;
 
     _send(OWNER_EMAIL, OWNER_NAME, $subject, $body, 'contact_message');
+}
+
+// ────────────────────────────────────────────────────
+// 5. Admin ko - Payment proof upload hua
+// ────────────────────────────────────────────────────
+function sendPaymentProofEmail(array $order): void {
+    $subject  = 'Payment Proof Submitted - Order #' . $order['order_number'];
+    $orderNo  = htmlspecialchars($order['order_number']);
+    $name     = htmlspecialchars($order['payment_proof_name'] ?? ($order['first_name'] . ' ' . $order['last_name']));
+    $total    = number_format($order['total'], 2);
+    $adminUrl = ADMIN_PATH . '/order-detail.php?id=' . $order['id'];
+
+    $body = <<<HTML
+    <p>A customer submitted payment proof for order <strong>#$orderNo</strong>.</p>
+
+    <div class="info-box">
+      <p><strong>Name on Payment:</strong> $name</p>
+      <p><strong>Order Total:</strong> \$$total</p>
+    </div>
+
+    <p>Please review the uploaded proof in the admin panel before shipping this order.</p>
+
+    <a href="$adminUrl" class="btn">View Order in Admin</a>
+    HTML;
+
+    _send(OWNER_EMAIL, OWNER_NAME, $subject, $body, 'payment_proof');
+}
+
+// ────────────────────────────────────────────────────
+// 6. Customer ko - Email verify karo (naya account)
+// ────────────────────────────────────────────────────
+function sendVerificationEmail(string $email, string $name, string $token): void {
+    $subject  = 'Verify Your Email - ' . SITE_NAME;
+    $safeName = htmlspecialchars($name);
+    $verifyUrl = SITE_URL . '/verify-email?token=' . urlencode($token);
+    $siteName  = SITE_NAME;
+
+    $body = <<<HTML
+    <p>Hi <strong>$safeName</strong>,</p>
+    <p>Thanks for creating an account with <strong>$siteName</strong>. Please confirm this is your real email address to activate your account.</p>
+
+    <a href="$verifyUrl" class="btn">Verify My Email</a>
+
+    <p style="margin-top:24px; font-size:13px; color:#777;">Or copy and paste this link into your browser:<br>
+    <a href="$verifyUrl">$verifyUrl</a></p>
+
+    <p style="margin-top:24px; font-size:13px; color:#777;">This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.</p>
+    HTML;
+
+    _send($email, $name, $subject, $body, 'email_verification');
 }
 
 // ── Internal send function ───────────────────────────

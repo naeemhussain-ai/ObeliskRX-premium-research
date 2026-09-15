@@ -67,6 +67,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <a href="products.php" class="<?= in_array($currentPage, ['products.php','product-add.php','product-edit.php']) ? 'active' : '' ?>">
             🧪 Products
         </a>
+        <a href="coupons.php" class="<?= in_array($currentPage, ['coupons.php']) ? 'active' : '' ?>">
+            🎟 Coupons
+        </a>
     </nav>
 
     <div class="sidebar-footer">

@@ -25,6 +25,10 @@ if (!$customer || !password_verify($body['password'], $customer['password_hash']
     error('Invalid email or password.', 401);
 }
 
+if (!$customer['email_verified_at']) {
+    error('Please verify your email before signing in. Check your inbox for the verification link.', 403, ['code' => 'EMAIL_NOT_VERIFIED']);
+}
+
 $token   = generateToken();
 $expires = date('Y-m-d H:i:s', strtotime('+30 days'));
 $db->prepare("INSERT INTO customer_sessions (customer_id, token, expires_at) VALUES (?, ?, ?)")

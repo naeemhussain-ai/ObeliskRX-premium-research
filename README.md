@@ -1,4 +1,4 @@
-# ObeliskRX Portal — Developer Reference
+# ObeliskRX Portal - Developer Reference
 
 Full context for developers or AI agents continuing work on this project.
 
@@ -11,7 +11,7 @@ ObeliskRX is a **research peptide e-commerce storefront** with:
 - A PHP backend for the admin panel, REST API, and order handling
 - Hosted on **cPanel shared hosting** at `axistechstaging.com/obeliskrx`
 
-The project is **NOT a typical Node.js server app** — the React app is compiled to static HTML/JS/CSS and the backend is plain PHP running under Apache on cPanel.
+The project is **NOT a typical Node.js server app** - the React app is compiled to static HTML/JS/CSS and the backend is plain PHP running under Apache on cPanel.
 
 ---
 
@@ -20,7 +20,7 @@ The project is **NOT a typical Node.js server app** — the React app is compile
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 19, Vite 8, TypeScript, Tailwind CSS v4, Radix UI, Lucide icons |
-| Routing | Custom SPA router (`src/lib/router.tsx`) — no React Router or TanStack Router in use |
+| Routing | Custom SPA router (`src/lib/router.tsx`) - no React Router or TanStack Router in use |
 | State | React useState + localStorage (no Redux, no Zustand) |
 | Backend | PHP 8+, PDO MySQL, no framework |
 | Admin panel | Plain PHP + custom CSS (no React) |
@@ -80,7 +80,7 @@ obeliskrx-portal/
 │   │   ├── database.php        # DB connection (loads local.php if exists)
 │   │   ├── constants.php       # Production URL/email constants
 │   │   ├── cors.php            # CORS headers for API
-│   │   └── local.php           # LOCAL ONLY — never upload to cPanel
+│   │   └── local.php           # LOCAL ONLY - never upload to cPanel
 │   ├── admin/                  # PHP admin panel (no React)
 │   │   ├── index.php           # Admin dashboard
 │   │   ├── products.php        # Product list
@@ -131,7 +131,7 @@ obeliskrx-portal/
 │
 ├── .env.local                  # Local dev environment vars (not committed)
 ├── .env.production             # Production environment vars (committed)
-├── vite.config.ts              # Vite config — base URL, proxy
+├── vite.config.ts              # Vite config - base URL, proxy
 ├── index.html                  # HTML shell for Vite
 └── public/                     # Static public files
     └── .htaccess               # React SPA fallback routing
@@ -141,13 +141,13 @@ obeliskrx-portal/
 
 ## Environment Variables
 
-### `.env.local` (local dev — do NOT commit)
+### `.env.local` (local dev - do NOT commit)
 ```
 VITE_API_URL=http://localhost/obeliskrx/backend/api
 VITE_BASE_URL=/obeliskrx/
 ```
 
-### `.env.production` (production — committed to repo)
+### `.env.production` (production - committed to repo)
 ```
 VITE_API_URL=https://axistechstaging.com/obeliskrx/backend/api
 VITE_BASE_URL=/obeliskrx/
@@ -165,7 +165,7 @@ Vite automatically picks up `.env.production` when you run `npm run build`.
 | Host | `localhost` |
 | Database | `axistechstaging_obeliskrx` |
 | Username | `axistechstaging_obeliskrx` |
-| Password | _stored on the server only — see `backend/config/local.php` / hosting panel_ |
+| Password | _stored on the server only - see `backend/config/local.php` / hosting panel_ |
 
 ### Local (XAMPP)
 | Setting | Value |
@@ -181,23 +181,23 @@ Vite automatically picks up `.env.production` when you run `npm run build`.
 - If it **doesn't exist** → falls back to the values in `database.php`, where
   `DB_PASS` comes from the `OBELISK_DB_PASS` env var or a placeholder
 
-`backend/config/local.php` is git-ignored. Put the **real credentials** there —
+`backend/config/local.php` is git-ignored. Put the **real credentials** there -
 local dev creds on your machine, production creds in the copy that lives on the
 server. Never commit real passwords.
 
 **CRITICAL:** never upload your **local machine's** `local.php` (root / empty
-password) to cPanel — it will break the production DB connection. The server
+password) to cPanel - it will break the production DB connection. The server
 keeps its **own** `local.php` with production credentials. The `deploy.zip`
 script excludes `local.php` so your local copy can't clobber the server's.
 
 ### Database setup order (production)
 Run these SQL files in phpMyAdmin in this order:
-1. `backend/database/schema.sql` — main tables
-2. `backend/database/seed_products.sql` — product data
-3. `backend/database/migration_coa.sql` — COA tables
-4. `backend/database/migration_customers.sql` — customer accounts
-5. `backend/database/migration_reviews_reply.sql` — review replies
-6. `backend/database/fix_coa_defaults.sql` — fix COA column defaults
+1. `backend/database/schema.sql` - main tables
+2. `backend/database/seed_products.sql` - product data
+3. `backend/database/migration_coa.sql` - COA tables
+4. `backend/database/migration_customers.sql` - customer accounts
+5. `backend/database/migration_reviews_reply.sql` - review replies
+6. `backend/database/fix_coa_defaults.sql` - fix COA column defaults
 
 Then create admin user by visiting:
 ```
@@ -230,8 +230,8 @@ npm run build
 This reads `.env.production` automatically and outputs to `dist/`.
 
 The build produces:
-- `dist/index.html` — HTML shell
-- `dist/assets/` — hashed JS, CSS, and image files
+- `dist/index.html` - HTML shell
+- `dist/assets/` - hashed JS, CSS, and image files
 
 ---
 
@@ -252,7 +252,7 @@ Get-ChildItem -Path ".\dist" -Recurse | Where-Object { -not $_.PSIsContainer } |
     [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $entry, 'Optimal') | Out-Null
 }
 
-# PHP backend (goes to backend/ folder in zip) — local.php excluded!
+# PHP backend (goes to backend/ folder in zip) - local.php excluded!
 Get-ChildItem -Path ".\backend" -Recurse | Where-Object {
     (-not $_.PSIsContainer) -and ($_.FullName -notlike "*\config\local.php")
 } | ForEach-Object {
@@ -272,7 +272,7 @@ Write-Host "deploy.zip ready"
 2. **Create zip:** Run the PowerShell script above → `deploy.zip`
 3. **Upload:** cPanel File Manager → navigate to `/public_html/obeliskrx/` → Upload → `deploy.zip`
 4. **Extract:** Right-click `deploy.zip` → Extract → extract here (into `obeliskrx/`)
-5. **Verify:** Check `backend/config/local.php` does NOT exist on server. If it does, delete it immediately — it will break production DB connection.
+5. **Verify:** Check `backend/config/local.php` does NOT exist on server. If it does, delete it immediately - it will break production DB connection.
 6. **Permissions:** `backend/images/coa/` and `backend/images/products/` must be `755` (writable by PHP)
 
 ### What the zip contains (relative to `obeliskrx/` folder after extraction)
@@ -316,8 +316,8 @@ The React SPA is fully static after build. Data is loaded at runtime:
 ### COA data priority
 ```
 1. PHP admin saved data  (API cache in localStorage)
-2. React admin uploads   (base64 images in localStorage — legacy)
-3. Static bundled images (compiled into JS bundle — fallback)
+2. React admin uploads   (base64 images in localStorage - legacy)
+3. Static bundled images (compiled into JS bundle - fallback)
 ```
 
 ---
@@ -326,7 +326,7 @@ The React SPA is fully static after build. Data is loaded at runtime:
 
 URL: `https://axistechstaging.com/obeliskrx/backend/admin/`
 
-Default credentials set by `reset_admin.php` — check that file for current password.
+Default credentials set by `reset_admin.php` - check that file for current password.
 
 ### Admin features
 - Products: add, edit, delete, toggle active/inactive
@@ -339,7 +339,7 @@ Default credentials set by `reset_admin.php` — check that file for current pas
 When admin edits a product, the form includes COA fields (purity, lot, tested date, file upload). These save directly to `product_coa` and `product_coa_files` tables via `action-product.php`.
 
 ### Important: Nested forms bug (fixed)
-HTML does not allow `<form>` inside `<form>`. The COA file delete buttons previously used nested forms which caused the main "Save Changes" button to not work. This was fixed — delete buttons now use JavaScript `deleteCoaFile()` which creates a dynamic form on click.
+HTML does not allow `<form>` inside `<form>`. The COA file delete buttons previously used nested forms which caused the main "Save Changes" button to not work. This was fixed - delete buttons now use JavaScript `deleteCoaFile()` which creates a dynamic form on click.
 
 ---
 
@@ -351,9 +351,9 @@ HTML does not allow `<form>` inside `<form>`. The COA file delete buttons previo
 | `backend/admin/action-product.php` | Saves product edits + COA to DB + uploads files to `backend/images/coa/` |
 | `backend/admin/coa.php` | Standalone COA management page |
 | `backend/admin/action-coa.php` | POST handler for standalone COA saves |
-| `backend/api/coa/index.php` | GET API — returns all COA data as JSON to frontend |
+| `backend/api/coa/index.php` | GET API - returns all COA data as JSON to frontend |
 | `src/lib/coa.ts` | getCoa(), syncCoaFromAPI(), localStorage cache management |
-| `src/routes/coa.tsx` | Frontend COA page — lists products with COA |
+| `src/routes/coa.tsx` | Frontend COA page - lists products with COA |
 | `src/components/CoaDialog.tsx` | Modal to view COA images/PDFs |
 
 ---
@@ -379,7 +379,7 @@ HTML does not allow `<form>` inside `<form>`. The COA file delete buttons previo
 
 ### 5. COA table columns had no DEFAULT value
 **Problem:** `purity`, `lot_number`, `tested_date` were `NOT NULL` with no `DEFAULT ''`, which could cause issues in strict MySQL mode.
-**Fix:** `fix_coa_defaults.sql` — run once on production to ALTER TABLE and add `DEFAULT ''`.
+**Fix:** `fix_coa_defaults.sql` - run once on production to ALTER TABLE and add `DEFAULT ''`.
 
 ### 6. XAMPP MySQL data corruption
 **Problem:** Local MariaDB Aria storage engine corruption prevented any connections.
@@ -430,7 +430,7 @@ All under `https://axistechstaging.com/obeliskrx/backend/api/`
 
 The project uses a **custom router** (`src/lib/router.tsx`), not React Router or TanStack Router.
 
-Navigation: `navigateTo("/catalog")` — pushes to history and updates current path state.
+Navigation: `navigateTo("/catalog")` - pushes to history and updates current path state.
 
 The SPA needs Apache to redirect all non-asset URLs to `index.html`. This is done via `.htaccess` in `public/`.
 

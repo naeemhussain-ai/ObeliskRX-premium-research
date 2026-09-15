@@ -12,6 +12,7 @@ define('SITE_URL',        'http://localhost/obeliskrx');
 define('ADMIN_PATH',      'http://localhost/obeliskrx/backend/admin');
 define('IMAGES_BASE_URL', 'http://localhost/obeliskrx/backend/images/products/');
 define('COA_BASE_URL',   'http://localhost/obeliskrx/backend/images/coa/');
+define('PAYMENT_PROOF_BASE_URL', 'http://localhost/obeliskrx/backend/images/payment_proofs/');
 
 // Local mein email nahi jaegi — bas log hogi
 define('SMTP_HOST',   'localhost');

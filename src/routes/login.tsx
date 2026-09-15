@@ -1,7 +1,7 @@
 ﻿import { useState } from "react";
-import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus, MailCheck } from "lucide-react";
 import { useAuth, AUTH_API } from "@/lib/auth";
-import { Link, navigateTo } from "@/lib/router";
+import { navigateTo } from "@/lib/router";
 
 type Tab = "login" | "register";
 
@@ -58,6 +58,7 @@ export function LoginPage() {
 
   // Register form state
   const [rName, setRName]         = useState("");
+  const [rAge, setRAge]           = useState("");
   const [rEmail, setREmail]       = useState("");
   const [rPassword, setRPassword] = useState("");
   const [rConfirm, setRConfirm]   = useState("");
@@ -65,11 +66,15 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
   const [success, setSuccess] = useState("");
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setNeedsVerification(false);
     try {
       const res  = await fetch(`${AUTH_API}/auth/login.php`, {
         method: "POST",
@@ -82,6 +87,7 @@ export function LoginPage() {
         navigateTo("/account");
       } else {
         setError(data.message || "Login failed.");
+        if (data.errors?.code === "EMAIL_NOT_VERIFIED") setNeedsVerification(true);
       }
     } catch {
       setError("Could not connect. Please try again.");
@@ -90,22 +96,41 @@ export function LoginPage() {
     }
   };
 
+  const handleResend = async () => {
+    setResending(true);
+    try {
+      const res = await fetch(`${AUTH_API}/auth/resend-verification.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: lEmail }),
+      });
+      const data = await res.json();
+      setError("");
+      setSuccess(data.message || "Verification email sent.");
+      setNeedsVerification(false);
+    } catch {
+      setError("Could not connect. Please try again.");
+    } finally {
+      setResending(false);
+    }
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (rPassword !== rConfirm) { setError("Passwords do not match."); return; }
     if (rPassword.length < 8)   { setError("Password must be at least 8 characters."); return; }
+    if (!rAge || Number(rAge) < 21) { setError("You must be at least 21 years old to create an account."); return; }
     setLoading(true);
     setError("");
     try {
       const res  = await fetch(`${AUTH_API}/auth/register.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: rName, email: rEmail, password: rPassword }),
+        body: JSON.stringify({ name: rName, age: rAge, email: rEmail, password: rPassword }),
       });
       const data = await res.json();
       if (data.success) {
-        login(data.data.token, data.data.customer);
-        navigateTo("/account");
+        setRegisteredEmail(rEmail);
       } else {
         setError(data.message || "Registration failed.");
       }
@@ -153,6 +178,21 @@ export function LoginPage() {
               {error && (
                 <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {error}
+                  {needsVerification && (
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      disabled={resending}
+                      className="mt-2 block font-semibold text-red-800 underline hover:no-underline disabled:opacity-60"
+                    >
+                      {resending ? "Sending…" : "Resend verification email"}
+                    </button>
+                  )}
+                </div>
+              )}
+              {success && (
+                <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {success}
                 </div>
               )}
 
@@ -175,6 +215,24 @@ export function LoginPage() {
                 </button>
               </p>
             </>
+          ) : registeredEmail ? (
+            <div className="text-center">
+              <div className="mx-auto mb-4 grid size-14 place-items-center rounded-full bg-emerald-100 text-emerald-600">
+                <MailCheck size={28} />
+              </div>
+              <h1 className="text-xl font-bold">Check your inbox</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                We sent a verification link to <span className="font-semibold text-foreground">{registeredEmail}</span>.
+                Your account stays inactive until you open that email and click the link - you won't be able to sign in before then.
+              </p>
+              <button
+                type="button"
+                onClick={() => { setTab("login"); setLEmail(registeredEmail); setRegisteredEmail(""); }}
+                className="mt-6 w-full rounded-full bg-[#0B1F3A] py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0d1631]"
+              >
+                Back to Sign In
+              </button>
+            </div>
           ) : (
             <>
               <div className="mb-6 flex items-center gap-3">
@@ -192,14 +250,10 @@ export function LoginPage() {
                   {error}
                 </div>
               )}
-              {success && (
-                <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                  {success}
-                </div>
-              )}
 
               <form onSubmit={handleRegister} className="space-y-4">
                 <InputField label="Full Name" value={rName} onChange={setRName} placeholder="John Doe" required />
+                <InputField label="Age" type="number" value={rAge} onChange={setRAge} placeholder="Must be 21 or older" required />
                 <InputField label="Email" type="email" value={rEmail} onChange={setREmail} placeholder="you@example.com" required />
                 <InputField label="Password" type="password" value={rPassword} onChange={setRPassword} placeholder="Min. 8 characters" required />
                 <InputField label="Confirm Password" type="password" value={rConfirm} onChange={setRConfirm} placeholder="Repeat password" required />
@@ -222,12 +276,6 @@ export function LoginPage() {
           )}
         </div>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Want to order without an account?{" "}
-          <Link to="/cart" className="font-semibold text-primary hover:underline">
-            Continue as Guest ←’
-          </Link>
-        </p>
       </div>
     </div>
   );

@@ -73,7 +73,7 @@ function OrderCard({ order }: { order: Order }) {
               <span className="text-foreground">
                 {item.product_name}
                 {item.size && <span className="ml-1 text-xs text-muted-foreground">({item.size})</span>}
-                {" Ã—"}{item.quantity}
+                {" Ã-"}{item.quantity}
               </span>
               <span className="font-semibold">{formatPrice(Number(item.unit_price) * item.quantity)}</span>
             </div>

@@ -1,8 +1,8 @@
 -- ============================================================
---  ObeliskRX — LOCAL FULL SETUP (XAMPP / phpMyAdmin)
+--  ObeliskRX - LOCAL FULL SETUP (XAMPP / phpMyAdmin)
 --  phpMyAdmin → database "obeliskrx_db" select karo → SQL tab
 --  → yeh poori file paste karo → Go
---  (DB name "obeliskrx_db" hona zaroori hai — local.php isi ko dhoondta hai)
+--  (DB name "obeliskrx_db" hona zaroori hai - local.php isi ko dhoondta hai)
 -- ============================================================
 
 USE obeliskrx_db;
@@ -61,7 +61,14 @@ CREATE TABLE IF NOT EXISTS orders (
     shipping_fee     DECIMAL(10,2) DEFAULT 0.00,
     total            DECIMAL(10,2) NOT NULL,
     payment_method   VARCHAR(100) DEFAULT 'alipay',
-    status           ENUM('pending','approved','rejected','shipped','delivered') DEFAULT 'approved',
+    coupon_code      VARCHAR(10) NULL,
+    discount_percent DECIMAL(5,2) NULL DEFAULT 0,
+    discount_amount  DECIMAL(10,2) NULL DEFAULT 0,
+    payment_proof_file        VARCHAR(255) NULL,
+    payment_proof_original    VARCHAR(255) NULL,
+    payment_proof_name        VARCHAR(150) NULL,
+    payment_proof_submitted_at DATETIME NULL,
+    status           ENUM('pending','approved','rejected','shipped','delivered') DEFAULT 'pending',
     rejection_reason TEXT DEFAULT NULL,
     admin_notes      TEXT DEFAULT NULL,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -82,6 +89,17 @@ CREATE TABLE IF NOT EXISTS order_items (
     subtotal     DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (order_id)   REFERENCES orders(id)   ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Coupons ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS coupons (
+    id               INT AUTO_INCREMENT PRIMARY KEY,
+    code             VARCHAR(10) UNIQUE NOT NULL,
+    discount_percent DECIMAL(5,2) NOT NULL,
+    max_uses         INT NOT NULL DEFAULT 1,
+    used_count       INT NOT NULL DEFAULT 0,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_code (code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Reviews ─────────────────────────────────────────
@@ -153,8 +171,12 @@ CREATE TABLE IF NOT EXISTS product_coa_files (
 CREATE TABLE IF NOT EXISTS customers (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     name          VARCHAR(100) NOT NULL,
+    age           SMALLINT UNSIGNED NULL,
     email         VARCHAR(150) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    email_verified_at    DATETIME NULL,
+    verification_token   VARCHAR(64) NULL,
+    verification_sent_at DATETIME NULL,
     phone         VARCHAR(50)  NULL,
     address_line1 VARCHAR(255) NULL,
     address_line2 VARCHAR(255) NULL,
@@ -163,7 +185,8 @@ CREATE TABLE IF NOT EXISTS customers (
     zip           VARCHAR(20)  NULL,
     country       VARCHAR(100) NULL DEFAULT 'United States',
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_email (email)
+    INDEX idx_email (email),
+    INDEX idx_verification_token (verification_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS customer_sessions (
@@ -185,7 +208,7 @@ ALTER TABLE orders
 
 
 -- ============================================================
---  4) REVIEWS — admin reply columns
+--  4) REVIEWS - admin reply columns
 -- ============================================================
 ALTER TABLE reviews
     ADD COLUMN IF NOT EXISTS customer_id     INT NULL AFTER id,
@@ -227,7 +250,7 @@ INSERT INTO products (slug, name, series, description, price, price_max, old_pri
 -- ============================================================
 --  7) ADMIN USER
 -- ============================================================
--- Admin user SQL se nahi ban raha — bcrypt hash PHP hi bana sakta hai.
+-- Admin user SQL se nahi ban raha - bcrypt hash PHP hi bana sakta hai.
 -- Apache start hone ke baad ek baar yeh URL kholo:
 --     http://localhost/obeliskrx/backend/database/reset_admin.php
 -- Woh admin bana dega →  admin@obeliskrx.com  /  ObeliskAdmin2024!

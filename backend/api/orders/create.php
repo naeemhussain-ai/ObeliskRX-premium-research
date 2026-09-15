@@ -32,8 +32,32 @@ foreach ($body['items'] as $item) {
 
 $db = getDB();
 
-// ── Optionally link logged-in customer ──────────────
-$customerId = getCustomerIdFromRequest($db);
+// ── Order ke liye login zaroori hai (guest checkout allowed nahi) ──
+$customer = getCustomerFromRequest($db);
+if (!$customer) error('Please log in to place an order.', 401);
+$customerId = (int)$customer['id'];
+
+// ── Coupon (optional) - discount hamesha server par verify/calculate hota hai,
+// client se aaya hua total kabhi trust nahi karte ──
+$couponCode      = strtoupper(trim($body['coupon_code'] ?? ''));
+$discountPercent = 0.0;
+$subtotal        = sanitizeFloat($body['subtotal'] ?? $body['total']);
+$shippingFee     = sanitizeFloat($body['shipping_fee'] ?? 0);
+
+if ($couponCode !== '') {
+    $couponStmt = $db->prepare("SELECT discount_percent, max_uses, used_count FROM coupons WHERE code = ?");
+    $couponStmt->execute([$couponCode]);
+    $couponRow = $couponStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$couponRow) error('Invalid coupon code.', 422);
+    if ((int)$couponRow['used_count'] >= (int)$couponRow['max_uses']) {
+        error('This coupon has reached its usage limit.', 422);
+    }
+    $discountPercent = (float)$couponRow['discount_percent'];
+}
+
+$discountAmount = round($subtotal * $discountPercent / 100, 2);
+$total          = round($subtotal - $discountAmount + $shippingFee, 2);
+if ($total <= 0) error('Invalid order total.', 422);
 
 // ── Generate unique order number ────────────────────
 do {
@@ -50,33 +74,38 @@ try {
         INSERT INTO orders (
             customer_id, order_number, first_name, last_name, email, phone,
             address_line1, address_line2, city, state, zip, country,
-            special_notes, items, subtotal, shipping_fee, total, payment_method, status
+            special_notes, items, subtotal, shipping_fee, total, payment_method,
+            coupon_code, discount_percent, discount_amount, status
         ) VALUES (
             :customer_id, :order_number, :first_name, :last_name, :email, :phone,
             :address_line1, :address_line2, :city, :state, :zip, :country,
-            :special_notes, :items, :subtotal, :shipping_fee, :total, :payment_method, 'approved'
+            :special_notes, :items, :subtotal, :shipping_fee, :total, :payment_method,
+            :coupon_code, :discount_percent, :discount_amount, 'pending'
         )
     ");
 
     $stmt->execute([
-        ':customer_id'   => $customerId,
-        ':order_number'  => $orderNumber,
-        ':first_name'    => sanitizeString($body['first_name']),
-        ':last_name'     => sanitizeString($body['last_name']),
-        ':email'         => strtolower(trim($body['email'])),
-        ':phone'         => sanitizeString($body['phone'] ?? ''),
-        ':address_line1' => sanitizeString($body['address_line1']),
-        ':address_line2' => sanitizeString($body['address_line2'] ?? ''),
-        ':city'          => sanitizeString($body['city']),
-        ':state'         => sanitizeString($body['state']),
-        ':zip'           => sanitizeString($body['zip']),
-        ':country'       => sanitizeString($body['country']),
-        ':special_notes' => sanitizeString($body['special_notes'] ?? ''),
-        ':items'         => json_encode($body['items']),
-        ':subtotal'      => sanitizeFloat($body['subtotal'] ?? $body['total']),
-        ':shipping_fee'  => sanitizeFloat($body['shipping_fee'] ?? 0),
-        ':total'         => sanitizeFloat($body['total']),
-        ':payment_method'=> sanitizeString($body['payment_method'] ?? 'alipay'),
+        ':customer_id'      => $customerId,
+        ':order_number'     => $orderNumber,
+        ':first_name'       => sanitizeString($body['first_name']),
+        ':last_name'        => sanitizeString($body['last_name']),
+        ':email'            => strtolower(trim($body['email'])),
+        ':phone'            => sanitizeString($body['phone'] ?? ''),
+        ':address_line1'    => sanitizeString($body['address_line1']),
+        ':address_line2'    => sanitizeString($body['address_line2'] ?? ''),
+        ':city'             => sanitizeString($body['city']),
+        ':state'            => sanitizeString($body['state']),
+        ':zip'              => sanitizeString($body['zip']),
+        ':country'          => sanitizeString($body['country']),
+        ':special_notes'    => sanitizeString($body['special_notes'] ?? ''),
+        ':items'            => json_encode($body['items']),
+        ':subtotal'         => $subtotal,
+        ':shipping_fee'     => $shippingFee,
+        ':total'            => $total,
+        ':payment_method'   => sanitizeString($body['payment_method'] ?? 'alipay'),
+        ':coupon_code'      => $couponCode !== '' ? $couponCode : null,
+        ':discount_percent' => $discountPercent,
+        ':discount_amount'  => $discountAmount,
     ]);
 
     $orderId = (int)$db->lastInsertId();
@@ -107,6 +136,17 @@ try {
             ':unit_price'   => (float)$item['unit_price'],
             ':subtotal'     => (float)$item['quantity'] * (float)$item['unit_price'],
         ]);
+    }
+
+    // Coupon slot atomically claim karo - agar isi waqt koi aur order isay use kar
+    // chuka ho aur limit poori ho gayi ho, to poora order rollback kar do
+    if ($couponCode !== '') {
+        $claim = $db->prepare("UPDATE coupons SET used_count = used_count + 1 WHERE code = ? AND used_count < max_uses");
+        $claim->execute([$couponCode]);
+        if ($claim->rowCount() === 0) {
+            $db->rollBack();
+            error('This coupon just reached its usage limit. Please remove it and try again.', 422);
+        }
     }
 
     $db->commit();

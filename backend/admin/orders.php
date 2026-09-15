@@ -14,7 +14,7 @@ $statusCounts = [];
 foreach ($db->query("SELECT status, COUNT(*) AS cnt FROM orders GROUP BY status")->fetchAll() as $r)
     $statusCounts[$r['status']] = (int)$r['cnt'];
 $totalOrders  = array_sum($statusCounts);
-$pendingCount = ($statusCounts['pending'] ?? 0) + ($statusCounts['approved'] ?? 0);
+$pendingCount = $statusCounts['pending'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,12 +37,12 @@ $pendingCount = ($statusCounts['pending'] ?? 0) + ($statusCounts['approved'] ?? 
         <div class="filter-tabs">
             <?php
             $tabs = [
-                'all'       => ['All',        $totalOrders],
-                'approved'  => ['New Orders', $statusCounts['approved']  ?? 0],
-                'pending'   => ['Pending',    $statusCounts['pending']   ?? 0],
-                'shipped'   => ['Shipped',    $statusCounts['shipped']   ?? 0],
-                'delivered' => ['Delivered',  $statusCounts['delivered'] ?? 0],
-                'rejected'  => ['Cancelled',  $statusCounts['rejected']  ?? 0],
+                'all'       => ['All',               $totalOrders],
+                'pending'   => ['Awaiting Payment',   $statusCounts['pending']   ?? 0],
+                'approved'  => ['Payment Confirmed',  $statusCounts['approved']  ?? 0],
+                'shipped'   => ['Shipped',            $statusCounts['shipped']   ?? 0],
+                'delivered' => ['Delivered',          $statusCounts['delivered'] ?? 0],
+                'rejected'  => ['Cancelled',          $statusCounts['rejected']  ?? 0],
             ];
             foreach ($tabs as $key => [$label, $count]):
             ?>
@@ -97,7 +97,14 @@ $pendingCount = ($statusCounts['pending'] ?? 0) + ($statusCounts['approved'] ?? 
                         </td>
                         <td><?= count($items) ?> item(s)</td>
                         <td><strong>$<?= number_format($order['total'], 2) ?></strong></td>
-                        <td><?= htmlspecialchars(ucfirst($order['payment_method'] ?? '-')) ?></td>
+                        <td>
+                            <?= htmlspecialchars(ucfirst($order['payment_method'] ?? '-')) ?><br>
+                            <?php if (!empty($order['payment_proof_file'])): ?>
+                                <span class="badge badge-green" style="font-size:10px">Proof uploaded</span>
+                            <?php else: ?>
+                                <span class="badge badge-yellow" style="font-size:10px">No proof yet</span>
+                            <?php endif; ?>
+                        </td>
                         <td><span class="badge <?= $statusClass ?>"><?= ucfirst($order['status']) ?></span></td>
                         <td><?= date('M d, Y', strtotime($order['created_at'])) ?></td>
                         <td>

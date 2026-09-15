@@ -1,5 +1,6 @@
-import { useEffect, type ComponentType } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 
+import { AgeGate, isAgeVerified } from "@/components/AgeGate";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Footer, Notice } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -15,6 +16,7 @@ import { ContactPage } from "@/routes/contact";
 import { FaqPage } from "@/routes/faq";
 import { HomePage } from "@/routes/index";
 import { LoginPage } from "@/routes/login";
+import { VerifyEmailPage } from "@/routes/verify-email";
 import { AccountPage } from "@/routes/account";
 import { ProductDetailPage } from "@/routes/product.$slug";
 import { RefundPolicyPage } from "@/routes/refund-policy";
@@ -41,6 +43,7 @@ const routes: RouteDefinition[] = [
   { path: "/coa", title: "ObeliskRX | Certificate of Analysis", component: CoaPage },
   { path: "/cart", title: "ObeliskRX | Shopping Cart", component: CartPage },
   { path: "/login", title: "ObeliskRX | Sign In", component: LoginPage },
+  { path: "/verify-email", title: "ObeliskRX | Verify Email", component: VerifyEmailPage },
   { path: "/account", title: "ObeliskRX | My Account", component: AccountPage },
   { path: "/product/$slug", title: "ObeliskRX | Product Detail", component: ProductDetailPage },
   { path: "/terms", title: "ObeliskRX | Terms of Service", component: TermsPage },
@@ -85,6 +88,11 @@ function DocumentTitle({ title }: { title: string }) {
 
 function AppShell() {
   const currentPath = useCurrentPath();
+  const [verified, setVerified] = useState(isAgeVerified);
+
+  if (!verified) {
+    return <AgeGate onVerified={() => setVerified(true)} />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-surface">

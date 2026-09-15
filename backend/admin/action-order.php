@@ -12,7 +12,7 @@ $orderId = (int)($_POST['order_id'] ?? 0);
 $action  = $_POST['action'] ?? '';
 $reason  = trim($_POST['rejection_reason'] ?? '');
 
-$validActions = ['rejected', 'shipped', 'delivered'];
+$validActions = ['approved', 'rejected', 'shipped', 'delivered'];
 
 if (!$orderId || !in_array($action, $validActions)) {
     header('Location: orders.php?error=invalid');
@@ -48,6 +48,7 @@ $update->execute([$action, $action === 'rejected' ? $reason : null, $orderId]);
 try {
     require_once __DIR__ . '/../helpers/email.php';
     $updatedOrder = $db->query("SELECT * FROM orders WHERE id = $orderId")->fetch();
+    if ($action === 'approved') sendOrderApprovedEmail($updatedOrder);
     if ($action === 'shipped')  sendOrderShippedEmail($updatedOrder);
     if ($action === 'rejected') sendOrderCancelledEmail($updatedOrder);
 } catch (\Exception $e) {}

@@ -137,7 +137,7 @@ if (!empty($_GET['error'])) {
                             <?php if (!empty($sizes)): ?>
                                 <?= htmlspecialchars(implode(', ', $sizes)) ?>
                             <?php else: ?>
-                                <span class="text-muted">—</span>
+                                <span class="text-muted">-</span>
                             <?php endif; ?>
                         </td>
 
