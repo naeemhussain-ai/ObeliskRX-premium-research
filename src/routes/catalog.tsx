@@ -25,6 +25,15 @@ const allSeries = [
   "Signature Blends",
 ];
 
+const seriesLabels: Record<string, string> = {
+  "Metabolic Series": "Metabolic Research",
+  "Recovery Series": "Repair-Pathway Research",
+  "Growth Series": "Growth-Factor Research",
+  "Longevity Series": "Cellular Research",
+  "Neuro Series": "Neuro Research",
+  "Signature Blends": "Research Blends",
+};
+
 const priceRanges = [
   { label: "All Prices", min: 0, max: Infinity },
   { label: "Under $50", min: 0, max: 50 },
@@ -122,7 +131,7 @@ function FilterSidebar({
                           checked ? "text-primary" : "text-gray-600 group-hover:text-gray-900"
                         }`}
                       >
-                        {s.replace(" Series", "").replace("Signature ", "")}
+                        {seriesLabels[s] ?? s}
                       </span>
                     </div>
                     <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">
@@ -386,7 +395,7 @@ export function CatalogPage() {
                 onClick={() => handleSeriesChange(s)}
                 className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
               >
-                {s.replace(" Series", "").replace("Signature ", "")}
+                {seriesLabels[s] ?? s}
                 <X size={11} />
               </button>
             ))}
