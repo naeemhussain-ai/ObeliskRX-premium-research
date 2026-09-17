@@ -54,7 +54,15 @@ export function HomePage() {
   const [filterCategory, setFilterCategory] = useState("All");
   const [filterPrice, setFilterPrice] = useState("All");
 
-  const categories = ["All", "Metabolic Series", "Recovery Series", "Growth Series", "Longevity Series", "Neuro Series", "Signature Blends"];
+  const categories = [
+    { value: "All", label: "All" },
+    { value: "Metabolic Series", label: "Metabolic Research" },
+    { value: "Recovery Series", label: "Repair-Pathway Research" },
+    { value: "Growth Series", label: "Growth-Factor Research" },
+    { value: "Longevity Series", label: "Cellular Research" },
+    { value: "Neuro Series", label: "Neuro Research" },
+    { value: "Signature Blends", label: "Research Blends" },
+  ];
   const priceRanges = [
     { label: "All Prices", value: "All" },
     { label: "Under $50", value: "under50" },
@@ -167,7 +175,7 @@ export function HomePage() {
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Featured Products</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Filter by category and price range to find the perfect research peptide.
+              Browse research materials by category and specification. 
             </p>
           </div>
           <Link
@@ -184,16 +192,16 @@ export function HomePage() {
             <span className="text-sm font-bold text-gray-700 mr-2">Category:</span>
             {categories.map((c) => (
               <button
-                key={c}
+                key={c.value}
                 type="button"
-                onClick={() => setFilterCategory(c)}
+                onClick={() => setFilterCategory(c.value)}
                 className={`rounded-full px-4 py-2 text-xs font-semibold transition-all duration-300 ${
-                  filterCategory === c
+                  filterCategory === c.value
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-surface text-gray-600 hover:bg-primary/10 hover:text-primary border border-border"
                 }`}
               >
-                {c.replace(" Series", "")}
+                {c.label}
               </button>
             ))}
           </div>

@@ -77,8 +77,6 @@ const usefulLinks = [
   { label: "Terms of Service", to: "/terms" },
 ];
 
-const payments = ["VISA", "stripe", "PayPal", "G Pay", "Apple Pay"];
-
 export function Footer() {
   return (
     <footer className="bg-ink px-4 pb-8 pt-10">
@@ -89,7 +87,7 @@ export function Footer() {
               <img src={logoImgWhite} alt="ObeliskRX" className="h-14 w-auto sm:h-16" />
             </Link>
             <p className="mt-4 max-w-64 text-sm text-ink-foreground/70">
-              Research-grade peptides, verified for precision and integrity.
+              Research peptides supported by batch-specific analytical documentation.
             </p>
             <div className="mt-5 flex gap-3">
               <a
@@ -119,13 +117,6 @@ export function Footer() {
               >
                 <TikTokIcon size={15} />
               </a>
-            </div>
-            <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-ink-foreground/10 pt-5">
-              {payments.map((p) => (
-                <span key={p} className="text-[11px] font-semibold text-ink-foreground/60">
-                  {p}
-                </span>
-              ))}
             </div>
           </div>
 

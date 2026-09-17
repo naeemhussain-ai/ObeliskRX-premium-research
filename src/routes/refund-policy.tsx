@@ -277,6 +277,12 @@ export function RefundPolicyPage() {
               <p className="font-semibold text-gray-900">
                 All products are used entirely at the purchaser’s own risk and responsibility.
               </p>
+              <p>
+                Research materials must be handled by appropriately qualified persons in
+                accordance with applicable laws, regulations, safety procedures and product
+                documentation. To the maximum extent permitted by applicable law, ObeliskRX's
+                liability is subject to the limitations described in these Terms.
+              </p>
             </div>
           </section>
 
@@ -286,9 +292,9 @@ export function RefundPolicyPage() {
               9. Policy Modifications
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-gray-600">
-              ObeliskRX LLC reserves the right to modify, update, or change this policy at any time
-              without prior notice. The version posted on the website at the time of purchase
-              governs the transaction.
+              ObeliskRX may update this policy from time to time. The version in effect at the
+              time an order is placed will apply to that transaction unless otherwise required by
+              applicable law.
             </p>
           </section>
 

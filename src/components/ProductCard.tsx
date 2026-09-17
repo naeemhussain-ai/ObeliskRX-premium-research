@@ -197,9 +197,6 @@ export function ProductCard({ product, compact = false }: { product: Product; co
     <>
       <div className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover-lift">
         <div className="relative overflow-hidden">
-          <span className="discount-badge absolute left-0 top-0 z-10 rounded-br-lg bg-discount px-2.5 py-1 text-[11px] font-bold text-discount-foreground shadow-sm">
-            -{product.discount}%
-          </span>
           <button
             type="button"
             aria-label="Add to wishlist"
