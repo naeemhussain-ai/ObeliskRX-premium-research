@@ -5,7 +5,7 @@ import logoImg from "@/assets/obeliskrx-logo.png";
 import logoImgWhite from "@/assets/obeliskrx-logo-white.png";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
-import { getProducts } from "@/lib/products";
+import { getProducts, normalizeSeries } from "@/lib/products";
 import { Link } from "@/lib/router";
 import { useScrolled } from "@/hooks/useScrolled";
 import { useCurrentPath } from "@/lib/router";
@@ -100,7 +100,7 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                     <img src={product.image} alt={product.name} className="size-12 shrink-0 rounded-lg bg-surface object-cover" />
                     <div className="min-w-0 flex-1">
                       <h4 className="truncate text-sm font-semibold text-gray-900 group-hover:text-primary">{product.name}</h4>
-                      <p className="text-xs text-gray-500">{product.series}</p>
+                      <p className="text-xs text-gray-500">{normalizeSeries(product.series)}</p>
                     </div>
                   </Link>
                 ))}

@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { AlertTriangle, X } from "lucide-react";
+import { isAgeVerified } from "@/components/AgeGate";
 
 export type CartItem = {
   slug: string;
@@ -119,8 +120,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (raw) setItems(JSON.parse(raw));
       const w = localStorage.getItem(WISH_KEY);
       if (w) setWishlist(JSON.parse(w));
-      const ageVal = localStorage.getItem(AGE_KEY);
-      if (ageVal === "true") setIs21Plus(true);
+      if (localStorage.getItem(AGE_KEY) === "true" || isAgeVerified()) setIs21Plus(true);
     } catch {
       /* ignore */
     }
@@ -144,16 +144,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const add = useCallback(
     (item: Omit<CartItem, "qty">, qty = 1): boolean => {
-      // IF-ELSE Age Verification Condition
-      const verifiedInStorage = localStorage.getItem(AGE_KEY) === "true";
-
-      if (!verifiedInStorage) {
-        // User is not 21 years old! Block add to cart and prompt for elder permission
-        setShowAgeNoticeModal(true);
-        return false;
-      }
-
-      // If user IS 21+, proceed normally with adding to cart
+      // Age is already verified by the entry age gate and by account signup (21+),
+      // so add-to-cart does not check it again.
       setItems((prev) => {
         const idx = prev.findIndex((i) => i.slug === item.slug && i.size === item.size);
         if (idx > -1) {

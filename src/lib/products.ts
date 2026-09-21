@@ -308,6 +308,31 @@ const _staticProducts: Product[] = [
 const PRODUCTS_KEY = "obeliskrx-products";
 const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/backend/api";
 
+// Older products (and the admin's built-in dropdown) used short internal names.
+// The site now shows/stores the descriptive research title directly, so both
+// forms need to resolve to the same filter bucket.
+const SERIES_ALIASES: Record<string, string> = {
+  "Metabolic Series": "Metabolic Research",
+  "Recovery Series": "Repair-Pathway Research",
+  "Growth Series": "Growth-Factor Research",
+  "Longevity Series": "Cellular Research",
+  "Neuro Series": "Neuro Research",
+  "Signature Blends": "Research Blends",
+};
+
+export const KNOWN_SERIES_LABELS = [
+  "Metabolic Research",
+  "Repair-Pathway Research",
+  "Growth-Factor Research",
+  "Cellular Research",
+  "Neuro Research",
+  "Research Blends",
+];
+
+export function normalizeSeries(raw: string): string {
+  return SERIES_ALIASES[raw] ?? raw;
+}
+
 type ApiProduct = {
   slug: string; name: string; series: string; description: string;
   price: string; price_max: string | null; old_price: string | null;

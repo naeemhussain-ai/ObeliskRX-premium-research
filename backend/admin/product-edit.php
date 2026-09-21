@@ -50,6 +50,7 @@ $seriesList = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="assets/favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product - ObeliskRX Admin</title>
@@ -109,15 +110,17 @@ $seriesList = [
                 </div>
 
                 <div class="form-group">
-                    <label for="series">Series</label>
-                    <select id="series" name="series" class="form-control">
+                    <label for="series">Series / Category</label>
+                    <input type="text" id="series" name="series" class="form-control"
+                           list="seriesSuggestions"
+                           value="<?= htmlspecialchars($product['series']) ?>"
+                           placeholder="e.g. Metabolic Research">
+                    <datalist id="seriesSuggestions">
                         <?php foreach ($seriesList as $s): ?>
-                            <option value="<?= htmlspecialchars($s) ?>"
-                                <?= $product['series'] === $s ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($s) ?>
-                            </option>
+                            <option value="<?= htmlspecialchars($s) ?>"></option>
                         <?php endforeach; ?>
-                    </select>
+                    </datalist>
+                    <small class="text-muted">Type any category name, or pick an existing one from the suggestions.</small>
                 </div>
 
                 <div class="form-group">

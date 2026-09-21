@@ -37,6 +37,24 @@ $customer = getCustomerFromRequest($db);
 if (!$customer) error('Please log in to place an order.', 401);
 $customerId = (int)$customer['id'];
 
+// ── Research info (checkout popup) ──────────────────
+$allowedUsage = ['Academic Research', 'Lab/Institutional Research', 'Clinical Research Professional', 'Graduate/PhD Student'];
+$legalName = sanitizeString($body['legal_name'] ?? '');
+$usageType = sanitizeString($body['usage_type'] ?? '');
+if ($legalName === '') error('Please enter your full legal name or company name.', 422);
+if (!in_array($usageType, $allowedUsage, true)) error('Please select how you are using ObeliskRX.', 422);
+
+// orders table mein columns na hon to khud bana do (migration_research_info.sql ka kaam)
+$hasResearchCols = false;
+try {
+    foreach (['legal_name' => 'VARCHAR(200) NULL', 'usage_type' => 'VARCHAR(100) NULL'] as $col => $def) {
+        if (!$db->query("SHOW COLUMNS FROM orders LIKE '$col'")->fetch()) {
+            $db->exec("ALTER TABLE orders ADD COLUMN $col $def");
+        }
+    }
+    $hasResearchCols = true;
+} catch (\Exception $e) {}
+
 // ── Coupon (optional) - discount hamesha server par verify/calculate hota hai,
 // client se aaya hua total kabhi trust nahi karte ──
 $couponCode      = strtoupper(trim($body['coupon_code'] ?? ''));
@@ -84,7 +102,7 @@ try {
         )
     ");
 
-    $stmt->execute([
+    $params = [
         ':customer_id'      => $customerId,
         ':order_number'     => $orderNumber,
         ':first_name'       => sanitizeString($body['first_name']),
@@ -106,9 +124,14 @@ try {
         ':coupon_code'      => $couponCode !== '' ? $couponCode : null,
         ':discount_percent' => $discountPercent,
         ':discount_amount'  => $discountAmount,
-    ]);
+    ];
+    $stmt->execute($params);
 
     $orderId = (int)$db->lastInsertId();
+    if ($hasResearchCols) {
+        $db->prepare("UPDATE orders SET legal_name = ?, usage_type = ? WHERE id = ?")
+           ->execute([$legalName, $usageType, $orderId]);
+    }
 
     // order_items insert - slug se product_id dhundho
     $itemStmt = $db->prepare("

@@ -3,7 +3,7 @@ import { Heart, Search, ShoppingCart, X, Check } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { Link } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
-import { formatPrice, priceLabel, type Product } from "@/lib/products";
+import { formatPrice, priceLabel, priceForSize, normalizeSeries, type Product } from "@/lib/products";
 
 export function Logo({ className = "h-8", light = false }: { className?: string; light?: boolean }) {
   const textColor = light ? "#ffffff" : "#0B1F3A";
@@ -55,8 +55,9 @@ function QuickViewModal({
 }) {
   const { add } = useCart();
   const { addToast } = useToast();
-  const [size, setSize] = useState("");
+  const [size, setSize] = useState(product.sizes[0] ?? "");
   const [isAdding, setIsAdding] = useState(false);
+  const sizedPrice = priceForSize(product, size);
 
   const handleAdd = () => {
     setIsAdding(true);
@@ -66,7 +67,7 @@ function QuickViewModal({
         slug: product.slug,
         name: product.name,
         size: selectedSize,
-        price: product.price,
+        price: priceForSize(product, selectedSize) ?? product.price,
         image: product.image,
       },
       1,
@@ -123,7 +124,6 @@ function QuickViewModal({
             onChange={(e) => setSize(e.target.value)}
             className="mx-auto w-full max-w-[220px] rounded-md border border-gray-300 px-4 py-2.5 text-sm text-gray-700 outline-none transition-colors focus:border-primary"
           >
-            <option value="">Choose an option</option>
             {product.sizes.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -162,14 +162,14 @@ function QuickViewModal({
           >
             {product.name}
           </Link>
-          <p className="mt-1 text-xs text-muted-foreground">{product.series}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{normalizeSeries(product.series)}</p>
           <p className="mt-1 text-sm font-bold text-foreground">
             {product.oldPrice && (
               <span className="mr-2 text-xs font-normal text-muted-foreground line-through">
                 {formatPrice(product.oldPrice)}
               </span>
             )}
-            {priceLabel(product)}
+            {sizedPrice !== null ? formatPrice(sizedPrice) : priceLabel(product)}
           </p>
         </div>
       </div>
@@ -242,7 +242,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
           >
             {product.name}
           </Link>
-          <p className="mt-1 text-xs text-white/60">{product.series}</p>
+          <p className="mt-1 text-xs text-white/60">{normalizeSeries(product.series)}</p>
           <p className="mt-2 text-sm font-bold text-white">
             {product.oldPrice && (
               <span className="mr-2 text-xs font-normal text-white/50 line-through">

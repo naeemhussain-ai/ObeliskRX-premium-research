@@ -23,7 +23,7 @@ import { Link, useRouteParams } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 import { getCoa } from "@/lib/coa";
-import { formatPrice, useProducts, priceForSize, priceLabel } from "@/lib/products";
+import { formatPrice, useProducts, priceForSize, priceLabel, normalizeSeries } from "@/lib/products";
 
 function ProductNotFound() {
   return (
@@ -98,7 +98,7 @@ function ProductDetail() {
         <Link to="/catalog" className="hover:text-primary">
           Shop
         </Link>{" "}
-        / {product.series} / <span className="font-medium text-foreground">{product.name}</span>
+        / {normalizeSeries(product.series)} / <span className="font-medium text-foreground">{product.name}</span>
       </nav>
 
       <div
@@ -123,7 +123,7 @@ function ProductDetail() {
         {/* ===== Details ===== */}
         <div className="anim-fade-in-up" style={{ animationDelay: "100ms" }}>
           <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
-            {product.series}
+            {normalizeSeries(product.series)}
           </span>
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{product.name}</h1>
 

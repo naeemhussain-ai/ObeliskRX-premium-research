@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CheckCircle2, UploadCloud } from "lucide-react";
 import { useAuth, AUTH_API } from "@/lib/auth";
 
-export function PaymentProofForm({ orderNumber, defaultFullName }: { orderNumber: string; defaultFullName: string }) {
+export function PaymentProofForm({ orderNumber, defaultFullName, onSubmitted }: { orderNumber: string; defaultFullName: string; onSubmitted?: () => void }) {
   const { token } = useAuth();
   const [fullName, setFullName] = useState(defaultFullName);
   const [file, setFile] = useState<File | null>(null);
@@ -29,6 +29,7 @@ export function PaymentProofForm({ orderNumber, defaultFullName }: { orderNumber
       const data = await res.json();
       if (data.success) {
         setSubmitted(true);
+        onSubmitted?.();
       } else {
         setError(data.message || "Something went wrong. Please try again.");
       }

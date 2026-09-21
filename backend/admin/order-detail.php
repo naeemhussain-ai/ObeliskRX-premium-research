@@ -26,6 +26,7 @@ $statusClass = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="assets/favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order <?= htmlspecialchars($order['order_number']) ?>   Admin</title>
@@ -54,6 +55,10 @@ $statusClass = [
                     <dd><a href="mailto:<?= htmlspecialchars($order['email']) ?>"><?= htmlspecialchars($order['email']) ?></a></dd>
                     <dt>Phone</dt>
                     <dd><?= htmlspecialchars($order['phone'] ?: ' ') ?></dd>
+                    <dt>Legal / Company Name</dt>
+                    <dd><?= htmlspecialchars(($order['legal_name'] ?? '') ?: ' ') ?></dd>
+                    <dt>Usage</dt>
+                    <dd><?= htmlspecialchars(($order['usage_type'] ?? '') ?: ' ') ?></dd>
                     <dt>Payment</dt>
                     <dd><?= htmlspecialchars(ucfirst($order['payment_method'] ?? ' ')) ?></dd>
                     <dt>Order Date</dt>

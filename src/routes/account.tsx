@@ -62,7 +62,7 @@ function OrderCard({ order }: { order: Order }) {
             {STATUS_LABEL[order.status] ?? order.status}
           </span>
           <span className="font-bold text-sm text-primary">{formatPrice(Number(order.total))}</span>
-          <span className="text-xs text-muted-foreground">{open ? "–²" : "–¼"}</span>
+          <span className="text-xs text-muted-foreground">{open ? "▲" : "▼"}</span>
         </div>
       </button>
 
@@ -73,7 +73,7 @@ function OrderCard({ order }: { order: Order }) {
               <span className="text-foreground">
                 {item.product_name}
                 {item.size && <span className="ml-1 text-xs text-muted-foreground">({item.size})</span>}
-                {" Ã-"}{item.quantity}
+                {" × "}{item.quantity}
               </span>
               <span className="font-semibold">{formatPrice(Number(item.unit_price) * item.quantity)}</span>
             </div>
@@ -224,7 +224,7 @@ export function AccountPage() {
                     <img src={i.image} alt={i.name} className="size-9 rounded-lg object-cover bg-surface shrink-0" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{i.name}</p>
-                      <p className="text-muted-foreground">{i.size} Ã  {i.qty}</p>
+                      <p className="text-muted-foreground">{i.size} × {i.qty}</p>
                     </div>
                     <span className="font-semibold shrink-0">{formatPrice(i.price * i.qty)}</span>
                   </div>

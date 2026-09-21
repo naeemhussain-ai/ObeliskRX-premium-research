@@ -10,29 +10,11 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { useProducts } from "@/lib/products";
+import { useProducts, normalizeSeries, KNOWN_SERIES_LABELS } from "@/lib/products";
 import { Link } from "@/lib/router";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 
 const showOptions = [9, 12, 18, 24];
-
-const allSeries = [
-  "Metabolic Series",
-  "Recovery Series",
-  "Growth Series",
-  "Longevity Series",
-  "Neuro Series",
-  "Signature Blends",
-];
-
-const seriesLabels: Record<string, string> = {
-  "Metabolic Series": "Metabolic Research",
-  "Recovery Series": "Repair-Pathway Research",
-  "Growth Series": "Growth-Factor Research",
-  "Longevity Series": "Cellular Research",
-  "Neuro Series": "Neuro Research",
-  "Signature Blends": "Research Blends",
-};
 
 const priceRanges = [
   { label: "All Prices", min: 0, max: Infinity },
@@ -50,6 +32,7 @@ function FilterSidebar({
   onClear,
   activeCount,
   products,
+  allSeries,
 }: {
   selectedSeries: string[];
   onSeriesChange: (s: string) => void;
@@ -58,6 +41,7 @@ function FilterSidebar({
   onClear: () => void;
   activeCount: number;
   products: { series: string }[];
+  allSeries: string[];
 }) {
   const [seriesOpen, setSeriesOpen] = useState(true);
   const [priceOpen, setPriceOpen] = useState(true);
@@ -103,7 +87,7 @@ function FilterSidebar({
           {seriesOpen && (
             <div className="px-5 pb-4 space-y-2.5">
               {allSeries.map((s) => {
-                const count = products.filter((p) => p.series === s).length;
+                const count = products.filter((p) => normalizeSeries(p.series) === s).length;
                 const checked = selectedSeries.includes(s);
                 return (
                   <label
@@ -131,7 +115,7 @@ function FilterSidebar({
                           checked ? "text-primary" : "text-gray-600 group-hover:text-gray-900"
                         }`}
                       >
-                        {seriesLabels[s] ?? s}
+                        {s}
                       </span>
                     </div>
                     <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">
@@ -226,11 +210,18 @@ export function CatalogPage() {
     setPage(1);
   };
 
+  const allSeries = useMemo(() => {
+    const extra = Array.from(
+      new Set(products.map((p) => normalizeSeries(p.series)).filter(Boolean))
+    ).filter((l) => !KNOWN_SERIES_LABELS.includes(l));
+    return [...KNOWN_SERIES_LABELS, ...extra];
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
     const { min, max } = priceRanges[priceRange];
     let result = products.filter((p) => {
       const seriesMatch =
-        selectedSeries.length === 0 || selectedSeries.includes(p.series);
+        selectedSeries.length === 0 || selectedSeries.includes(normalizeSeries(p.series));
       const priceMatch = p.price >= min && p.price <= max;
       return seriesMatch && priceMatch;
     });
@@ -267,6 +258,7 @@ export function CatalogPage() {
     onClear: handleClearFilters,
     activeCount: activeFilterCount,
     products,
+    allSeries,
   };
 
   return (
@@ -395,7 +387,7 @@ export function CatalogPage() {
                 onClick={() => handleSeriesChange(s)}
                 className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
               >
-                {seriesLabels[s] ?? s}
+                {s}
                 <X size={11} />
               </button>
             ))}

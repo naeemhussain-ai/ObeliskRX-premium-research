@@ -61,7 +61,17 @@ export function CartPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
+  const [proofSubmitted, setProofSubmitted] = useState(false);
+  const [showResearchModal, setShowResearchModal] = useState(false);
+  const [legalName, setLegalName] = useState("");
+  const [usageType, setUsageType] = useState("");
+  const [researchError, setResearchError] = useState("");
   const suggestions = products.slice(0, 5);
+
+  // Proof submit hone par page chhota ho jata hai - top par le jao taake green box nazar aaye
+  useEffect(() => {
+    if (proofSubmitted) window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [proofSubmitted]);
 
   // Checkout sirf logged-in customers ke liye hai - guest ko login par bhej do
   useEffect(() => {
@@ -133,8 +143,24 @@ export function CartPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleCheckout = async (e: React.FormEvent) => {
+  // "Place Order" sirf research-info popup kholta hai; order "Proceed" par place hota hai
+  const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
+    setResearchError("");
+    setShowResearchModal(true);
+  };
+
+  const handleProceed = async () => {
+    if (!legalName.trim() || !usageType) {
+      setResearchError("Please answer both questions to continue.");
+      return;
+    }
+    setResearchError("");
+    setShowResearchModal(false);
+    await placeOrder();
+  };
+
+  const placeOrder = async () => {
     setSubmitting(true);
     setError("");
     try {
@@ -158,11 +184,14 @@ export function CartPage() {
           total: orderTotal,
           payment_method: "zelle_cashapp",
           coupon_code: appliedCoupon?.code ?? "",
+          legal_name: legalName.trim(),
+          usage_type: usageType,
         }),
       });
       const data = await res.json();
       if (data.success) {
         setOrderNumber(data.data.order_number);
+        setProofSubmitted(false);
         clear();
         setStep("success");
       } else {
@@ -179,6 +208,7 @@ export function CartPage() {
   if (step === "success") {
     return (
       <div className="container-page py-16">
+        {!proofSubmitted && (
         <div className="mx-auto max-w-2xl text-center">
           <CheckCircle2 className="mx-auto text-emerald-500" size={64} />
           <h1 className="mt-6 text-3xl font-bold">Order Received!</h1>
@@ -198,12 +228,14 @@ export function CartPage() {
             </p>
           </div>
         </div>
+        )}
 
-        <div className="mx-auto mt-8 max-w-2xl space-y-8">
-          <PaymentInstructions />
+        <div className={`mx-auto max-w-2xl space-y-8 ${proofSubmitted ? "mt-0" : "mt-8"}`}>
+          {!proofSubmitted && <PaymentInstructions />}
           <PaymentProofForm
             orderNumber={orderNumber}
             defaultFullName={`${form.first_name} ${form.last_name}`.trim()}
+            onSubmitted={() => setProofSubmitted(true)}
           />
         </div>
 
@@ -385,6 +417,68 @@ export function CartPage() {
             </button>
           </aside>
         </form>
+
+        {showResearchModal && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            onClick={() => setShowResearchModal(false)}
+          >
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+            <div
+              className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setShowResearchModal(false)}
+                className="absolute right-4 top-4 text-sm font-medium text-gray-500 hover:text-primary"
+              >
+                Close
+              </button>
+              <h3 className="text-xl font-bold text-gray-900">Before you proceed</h3>
+              <div className="mt-5 space-y-4">
+                <div>
+                  <label htmlFor="legal-name" className="mb-1.5 block text-sm font-semibold text-gray-800">
+                    What is your Full Legal Name or Company Name:
+                  </label>
+                  <input
+                    id="legal-name"
+                    type="text"
+                    value={legalName}
+                    onChange={(e) => setLegalName(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="usage-type" className="mb-1.5 block text-sm font-semibold text-gray-800">
+                    How are you using ObeliskRX?
+                  </label>
+                  <select
+                    id="usage-type"
+                    value={usageType}
+                    onChange={(e) => setUsageType(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-primary"
+                  >
+                    <option value="">Choose an option</option>
+                    <option value="Academic Research">Academic Research</option>
+                    <option value="Lab/Institutional Research">Lab/Institutional Research</option>
+                    <option value="Clinical Research Professional">Clinical Research Professional</option>
+                    <option value="Graduate/PhD Student">Graduate/PhD Student</option>
+                  </select>
+                </div>
+                {researchError && <p className="text-xs font-medium text-red-600">{researchError}</p>}
+              </div>
+              <button
+                type="button"
+                onClick={handleProceed}
+                disabled={submitting}
+                className="mt-6 w-full rounded-full bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 disabled:opacity-60"
+              >
+                Proceed
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

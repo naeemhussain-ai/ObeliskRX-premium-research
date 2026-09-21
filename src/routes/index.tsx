@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { Link } from "@/lib/router";
-import { useProducts } from "@/lib/products";
+import { useProducts, normalizeSeries, KNOWN_SERIES_LABELS } from "@/lib/products";
 import Aboutus from "@/assets/products/Aboutus.png";
 import heroBg from "@/assets/hero-bg.jpg";
 
@@ -56,12 +56,7 @@ export function HomePage() {
 
   const categories = [
     { value: "All", label: "All" },
-    { value: "Metabolic Series", label: "Metabolic Research" },
-    { value: "Recovery Series", label: "Repair-Pathway Research" },
-    { value: "Growth Series", label: "Growth-Factor Research" },
-    { value: "Longevity Series", label: "Cellular Research" },
-    { value: "Neuro Series", label: "Neuro Research" },
-    { value: "Signature Blends", label: "Research Blends" },
+    ...KNOWN_SERIES_LABELS.map((label) => ({ value: label, label })),
   ];
   const priceRanges = [
     { label: "All Prices", value: "All" },
@@ -71,7 +66,7 @@ export function HomePage() {
   ];
 
   const filteredProducts = products.filter((p) => {
-    if (filterCategory !== "All" && p.series !== filterCategory) return false;
+    if (filterCategory !== "All" && normalizeSeries(p.series) !== filterCategory) return false;
     if (filterPrice === "under50" && p.price >= 50) return false;
     if (filterPrice === "50to100" && (p.price < 50 || p.price > 100)) return false;
     if (filterPrice === "over100" && p.price <= 100) return false;
@@ -134,10 +129,10 @@ export function HomePage() {
         </div>
 
         {/* Trust bar   frosted glass container */}
-        <div className="absolute bottom-0 left-0 right-0 z-[2] px-4 pb-10">
+        <div className="absolute bottom-0 left-0 right-0 z-[2] px-4 pb-6 sm:pb-10">
           <div className="hero-features flex flex-wrap items-center justify-center divide-x divide-white/20">
             {["Independent Testing", "Batch Documentation", "Research Use Only"].map((item) => (
-              <span key={item} className="px-8 py-1 text-sm font-medium text-white/80 tracking-wide">
+              <span key={item} className="px-3 py-1 text-[11px] sm:px-8 sm:text-sm font-medium text-white/80 tracking-wide whitespace-nowrap">
                 {item}
               </span>
             ))}

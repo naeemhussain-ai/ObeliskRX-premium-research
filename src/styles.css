@@ -216,6 +216,15 @@
   z-index: 2;
 }
 
+/* Smaller, tighter card on mobile so it doesn't overlap the hero buttons */
+@media (max-width: 640px) {
+  .hero-features {
+    padding: 12px 10px;
+    border-radius: 8px;
+    transform: translateY(-20px);
+  }
+}
+
 /* Announcement bar   continuous right-to-left marquee */
 @keyframes marquee-scroll {
   from { transform: translateX(0); }
