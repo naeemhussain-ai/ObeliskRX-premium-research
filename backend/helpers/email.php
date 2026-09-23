@@ -286,9 +286,94 @@ function sendVerificationEmail(string $email, string $name, string $token): void
     _send($email, $name, $subject, $body, 'email_verification');
 }
 
+// ────────────────────────────────────────────────────
+// 7. Customer ko - Cart mein items chhor diye (abandoned cart reminder)
+//    $stage 1 = pehla reminder, 2 = aakhri reminder (thori alag wording)
+// ────────────────────────────────────────────────────
+function sendAbandonedCartEmail(array $cart, int $stage = 1): bool {
+    require_once __DIR__ . '/abandoned_cart.php';
+
+    $items     = json_decode($cart['cart_items'], true) ?: [];
+    $firstName = trim(explode(' ', trim($cart['name'] ?? ''))[0]);
+    $safeFirst = htmlspecialchars($firstName !== '' ? $firstName : 'there');
+    $siteName  = SITE_NAME;
+    $cartUrl   = htmlspecialchars(SITE_URL . '/cart');
+    $contactUrl = htmlspecialchars(SITE_URL . '/contact');
+    $unsubUrl  = htmlspecialchars(SITE_URL . '/backend/api/cart/unsubscribe.php?token=' . urlencode($cart['unsubscribe_token'] ?? ''));
+
+    $count = 0;
+    foreach ($items as $i) $count += (int)$i['qty'];
+    $itemsText = $count === 1 ? 'an item' : 'a few items';
+    $pickedText = $count === 1 ? 'the item you picked is' : 'the items you picked are';
+
+    if ($stage >= 2) {
+        $subject   = ($firstName !== '' ? "$firstName, still" : 'Still') . ' thinking it over?';
+        $heading   = 'Your cart is still saved';
+        $preheader = ucfirst($pickedText) . " still in your cart, ready when you are.";
+        $intro     = "Just a friendly reminder: $pickedText still waiting in your cart. If you're still interested, you can complete your order in just a few clicks.";
+        $closing   = "This is the last reminder we'll send about this cart.";
+    } else {
+        $subject   = ($firstName !== '' ? "$firstName, your" : 'Your') . ' cart is waiting for you';
+        $heading   = 'Your cart is waiting for you';
+        // Inbox list mein subject ke saath dikhne wala preview text (email mein chhupa rehta hai)
+        $preheader = "We saved $itemsText in your cart. Pick up right where you left off.";
+        $intro     = "Looks like you left $itemsText in your cart. No worries, we've saved everything for you, so you can pick up right where you left off.";
+        $closing   = '';
+    }
+    $closingHtml = $closing !== '' ? "<p style=\"font-size:13px; color:#777;\">$closing</p>" : '';
+
+    $rows = '';
+    foreach ($items as $item) {
+        $img      = absoluteImageUrl((string)($item['image'] ?? ''));
+        $imgCell  = $img
+            ? '<img src="' . htmlspecialchars($img) . '" alt="" width="56" height="56" style="border-radius:6px; object-fit:cover; display:block;">'
+            : '';
+        $link     = htmlspecialchars(SITE_URL . '/product/' . rawurlencode($item['slug'] ?? ''));
+        $name     = htmlspecialchars($item['name']);
+        $size     = htmlspecialchars($item['size'] ?? '');
+        $qty      = (int)$item['qty'];
+        $price    = number_format((float)$item['price'], 2);
+        $sub      = number_format((float)$item['price'] * $qty, 2);
+        $rows    .= "<tr>
+            <td style=\"width:56px;\">$imgCell</td>
+            <td><a href=\"$link\" style=\"color:#0f172a; text-decoration:none; font-weight:bold;\">$name</a><br><span style=\"color:#777; font-size:12px;\">$size</span></td>
+            <td>$qty</td>
+            <td>\$$price</td>
+            <td>\$$sub</td>
+        </tr>";
+    }
+    $subtotal = number_format((float)$cart['subtotal'], 2);
+
+
+    $body = <<<HTML
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0;">$preheader</div>
+    <p>Hi <strong>$safeFirst</strong>,</p>
+    <p>$intro</p>
+
+    <table class="items">
+      <thead><tr><th></th><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+      <tbody>$rows</tbody>
+      <tfoot><tr class="total-row"><td colspan="4" align="right">Subtotal</td><td>\$$subtotal</td></tr></tfoot>
+    </table>
+
+    <p style="text-align:center;">
+      <a href="$cartUrl" class="btn" style="color:#0f172a !important; text-decoration:none;">Return to My Cart</a>
+    </p>
+
+    <p style="margin-top:28px;">Have a question about a product or your order? <a href="$contactUrl" style="color:#0f172a;">Contact our team</a>. We're happy to help.</p>
+    <p>Thanks for choosing <strong>$siteName</strong>!</p>
+    $closingHtml
+
+    <p style="margin-top:24px; font-size:12px; color:#999;">All products are sold for laboratory research use only.<br>
+    Don't want cart reminders? <a href="$unsubUrl" style="color:#999;">Unsubscribe</a></p>
+    HTML;
+
+    return _send($cart['email'], $cart['name'] ?: '', $subject, $body, 'abandoned_cart', $heading);
+}
+
 // ── Internal send function ───────────────────────────
-function _send(string $toEmail, string $toName, string $subject, string $bodyHtml, string $type): void {
-    $html = emailLayout($subject, $bodyHtml);
+function _send(string $toEmail, string $toName, string $subject, string $bodyHtml, string $type, ?string $heading = null): bool {
+    $html = emailLayout($heading ?? $subject, $bodyHtml);
     try {
         $mail = makeMailer();
         $mail->addAddress($toEmail, $toName);
@@ -297,7 +382,9 @@ function _send(string $toEmail, string $toName, string $subject, string $bodyHtm
         $mail->AltBody = strip_tags($bodyHtml);
         $mail->send();
         logEmail($type, $toEmail, $subject, true);
+        return true;
     } catch (\Exception $e) {
         logEmail($type, $toEmail, $subject, false, $e->getMessage());
+        return false;
     }
 }

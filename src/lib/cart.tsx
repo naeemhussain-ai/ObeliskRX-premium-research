@@ -4,11 +4,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { AlertTriangle, X } from "lucide-react";
 import { isAgeVerified } from "@/components/AgeGate";
+import { AUTH_API, useAuth } from "@/lib/auth";
 
 export type CartItem = {
   slug: string;
@@ -39,6 +41,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "obeliskrx-cart";
 const WISH_KEY = "obeliskrx-wishlist";
 const AGE_KEY = "obelisk_verified_21";
+const SYNC_DEBOUNCE_MS = 2000;
 
 function ElderPermissionModal({
   open,
@@ -136,6 +139,63 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!hydrated) return;
     localStorage.setItem(WISH_KEY, JSON.stringify(wishlist));
   }, [wishlist, hydrated]);
+
+  // ── Server sync (abandoned cart reminder emails) ──
+  // Logged-in user ka cart server par save hota hai. Login par agar local cart khali
+  // ho to server wala cart restore karte hain; restore se pehle sync band rehta hai
+  // taake khali local cart server ka cart mita na de.
+  const { token } = useAuth();
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+  const lastSyncedRef = useRef<string | null>(null);
+  const [syncReady, setSyncReady] = useState(false);
+
+  useEffect(() => {
+    setSyncReady(false);
+    lastSyncedRef.current = null;
+    if (!hydrated || !token) return;
+    if (itemsRef.current.length > 0) {
+      setSyncReady(true);
+      return;
+    }
+    let cancelled = false;
+    fetch(`${AUTH_API}/cart/sync.php`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        const saved: CartItem[] = data?.success ? (data.data?.items ?? []) : [];
+        if (saved.length > 0 && itemsRef.current.length === 0) {
+          lastSyncedRef.current = JSON.stringify(saved);
+          setItems(saved);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setSyncReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, token]);
+
+  useEffect(() => {
+    if (!syncReady || !token) return;
+    const payload = JSON.stringify(items);
+    if (payload === lastSyncedRef.current) return;
+    const timer = setTimeout(() => {
+      fetch(`${AUTH_API}/cart/sync.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ items }),
+        keepalive: true,
+      })
+        .then(() => {
+          lastSyncedRef.current = payload;
+        })
+        .catch(() => {});
+    }, SYNC_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [items, token, syncReady]);
 
   const setAgeVerified = useCallback((verified: boolean) => {
     setIs21Plus(verified);

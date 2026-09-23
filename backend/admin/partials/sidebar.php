@@ -70,6 +70,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <a href="coupons.php" class="<?= in_array($currentPage, ['coupons.php']) ? 'active' : '' ?>">
             🎟 Coupons
         </a>
+        <a href="abandoned-carts.php" class="<?= in_array($currentPage, ['abandoned-carts.php']) ? 'active' : '' ?>">
+            🛒 Abandoned Carts
+        </a>
     </nav>
 
     <div class="sidebar-footer">

@@ -200,6 +200,12 @@ try {
         } catch (\Exception $e) {}
     }
 
+    // Order ho gaya - is customer ko abandoned cart reminder nahi jana chahiye
+    try {
+        $db->prepare("UPDATE abandoned_carts SET status = 'ordered' WHERE customer_id = ?")
+           ->execute([$customerId]);
+    } catch (\Exception $e) {}
+
     // Admin ko email bhejo - naya order
     try {
         require_once __DIR__ . '/../../helpers/email.php';

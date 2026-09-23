@@ -24,4 +24,10 @@ if (!file_exists($localConfig)) {
     define('FROM_NAME',   'ObeliskRX');
     define('OWNER_EMAIL', 'Contact@Obeliskrx.com');
     define('OWNER_NAME',  'ObeliskRX Admin');
+
+    // ── Abandoned cart reminder ─────────────────────
+    // Default (helpers/abandoned_cart.php): 1st reminder cart ke 60 min baad,
+    // 2nd (aakhri) reminder 1st ke 1440 min (24 ghante) baad. Jaldi test karna ho to:
+    //   define('CART_REMINDER_MINUTES', 5);
+    //   define('CART_SECOND_REMINDER_MINUTES', 5);
 }
