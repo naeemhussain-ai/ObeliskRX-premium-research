@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../helpers/product_fields.php';
 requireAdmin();
 
 // ── Legacy toggle-product behavior (backward compat) ──
@@ -25,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $action = $_POST['action'] ?? '';
 $db     = getDB();
+ensureProductColumns($db);
 
 // ─────────────────────────────────────────────────────
 // ADD PRODUCT
@@ -34,17 +36,16 @@ if ($action === 'add') {
     $slug        = trim($_POST['slug'] ?? '');
     $series      = trim($_POST['series'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $price       = (float)($_POST['price'] ?? 0);
-    $priceMax    = !empty($_POST['price_max'])  ? (float)$_POST['price_max']  : null;
     $oldPrice    = !empty($_POST['old_price'])  ? (float)$_POST['old_price']  : null;
     $discount    = (int)($_POST['discount'] ?? 0);
-    $sizesRaw    = trim($_POST['sizes'] ?? '');
+    $sizePrices  = parseSizePrices($_POST);
+    $stock       = parseStock($_POST['stock'] ?? '');
     $specsJson   = trim($_POST['specs_json'] ?? '[]');
     $isActive    = isset($_POST['is_active']) ? 1 : 0;
 
     // Validate required fields
-    if (!$name || !$slug || !$sizesRaw || $price <= 0) {
-        header('Location: product-add.php?error=' . urlencode('Name, slug, price, and sizes are required.'));
+    if (!$name || !$slug || !$sizePrices || $stock === null) {
+        header('Location: product-add.php?error=' . urlencode('Name, slug, stock, and at least one size with a price are required.'));
         exit();
     }
 
@@ -56,9 +57,12 @@ if ($action === 'add') {
         exit();
     }
 
-    // Convert sizes to JSON array
-    $sizesArray = array_filter(array_map('trim', explode(',', $sizesRaw)));
-    $sizesJson  = json_encode(array_values($sizesArray));
+    // Sizes list + price range size rows se nikalo (catalog "min - max" dikhata hai)
+    $allPrices      = array_column($sizePrices, 'price');
+    $price          = min($allPrices);
+    $priceMax       = max($allPrices) > $price ? max($allPrices) : null;
+    $sizesJson      = json_encode(array_column($sizePrices, 'size'));
+    $sizePricesJson = json_encode($sizePrices);
 
     // Validate specs JSON
     $decoded = json_decode($specsJson, true);
@@ -75,13 +79,13 @@ if ($action === 'add') {
     }
 
     $stmt = $db->prepare("
-        INSERT INTO products (slug, name, series, description, price, price_max, old_price, discount, sizes, specs, image_url, is_active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO products (slug, name, series, description, price, price_max, old_price, discount, sizes, size_prices, stock, specs, image_url, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->execute([
         $slug, $name, $series, $description,
         $price, $priceMax, $oldPrice, $discount,
-        $sizesJson, $specsJson, $imageFilename, $isActive
+        $sizesJson, $sizePricesJson, $stock, $specsJson, $imageFilename, $isActive
     ]);
 
     // ── COA Handling (optional on add) ───────────────────
@@ -130,16 +134,15 @@ if ($action === 'edit') {
     $slug        = trim($_POST['slug'] ?? '');
     $series      = trim($_POST['series'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $price       = (float)($_POST['price'] ?? 0);
-    $priceMax    = !empty($_POST['price_max'])  ? (float)$_POST['price_max']  : null;
     $oldPrice    = !empty($_POST['old_price'])  ? (float)$_POST['old_price']  : null;
     $discount    = (int)($_POST['discount'] ?? 0);
-    $sizesRaw    = trim($_POST['sizes'] ?? '');
+    $sizePrices  = parseSizePrices($_POST);
+    $stock       = parseStock($_POST['stock'] ?? '');
     $specsJson   = trim($_POST['specs_json'] ?? '[]');
     $isActive    = isset($_POST['is_active']) ? 1 : 0;
 
-    if (!$productId || !$name || !$slug || !$sizesRaw || $price <= 0) {
-        header("Location: product-edit.php?id=$productId&error=" . urlencode('Name, slug, price, and sizes are required.'));
+    if (!$productId || !$name || !$slug || !$sizePrices || $stock === null) {
+        header("Location: product-edit.php?id=$productId&error=" . urlencode('Name, slug, stock, and at least one size with a price are required.'));
         exit();
     }
 
@@ -160,9 +163,12 @@ if ($action === 'edit') {
         exit();
     }
 
-    // Convert sizes to JSON array
-    $sizesArray = array_filter(array_map('trim', explode(',', $sizesRaw)));
-    $sizesJson  = json_encode(array_values($sizesArray));
+    // Sizes list + price range size rows se nikalo (catalog "min - max" dikhata hai)
+    $allPrices      = array_column($sizePrices, 'price');
+    $price          = min($allPrices);
+    $priceMax       = max($allPrices) > $price ? max($allPrices) : null;
+    $sizesJson      = json_encode(array_column($sizePrices, 'size'));
+    $sizePricesJson = json_encode($sizePrices);
 
     // Validate specs JSON
     $decoded = json_decode($specsJson, true);
@@ -200,13 +206,13 @@ if ($action === 'edit') {
     $stmt = $db->prepare("
         UPDATE products
         SET slug=?, name=?, series=?, description=?, price=?, price_max=?, old_price=?,
-            discount=?, sizes=?, specs=?, image_url=?, is_active=?
+            discount=?, sizes=?, size_prices=?, stock=?, specs=?, image_url=?, is_active=?
         WHERE id=?
     ");
     $stmt->execute([
         $slug, $name, $series, $description,
         $price, $priceMax, $oldPrice, $discount,
-        $sizesJson, $specsJson, $imageFilename, $isActive,
+        $sizesJson, $sizePricesJson, $stock, $specsJson, $imageFilename, $isActive,
         $productId
     ]);
 

@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS products (
     old_price         DECIMAL(10,2) DEFAULT NULL,
     discount          INT DEFAULT 0,
     sizes             JSON NOT NULL,
+    size_prices       JSON DEFAULT NULL,
+    stock             INT DEFAULT NULL,
     specs             JSON,
     image_url         VARCHAR(500) DEFAULT NULL,
     is_active         TINYINT(1) DEFAULT 1,

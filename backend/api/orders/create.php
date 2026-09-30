@@ -6,6 +6,8 @@ require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../helpers/response.php';
 require_once __DIR__ . '/../../helpers/validator.php';
 require_once __DIR__ . '/../../helpers/customer_auth.php';
+require_once __DIR__ . '/../../helpers/product_fields.php';
+require_once __DIR__ . '/../../helpers/coupon_fields.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') error('Method not allowed', 405);
 
@@ -25,12 +27,13 @@ if ((float)$body['total'] <= 0) error('Invalid order total.', 422);
 
 // Validate each item (product_id optional - slug se lookup hoga)
 foreach ($body['items'] as $item) {
-    if (empty($item['product_name']) || empty($item['quantity']) || !isset($item['unit_price'])) {
+    if (empty($item['product_name']) || (int)($item['quantity'] ?? 0) < 1 || !isset($item['unit_price'])) {
         error('Invalid item data in order.', 422);
     }
 }
 
 $db = getDB();
+ensureProductColumns($db);
 
 // ── Order ke liye login zaroori hai (guest checkout allowed nahi) ──
 $customer = getCustomerFromRequest($db);
@@ -63,10 +66,12 @@ $subtotal        = sanitizeFloat($body['subtotal'] ?? $body['total']);
 $shippingFee     = sanitizeFloat($body['shipping_fee'] ?? 0);
 
 if ($couponCode !== '') {
-    $couponStmt = $db->prepare("SELECT discount_percent, max_uses, used_count FROM coupons WHERE code = ?");
+    ensureCouponColumns($db);
+    $couponStmt = $db->prepare("SELECT discount_percent, max_uses, used_count, expires_at FROM coupons WHERE code = ?");
     $couponStmt->execute([$couponCode]);
     $couponRow = $couponStmt->fetch(PDO::FETCH_ASSOC);
     if (!$couponRow) error('Invalid coupon code.', 422);
+    if (couponIsExpired($couponRow)) error('This coupon has expired. Please remove it and try again.', 422);
     if ((int)$couponRow['used_count'] >= (int)$couponRow['max_uses']) {
         error('This coupon has reached its usage limit.', 422);
     }
@@ -139,16 +144,34 @@ try {
         VALUES (:order_id, :product_id, :product_name, :size, :quantity, :unit_price, :subtotal)
     ");
 
+    // Stock check + deduct - FOR UPDATE row lock taake do orders ek sath aakhri piece na le saken.
+    // Ek product ke alag sizes ki quantity jod kar check hoti hai (stock product level par hai).
+    $lookup     = $db->prepare("SELECT id, name, stock FROM products WHERE slug = ? FOR UPDATE");
+    $productIds = [];
+    $qtyBySlug  = [];
     foreach ($body['items'] as $item) {
-        // Slug se product_id lookup karo
-        $productId = null;
         $slug = sanitizeString($item['slug'] ?? '');
-        if ($slug) {
-            $lookup = $db->prepare("SELECT id FROM products WHERE slug = ?");
-            $lookup->execute([$slug]);
-            $row = $lookup->fetch();
-            if ($row) $productId = (int)$row['id'];
+        if ($slug) $qtyBySlug[$slug] = ($qtyBySlug[$slug] ?? 0) + (int)$item['quantity'];
+    }
+    foreach ($qtyBySlug as $slug => $qty) {
+        $lookup->execute([$slug]);
+        $row = $lookup->fetch();
+        if (!$row) continue;
+        $productIds[$slug] = (int)$row['id'];
+        if ($row['stock'] === null) continue; // stock set nahi - track nahi hota
+
+        $stock = (int)$row['stock'];
+        if ($stock < $qty) {
+            $db->rollBack();
+            error($stock <= 0
+                ? "{$row['name']} is out of stock. Please remove it from your cart."
+                : "Only $stock of {$row['name']} left in stock. Please reduce the quantity.", 409);
         }
+        $db->prepare("UPDATE products SET stock = stock - ? WHERE id = ?")->execute([$qty, $row['id']]);
+    }
+
+    foreach ($body['items'] as $item) {
+        $productId = $productIds[sanitizeString($item['slug'] ?? '')] ?? null;
 
         $itemStmt->execute([
             ':order_id'     => $orderId,

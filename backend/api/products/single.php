@@ -20,6 +20,7 @@ if (!$product) error('Product not found', 404);
 
 $product['sizes']     = json_decode($product['sizes'], true);
 $product['specs']     = json_decode($product['specs'] ?? '[]', true);
+$product['size_prices'] = json_decode($product['size_prices'] ?? 'null', true);
 $product['image_url'] = IMAGES_BASE_URL . ($product['image_url'] ?? '');
 unset($product['is_active'], $product['updated_at']);
 

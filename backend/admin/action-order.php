@@ -36,6 +36,21 @@ if (!$order) {
     exit();
 }
 
+// Order reject hua to stock wapas karo; rejected se wapas approve hua to dobara kaato
+$wasRejected = $order['status'] === 'rejected';
+$isRejected  = $action === 'rejected';
+if ($wasRejected !== $isRejected) {
+    $items = $db->prepare("SELECT product_id, SUM(quantity) AS qty FROM order_items WHERE order_id = ? AND product_id IS NOT NULL GROUP BY product_id");
+    $items->execute([$orderId]);
+    $sql = $isRejected
+        ? "UPDATE products SET stock = stock + ? WHERE id = ? AND stock IS NOT NULL"
+        : "UPDATE products SET stock = GREATEST(stock - ?, 0) WHERE id = ? AND stock IS NOT NULL";
+    $restock = $db->prepare($sql);
+    foreach ($items->fetchAll() as $it) {
+        $restock->execute([(int)$it['qty'], (int)$it['product_id']]);
+    }
+}
+
 // Status update
 $update = $db->prepare("
     UPDATE orders

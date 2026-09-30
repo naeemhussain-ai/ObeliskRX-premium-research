@@ -57,6 +57,7 @@ $products = $stmt->fetchAll();
 foreach ($products as &$p) {
     $p['sizes'] = json_decode($p['sizes'], true);
     $p['specs'] = json_decode($p['specs'] ?? '[]', true);
+    $p['size_prices'] = json_decode($p['size_prices'] ?? 'null', true);
     $p['image_url'] = IMAGES_BASE_URL . ($p['image_url'] ?? '');
     unset($p['is_active'], $p['updated_at']); // clean response
 }

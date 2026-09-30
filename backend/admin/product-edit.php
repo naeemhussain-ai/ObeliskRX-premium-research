@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../helpers/product_fields.php';
 requireAdmin();
 
 $productId = (int)($_GET['id'] ?? 0);
@@ -11,6 +12,7 @@ if (!$productId) {
 }
 
 $db = getDB();
+ensureProductColumns($db);
 $stmt = $db->prepare("SELECT * FROM products WHERE id = ?");
 $stmt->execute([$productId]);
 $product = $stmt->fetch();
@@ -21,8 +23,8 @@ if (!$product) {
 }
 
 // Decode stored JSON fields
-$sizes = json_decode($product['sizes'], true) ?: [];
-$specs = json_decode($product['specs'], true) ?: [];
+$sizePrices = sizePriceRowsFor($product);
+$specs      = json_decode($product['specs'], true) ?: [];
 
 // Load existing COA for this product
 $coaStmt = $db->prepare("SELECT * FROM product_coa WHERE product_slug = ?");
@@ -60,6 +62,9 @@ $seriesList = [
         .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
         .spec-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
         .spec-row input { flex: 1; }
+        .size-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .size-row .size-name { flex: 2; }
+        .size-row .size-price { flex: 1; }
         .image-preview { margin-top: 8px; }
         .image-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
         .section-label {
@@ -128,23 +133,16 @@ $seriesList = [
                     <textarea id="description" name="description" class="form-control" rows="4"><?= htmlspecialchars($product['description'] ?? '') ?></textarea>
                 </div>
 
-                <!-- Pricing -->
-                <div class="section-label">Pricing</div>
+                <!-- Sizes & Pricing -->
+                <div class="section-label">Sizes &amp; Pricing</div>
 
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label for="price">Price ($) <span class="required">*</span></label>
-                        <input type="number" id="price" name="price" class="form-control"
-                               step="0.01" min="0" required
-                               value="<?= htmlspecialchars($product['price']) ?>">
-                    </div>
-                    <div class="form-group">
-                        <label for="price_max">Price Max ($)</label>
-                        <input type="number" id="price_max" name="price_max" class="form-control"
-                               step="0.01" min="0"
-                               value="<?= htmlspecialchars($product['price_max'] ?? '') ?>"
-                               placeholder="Leave blank if single size">
-                    </div>
+                <div id="sizes-container">
+                    <!-- Populated by JS on page load -->
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="addSize()">+ Add Size</button>
+                <small class="text-muted" style="display:block;margin-top:6px;">Each size has its own price. The store shows the lowest–highest price range.</small>
+
+                <div class="form-row" style="margin-top:16px;">
                     <div class="form-group">
                         <label for="old_price">Old Price ($)</label>
                         <input type="number" id="old_price" name="old_price" class="form-control"
@@ -152,24 +150,23 @@ $seriesList = [
                                value="<?= htmlspecialchars($product['old_price'] ?? '') ?>"
                                placeholder="Leave blank if no discount display">
                     </div>
+                    <div class="form-group">
+                        <label for="discount">Discount (%)</label>
+                        <input type="number" id="discount" name="discount" class="form-control"
+                               min="0" max="100"
+                               value="<?= htmlspecialchars($product['discount'] ?? 0) ?>">
+                    </div>
                 </div>
+
+                <!-- Inventory -->
+                <div class="section-label">Inventory</div>
 
                 <div class="form-group" style="max-width:200px;">
-                    <label for="discount">Discount (%)</label>
-                    <input type="number" id="discount" name="discount" class="form-control"
-                           min="0" max="100"
-                           value="<?= htmlspecialchars($product['discount'] ?? 0) ?>">
-                </div>
-
-                <!-- Sizes -->
-                <div class="section-label">Sizes &amp; Variants</div>
-
-                <div class="form-group">
-                    <label for="sizes">Sizes <span class="required">*</span></label>
-                    <input type="text" id="sizes" name="sizes" class="form-control" required
-                           value="<?= htmlspecialchars(implode(', ', $sizes)) ?>"
-                           placeholder="e.g. 10mg, 20mg, 30mg  (comma separated)">
-                    <small class="text-muted">Enter comma-separated size options.</small>
+                    <label for="stock">Stock (Pcs) <span class="required">*</span></label>
+                    <input type="number" id="stock" name="stock" class="form-control"
+                           min="0" step="1" required placeholder="e.g. 12"
+                           value="<?= htmlspecialchars($product['stock'] ?? '') ?>">
+                    <small class="text-muted">At 0 the product shows as out of stock and can't be ordered.</small>
                 </div>
 
                 <!-- Specs -->
@@ -305,6 +302,7 @@ $seriesList = [
 <script>
 // ── Existing specs (from PHP) ─────────────────────────
 var existingSpecs = <?= json_encode($specs) ?>;
+var existingSizes = <?= json_encode($sizePrices) ?>;
 
 // ── Slug auto-generation ──────────────────────────────
 function slugify(str) {
@@ -453,6 +451,30 @@ function deleteCoaFile(fileId, productId) {
     document.body.appendChild(f);
     f.submit();
 }
+
+// ── Sizes & per-size price ────────────────────────────
+function escAttr(v) {
+    return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function addSize(size, price) {
+    var row = document.createElement('div');
+    row.className = 'size-row';
+    row.innerHTML =
+        '<input type="text" name="size_name[]" class="form-control size-name" placeholder="Size (e.g. 10mg)" value="' + escAttr(size) + '">' +
+        '<input type="number" name="size_price[]" class="form-control size-price" step="0.01" min="0" placeholder="Price ($)" value="' + escAttr(price) + '">' +
+        '<button type="button" class="btn btn-sm btn-danger" onclick="removeSize(this)" style="flex-shrink:0;">✕</button>';
+    document.getElementById('sizes-container').appendChild(row);
+}
+
+function removeSize(btn) {
+    btn.closest('.size-row').remove();
+}
+
+(function() {
+    existingSizes.forEach(function(r) { addSize(r.size, r.price); });
+    if (!existingSizes.length) addSize();
+})();
 
 // ── Load existing specs on page load ──────────────────
 (function() {

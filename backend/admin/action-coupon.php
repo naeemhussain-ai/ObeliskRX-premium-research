@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../helpers/coupon_fields.php';
 requireAdmin();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -9,30 +10,39 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $db     = getDB();
+ensureCouponColumns($db);
 $action = $_POST['action'] ?? '';
 
 if ($action === 'generate') {
+    $code            = strtoupper(trim($_POST['code'] ?? ''));
     $discountPercent = (float)($_POST['discount_percent'] ?? 0);
     $maxUses         = (int)($_POST['max_uses'] ?? 0);
+    $expiresDate     = trim($_POST['expires_at'] ?? '');
+
+    if (!preg_match('/^[A-Z0-9_-]{3,' . COUPON_CODE_MAX . '}$/', $code)) {
+        header('Location: coupons.php?error=invalid_code');
+        exit();
+    }
     if ($discountPercent <= 0 || $discountPercent > 100 || $maxUses <= 0) {
         header('Location: coupons.php?error=invalid_discount');
         exit();
     }
+    // End date ke din ke aakhir (23:59:59) tak coupon chalega
+    $expiry = DateTime::createFromFormat('!Y-m-d', $expiresDate);
+    if (!$expiry || $expiry->format('Y-m-d') !== $expiresDate || $expiresDate < date('Y-m-d')) {
+        header('Location: coupons.php?error=invalid_expiry');
+        exit();
+    }
 
-    // 3 random letters + 3 random digits - dobara try karo agar code already exist kare
-    do {
-        $letters = '';
-        for ($i = 0; $i < 3; $i++) $letters .= chr(random_int(65, 90));
-        $digits = '';
-        for ($i = 0; $i < 3; $i++) $digits .= (string) random_int(0, 9);
-        $code = $letters . $digits;
+    $exists = $db->prepare("SELECT id FROM coupons WHERE code = ?");
+    $exists->execute([$code]);
+    if ($exists->fetch()) {
+        header('Location: coupons.php?error=code_exists');
+        exit();
+    }
 
-        $exists = $db->prepare("SELECT id FROM coupons WHERE code = ?");
-        $exists->execute([$code]);
-    } while ($exists->fetch());
-
-    $db->prepare("INSERT INTO coupons (code, discount_percent, max_uses) VALUES (?, ?, ?)")
-       ->execute([$code, $discountPercent, $maxUses]);
+    $db->prepare("INSERT INTO coupons (code, discount_percent, max_uses, expires_at) VALUES (?, ?, ?, ?)")
+       ->execute([$code, $discountPercent, $maxUses, $expiresDate . ' 23:59:59']);
 
     header('Location: coupons.php?success=generated');
     exit();

@@ -23,7 +23,7 @@ import { Link, useRouteParams } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 import { getCoa } from "@/lib/coa";
-import { formatPrice, useProducts, priceForSize, priceLabel, normalizeSeries } from "@/lib/products";
+import { formatPrice, useProducts, priceForSize, priceLabel, normalizeSeries, isOutOfStock } from "@/lib/products";
 
 function ProductNotFound() {
   return (
@@ -62,10 +62,13 @@ function ProductDetail() {
 
   const sizedPrice = priceForSize(product, size);
   const coa = getCoa(product.slug);
+  const soldOut = isOutOfStock(product);
+  const maxQty = product.stock ?? Infinity;
 
   const related = products.filter((p) => p.slug !== product.slug).slice(0, 5);
 
   const handleAdd = () => {
+    if (soldOut) return;
     setIsAdding(true);
     const selectedSize = size || product.sizes[0];
     add(
@@ -145,10 +148,17 @@ function ProductDetail() {
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              In Stock
-            </span>
+            {soldOut ? (
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-destructive">
+                <span className="size-1.5 rounded-full bg-destructive" />
+                Out of Stock
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                <span className="size-1.5 rounded-full bg-emerald-500" />
+                In Stock
+              </span>
+            )}
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">
               <BadgeCheck size={13} /> Third-Party Tested
             </span>
@@ -226,7 +236,8 @@ function ProductDetail() {
               <button
                 type="button"
                 aria-label="Increase quantity"
-                onClick={() => setQty((q) => q + 1)}
+                onClick={() => setQty((q) => Math.min(maxQty, q + 1))}
+                disabled={soldOut || qty >= maxQty}
                 className="px-3 py-2.5 text-muted-foreground hover:text-primary"
               >
                 <Plus size={14} />
@@ -257,17 +268,27 @@ function ProductDetail() {
             </button>
           </div>
 
+          {soldOut && (
+            <div className="mt-3 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm font-semibold text-destructive">
+              This product is currently out of stock and can't be ordered.
+            </div>
+          )}
+
           <button
             type="button"
             onClick={handleAdd}
-            disabled={isAdding}
-            className={`mt-3 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] ${
-              isAdding
-                ? "bg-emerald-500 scale-105"
-                : "bg-primary hover:bg-primary/90 hover:-translate-y-0.5"
+            disabled={isAdding || soldOut}
+            className={`mt-3 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-300 ${
+              soldOut
+                ? "cursor-not-allowed bg-muted-foreground/50"
+                : isAdding
+                  ? "bg-emerald-500 scale-105"
+                  : "bg-primary hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
             }`}
           >
-            {isAdding ? (
+            {soldOut ? (
+              "Out of Stock"
+            ) : isAdding ? (
               <>
                 <Check size={18} className="anim-bounce-in" /> Added To Cart
               </>

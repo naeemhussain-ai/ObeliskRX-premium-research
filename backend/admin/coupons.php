@@ -1,9 +1,11 @@
 <?php
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../helpers/coupon_fields.php';
 requireAdmin();
 
 $db      = getDB();
+ensureCouponColumns($db);
 $coupons = $db->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -25,7 +27,7 @@ $coupons = $db->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchAl
 
         <?php
         $successMessages = [
-            'generated' => '✅ Coupon generated.',
+            'generated' => '✅ Coupon created.',
             'deleted'   => '🗑 Coupon deleted.',
         ];
         if (!empty($_GET['success']) && isset($successMessages[$_GET['success']])): ?>
@@ -34,9 +36,16 @@ $coupons = $db->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchAl
         </div>
         <?php endif; ?>
 
-        <?php if (!empty($_GET['error'])): ?>
+        <?php
+        $errorMessages = [
+            'invalid_code'     => 'Coupon code must be 3-' . COUPON_CODE_MAX . ' characters: letters, numbers, - or _ only (no spaces).',
+            'code_exists'      => 'This coupon code already exists. Please choose a different code.',
+            'invalid_discount' => 'Please enter a valid discount percentage (1-100) and number of uses (1 or more).',
+            'invalid_expiry'   => 'Please pick an end date of today or later.',
+        ];
+        if (!empty($_GET['error'])): ?>
         <div style="background:#fee2e2;color:#991b1b;border:1px solid #fecaca;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;">
-            Could not generate coupon. Please enter a valid discount percentage (1-100) and number of uses (1 or more).
+            Could not create coupon. <?= htmlspecialchars($errorMessages[$_GET['error']] ?? 'Please check the form and try again.') ?>
         </div>
         <?php endif; ?>
 
@@ -46,9 +55,16 @@ $coupons = $db->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchAl
 
         <!-- Generate Coupon -->
         <div class="card">
-            <h2>Generate New Coupon</h2>
+            <h2>Create New Coupon</h2>
             <form method="POST" action="action-coupon.php" class="coupon-form">
                 <input type="hidden" name="action" value="generate">
+                <div class="form-group">
+                    <label>Coupon Code <span class="required">*</span></label>
+                    <input type="text" name="code" maxlength="<?= COUPON_CODE_MAX ?>" pattern="[A-Za-z0-9_\-]{3,<?= COUPON_CODE_MAX ?>}"
+                        placeholder="e.g. SUMMER20" class="form-control" required
+                        style="width:180px;text-transform:uppercase;"
+                        title="3-<?= COUPON_CODE_MAX ?> characters: letters, numbers, - or _">
+                </div>
                 <div class="form-group">
                     <label>Discount Percentage <span class="required">*</span></label>
                     <input type="number" name="discount_percent" min="1" max="100" step="1"
@@ -59,7 +75,12 @@ $coupons = $db->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchAl
                     <input type="number" name="max_uses" min="1" step="1"
                         placeholder="e.g. 5" class="form-control" required style="width:140px;">
                 </div>
-                <button type="submit" class="btn btn-primary">🎟 Generate Coupon</button>
+                <div class="form-group">
+                    <label>End Date <span class="required">*</span></label>
+                    <input type="date" name="expires_at" min="<?= date('Y-m-d') ?>"
+                        class="form-control" required style="width:170px;">
+                </div>
+                <button type="submit" class="btn btn-primary">🎟 Create Coupon</button>
             </form>
         </div>
 
@@ -75,20 +96,29 @@ $coupons = $db->query("SELECT * FROM coupons ORDER BY created_at DESC")->fetchAl
                         <th>Code</th>
                         <th>Discount</th>
                         <th>Uses</th>
+                        <th>Expires</th>
                         <th>Status</th>
                         <th>Created</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($coupons as $c): $exhausted = (int)$c['used_count'] >= (int)$c['max_uses']; ?>
+                    <?php foreach ($coupons as $c):
+                        $exhausted = (int)$c['used_count'] >= (int)$c['max_uses'];
+                        $expired   = couponIsExpired($c);
+                    ?>
                     <tr>
                         <td><span class="coupon-code-tag"><?= htmlspecialchars($c['code']) ?></span></td>
                         <td><strong><?= rtrim(rtrim(number_format($c['discount_percent'], 2), '0'), '.') ?>%</strong></td>
                         <td><?= (int)$c['used_count'] ?> / <?= (int)$c['max_uses'] ?></td>
                         <td>
-                            <?php if ($exhausted): ?>
+                            <?= $c['expires_at'] ? date('M d, Y', strtotime($c['expires_at'])) : '<span class="text-muted">No end date</span>' ?>
+                        </td>
+                        <td>
+                            <?php if ($expired): ?>
                                 <span class="badge badge-red">Expired</span>
+                            <?php elseif ($exhausted): ?>
+                                <span class="badge badge-red">Used up</span>
                             <?php else: ?>
                                 <span class="badge badge-green">Active</span>
                             <?php endif; ?>

@@ -3,7 +3,7 @@ import { Heart, Search, ShoppingCart, X, Check } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { Link } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
-import { formatPrice, priceLabel, priceForSize, normalizeSeries, type Product } from "@/lib/products";
+import { formatPrice, priceLabel, priceForSize, normalizeSeries, isOutOfStock, type Product } from "@/lib/products";
 
 export function Logo({ className = "h-8", light = false }: { className?: string; light?: boolean }) {
   const textColor = light ? "#ffffff" : "#0B1F3A";
@@ -58,8 +58,10 @@ function QuickViewModal({
   const [size, setSize] = useState(product.sizes[0] ?? "");
   const [isAdding, setIsAdding] = useState(false);
   const sizedPrice = priceForSize(product, size);
+  const soldOut = isOutOfStock(product);
 
   const handleAdd = () => {
+    if (soldOut) return;
     setIsAdding(true);
     const selectedSize = size || product.sizes[0];
     add(
@@ -134,15 +136,26 @@ function QuickViewModal({
 
         {/* Add To Cart Button */}
         <div className="px-6 pb-4 pt-4">
+          {soldOut && (
+            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-center text-xs font-semibold text-red-600">
+              This product is out of stock and can't be ordered.
+            </p>
+          )}
           <button
             type="button"
             onClick={handleAdd}
-            disabled={isAdding}
-            className={`flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] ${
-              isAdding ? "bg-emerald-500 scale-105" : "bg-primary hover:bg-primary/90 hover:-translate-y-0.5"
+            disabled={isAdding || soldOut}
+            className={`flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 ${
+              soldOut
+                ? "cursor-not-allowed bg-gray-400"
+                : isAdding
+                  ? "bg-emerald-500 scale-105"
+                  : "bg-primary hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
             }`}
           >
-            {isAdding ? (
+            {soldOut ? (
+              "Out of Stock"
+            ) : isAdding ? (
               <>
                 <Check size={18} className="anim-bounce-in" /> Added
               </>
@@ -205,6 +218,11 @@ export function ProductCard({ product, compact = false }: { product: Product; co
           >
             <Heart size={16} className={`transition-all duration-300 ${wished ? "fill-primary text-primary anim-heart-pop" : ""}`} />
           </button>
+          {isOutOfStock(product) && (
+            <span className="absolute left-2 top-2 z-10 rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
+              Out of Stock
+            </span>
+          )}
           <Link to="/product/$slug" params={{ slug: product.slug }} className="block overflow-hidden">
             <img
               src={product.image}

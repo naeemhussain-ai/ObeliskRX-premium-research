@@ -2,9 +2,11 @@
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../helpers/product_fields.php';
 requireAdmin();
 
 $db = getDB();
+ensureProductColumns($db);
 
 $products = $db->query("SELECT * FROM products ORDER BY id ASC")->fetchAll();
 
@@ -93,6 +95,7 @@ if (!empty($_GET['error'])) {
                         <th>Series</th>
                         <th>Price</th>
                         <th>Sizes</th>
+                        <th>Stock</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -139,6 +142,17 @@ if (!empty($_GET['error'])) {
                                 <?= htmlspecialchars(implode(', ', $sizes)) ?>
                             <?php else: ?>
                                 <span class="text-muted">-</span>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- Stock -->
+                        <td>
+                            <?php if ($p['stock'] === null): ?>
+                                <span class="badge badge-yellow" title="Edit this product to set its stock">Not set</span>
+                            <?php elseif ((int)$p['stock'] <= 0): ?>
+                                <span class="badge badge-red">Out of stock</span>
+                            <?php else: ?>
+                                <strong><?= (int)$p['stock'] ?></strong> <span class="text-muted">pcs</span>
                             <?php endif; ?>
                         </td>
 

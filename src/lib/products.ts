@@ -25,6 +25,10 @@ export type Product = {
   oldPrice?: number;
   discount: number;
   sizes: string[];
+  /** Admin-set price per size; falls back to price/priceMax when missing. */
+  sizePrices?: { size: string; price: number }[];
+  /** Pieces in stock. null/undefined = not tracked (always orderable). */
+  stock?: number | null;
   description: string;
   specs: { label: string; value: string }[];
 };
@@ -337,6 +341,8 @@ type ApiProduct = {
   slug: string; name: string; series: string; description: string;
   price: string; price_max: string | null; old_price: string | null;
   discount: number; sizes: string[]; specs: { label: string; value: string }[];
+  size_prices?: { size: string; price: number | string }[] | null;
+  stock?: number | string | null;
   image_url: string;
 };
 
@@ -351,6 +357,8 @@ function mapApiProduct(p: ApiProduct): Product {
     oldPrice: p.old_price ? parseFloat(p.old_price) : undefined,
     discount: p.discount,
     sizes: p.sizes ?? [],
+    sizePrices: p.size_prices?.map((r) => ({ size: r.size, price: Number(r.price) })),
+    stock: p.stock == null ? null : Number(p.stock),
     description: p.description ?? "",
     specs: p.specs ?? [],
   };
@@ -427,11 +435,16 @@ export const priceLabel = (p: Product) =>
   p.priceMax ? `${formatPrice(p.price)}   ${formatPrice(p.priceMax)}` : formatPrice(p.price);
 
 export const priceForSize = (p: Product, size: string) => {
-  if (!size || !p.priceMax) return null;
+  if (!size) return null;
+  const sized = p.sizePrices?.find((r) => r.size === size);
+  if (sized) return sized.price;
+  if (!p.priceMax) return null;
   const idx = p.sizes.indexOf(size);
   if (idx === -1) return null;
   return idx === p.sizes.length - 1 ? p.priceMax : p.price;
 };
+
+export const isOutOfStock = (p: Product) => p.stock != null && p.stock <= 0;
 
 // React hook   products + COA dono API se sync karta hai
 import { useState, useEffect } from "react";

@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS products (
     old_price         DECIMAL(10,2) DEFAULT NULL,
     discount          INT DEFAULT 0,
     sizes             JSON NOT NULL,
+    size_prices       JSON DEFAULT NULL,
+    stock             INT DEFAULT NULL,
     specs             JSON,
     image_url         VARCHAR(500) DEFAULT NULL,
     is_active         TINYINT(1) DEFAULT 1,
@@ -61,7 +63,7 @@ CREATE TABLE IF NOT EXISTS orders (
     shipping_fee     DECIMAL(10,2) DEFAULT 0.00,
     total            DECIMAL(10,2) NOT NULL,
     payment_method   VARCHAR(100) DEFAULT 'alipay',
-    coupon_code      VARCHAR(10) NULL,
+    coupon_code      VARCHAR(30) NULL,
     discount_percent DECIMAL(5,2) NULL DEFAULT 0,
     discount_amount  DECIMAL(10,2) NULL DEFAULT 0,
     payment_proof_file        VARCHAR(255) NULL,
@@ -94,10 +96,11 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- ── Coupons ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS coupons (
     id               INT AUTO_INCREMENT PRIMARY KEY,
-    code             VARCHAR(10) UNIQUE NOT NULL,
+    code             VARCHAR(30) UNIQUE NOT NULL,
     discount_percent DECIMAL(5,2) NOT NULL,
     max_uses         INT NOT NULL DEFAULT 1,
     used_count       INT NOT NULL DEFAULT 0,
+    expires_at       DATETIME NULL DEFAULT NULL,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_code (code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
