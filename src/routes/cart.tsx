@@ -6,7 +6,7 @@ import { PaymentProofForm } from "@/components/PaymentProofForm";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { Link, navigateTo } from "@/lib/router";
-import { formatPrice, getProducts, isOutOfStock } from "@/lib/products";
+import { formatPrice, getProducts, isSizeOutOfStock } from "@/lib/products";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/api";
 
@@ -553,7 +553,7 @@ export function CartPage() {
                               <span className="ml-1 text-xs font-normal text-muted-foreground border border-border rounded-full px-2 py-0.5">
                                 {item.size}
                               </span>
-                              {products.some((p) => p.slug === item.slug && isOutOfStock(p)) && (
+                              {products.some((p) => p.slug === item.slug && isSizeOutOfStock(p, item.size)) && (
                                 <span className="mt-1 block text-xs font-semibold text-red-600">
                                   Out of stock - please remove this item
                                 </span>

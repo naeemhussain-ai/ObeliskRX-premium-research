@@ -36,19 +36,24 @@ if (!$order) {
     exit();
 }
 
-// Order reject hua to stock wapas karo; rejected se wapas approve hua to dobara kaato
+// Order reject hua to har size ka stock wapas karo; rejected se wapas approve hua to dobara kaato
 $wasRejected = $order['status'] === 'rejected';
 $isRejected  = $action === 'rejected';
 if ($wasRejected !== $isRejected) {
-    $items = $db->prepare("SELECT product_id, SUM(quantity) AS qty FROM order_items WHERE order_id = ? AND product_id IS NOT NULL GROUP BY product_id");
+    require_once __DIR__ . '/../helpers/product_fields.php';
+    ensureProductColumns($db);
+    $items = $db->prepare("SELECT product_id, size, quantity FROM order_items WHERE order_id = ? AND product_id IS NOT NULL");
     $items->execute([$orderId]);
-    $sql = $isRejected
-        ? "UPDATE products SET stock = stock + ? WHERE id = ? AND stock IS NOT NULL"
-        : "UPDATE products SET stock = GREATEST(stock - ?, 0) WHERE id = ? AND stock IS NOT NULL";
-    $restock = $db->prepare($sql);
+    $qtyByProduct = [];
     foreach ($items->fetchAll() as $it) {
-        $restock->execute([(int)$it['qty'], (int)$it['product_id']]);
+        $size = html_entity_decode($it['size'] ?? '', ENT_QUOTES, 'UTF-8');
+        $qtyByProduct[$it['product_id']][$size] = ($qtyByProduct[$it['product_id']][$size] ?? 0) + (int)$it['quantity'];
     }
+    $db->beginTransaction();
+    foreach ($qtyByProduct as $productId => $qtyBySize) {
+        adjustProductStock($db, (int)$productId, $qtyBySize, $isRejected ? 1 : -1);
+    }
+    $db->commit();
 }
 
 // Status update

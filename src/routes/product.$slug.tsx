@@ -23,7 +23,17 @@ import { Link, useRouteParams } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 import { getCoa } from "@/lib/coa";
-import { formatPrice, useProducts, priceForSize, priceLabel, normalizeSeries, isOutOfStock } from "@/lib/products";
+import {
+  formatPrice,
+  useProducts,
+  priceForSize,
+  priceLabel,
+  normalizeSeries,
+  isOutOfStock,
+  isSizeOutOfStock,
+  sizeStock,
+  firstAvailableSize,
+} from "@/lib/products";
 
 function ProductNotFound() {
   return (
@@ -53,7 +63,7 @@ function ProductDetail() {
   const [heroRef, heroVisible] = useStaggerAnimation<HTMLDivElement>();
 
   useEffect(() => {
-    if (product?.sizes[0] && !size) setSize(product.sizes[0]);
+    if (product?.sizes[0] && !size) setSize(firstAvailableSize(product));
   }, [product?.slug]);
 
   if (!product) {
@@ -62,8 +72,10 @@ function ProductDetail() {
 
   const sizedPrice = priceForSize(product, size);
   const coa = getCoa(product.slug);
-  const soldOut = isOutOfStock(product);
-  const maxQty = product.stock ?? Infinity;
+  const allSoldOut = isOutOfStock(product);
+  const soldOut = allSoldOut || isSizeOutOfStock(product, size);
+  const sizeLeft = sizeStock(product, size);
+  const maxQty = sizeLeft ?? Infinity;
 
   const related = products.filter((p) => p.slug !== product.slug).slice(0, 5);
 
@@ -148,7 +160,7 @@ function ProductDetail() {
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            {soldOut ? (
+            {allSoldOut ? (
               <span className="inline-flex items-center gap-1.5 text-xs font-bold text-destructive">
                 <span className="size-1.5 rounded-full bg-destructive" />
                 Out of Stock
@@ -189,21 +201,35 @@ function ProductDetail() {
               Size
             </span>
             <div className="mt-2 flex flex-wrap gap-2">
-              {product.sizes.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setSize(s)}
-                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
-                    size === s
-                      ? "border-primary bg-primary text-primary-foreground shadow-md"
-                      : "border-border text-foreground hover:border-primary hover:text-primary"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
+              {product.sizes.map((s) => {
+                const sizeSoldOut = isSizeOutOfStock(product, s);
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => {
+                      setSize(s);
+                      const left = sizeStock(product, s);
+                      if (left != null && left > 0) setQty((q) => Math.min(q, left));
+                    }}
+                    disabled={sizeSoldOut}
+                    title={sizeSoldOut ? "Out of stock" : undefined}
+                    className={`rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                      sizeSoldOut
+                        ? "cursor-not-allowed border-border text-muted-foreground line-through opacity-60"
+                        : size === s
+                          ? "border-primary bg-primary text-primary-foreground shadow-md"
+                          : "border-border text-foreground hover:border-primary hover:text-primary"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                );
+              })}
             </div>
+            {!soldOut && sizeLeft != null && sizeLeft <= 5 && (
+              <p className="mt-2 text-xs font-semibold text-amber-600">Only {sizeLeft} left in stock</p>
+            )}
           </div>
 
           <div className="mt-5 flex flex-wrap items-baseline gap-3">
@@ -270,7 +296,9 @@ function ProductDetail() {
 
           {soldOut && (
             <div className="mt-3 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm font-semibold text-destructive">
-              This product is currently out of stock and can't be ordered.
+              {allSoldOut
+                ? "This product is currently out of stock and can't be ordered."
+                : `The ${size} size is out of stock. Please choose another size.`}
             </div>
           )}
 

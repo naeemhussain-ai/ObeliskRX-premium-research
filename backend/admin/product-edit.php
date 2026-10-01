@@ -64,7 +64,11 @@ $seriesList = [
         .spec-row input { flex: 1; }
         .size-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
         .size-row .size-name { flex: 2; }
-        .size-row .size-price { flex: 1; }
+        .size-row .size-price, .size-row .size-stock { flex: 1; }
+        .size-head { display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+        .size-head span:nth-child(1) { flex: 2; }
+        .size-head span:nth-child(2), .size-head span:nth-child(3) { flex: 1; }
+        .size-head span:nth-child(4) { width: 34px; flex-shrink: 0; }
         .image-preview { margin-top: 8px; }
         .image-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
         .section-label {
@@ -136,11 +140,12 @@ $seriesList = [
                 <!-- Sizes & Pricing -->
                 <div class="section-label">Sizes &amp; Pricing</div>
 
+                <div class="size-head"><span>Size</span><span>Price ($)</span><span>Stock (Pcs)</span><span></span></div>
                 <div id="sizes-container">
                     <!-- Populated by JS on page load -->
                 </div>
                 <button type="button" class="btn btn-outline btn-sm" onclick="addSize()">+ Add Size</button>
-                <small class="text-muted" style="display:block;margin-top:6px;">Each size has its own price. The store shows the lowest–highest price range.</small>
+                <small class="text-muted" style="display:block;margin-top:6px;">Each size has its own price and stock. A size with 0 stock shows as out of stock and can't be ordered.</small>
 
                 <div class="form-row" style="margin-top:16px;">
                     <div class="form-group">
@@ -156,17 +161,6 @@ $seriesList = [
                                min="0" max="100"
                                value="<?= htmlspecialchars($product['discount'] ?? 0) ?>">
                     </div>
-                </div>
-
-                <!-- Inventory -->
-                <div class="section-label">Inventory</div>
-
-                <div class="form-group" style="max-width:200px;">
-                    <label for="stock">Stock (Pcs) <span class="required">*</span></label>
-                    <input type="number" id="stock" name="stock" class="form-control"
-                           min="0" step="1" required placeholder="e.g. 12"
-                           value="<?= htmlspecialchars($product['stock'] ?? '') ?>">
-                    <small class="text-muted">At 0 the product shows as out of stock and can't be ordered.</small>
                 </div>
 
                 <!-- Specs -->
@@ -457,12 +451,13 @@ function escAttr(v) {
     return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 }
 
-function addSize(size, price) {
+function addSize(size, price, stock) {
     var row = document.createElement('div');
     row.className = 'size-row';
     row.innerHTML =
         '<input type="text" name="size_name[]" class="form-control size-name" placeholder="Size (e.g. 10mg)" value="' + escAttr(size) + '">' +
         '<input type="number" name="size_price[]" class="form-control size-price" step="0.01" min="0" placeholder="Price ($)" value="' + escAttr(price) + '">' +
+        '<input type="number" name="size_stock[]" class="form-control size-stock" step="1" min="0" placeholder="Stock (e.g. 12)" value="' + escAttr(stock) + '">' +
         '<button type="button" class="btn btn-sm btn-danger" onclick="removeSize(this)" style="flex-shrink:0;">✕</button>';
     document.getElementById('sizes-container').appendChild(row);
 }
@@ -472,7 +467,7 @@ function removeSize(btn) {
 }
 
 (function() {
-    existingSizes.forEach(function(r) { addSize(r.size, r.price); });
+    existingSizes.forEach(function(r) { addSize(r.size, r.price, r.stock); });
     if (!existingSizes.length) addSize();
 })();
 

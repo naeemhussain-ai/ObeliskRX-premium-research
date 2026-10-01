@@ -144,30 +144,25 @@ try {
         VALUES (:order_id, :product_id, :product_name, :size, :quantity, :unit_price, :subtotal)
     ");
 
-    // Stock check + deduct - FOR UPDATE row lock taake do orders ek sath aakhri piece na le saken.
-    // Ek product ke alag sizes ki quantity jod kar check hoti hai (stock product level par hai).
-    $lookup     = $db->prepare("SELECT id, name, stock FROM products WHERE slug = ? FOR UPDATE");
+    // Stock check + deduct (har size ka apna stock). adjustProductStock row lock (FOR UPDATE)
+    // leta hai taake do orders ek sath aakhri piece na le saken.
+    $lookup     = $db->prepare("SELECT id FROM products WHERE slug = ?");
     $productIds = [];
     $qtyBySlug  = [];
     foreach ($body['items'] as $item) {
         $slug = sanitizeString($item['slug'] ?? '');
-        if ($slug) $qtyBySlug[$slug] = ($qtyBySlug[$slug] ?? 0) + (int)$item['quantity'];
+        $size = trim((string)($item['size'] ?? ''));
+        if ($slug) $qtyBySlug[$slug][$size] = ($qtyBySlug[$slug][$size] ?? 0) + (int)$item['quantity'];
     }
-    foreach ($qtyBySlug as $slug => $qty) {
+    foreach ($qtyBySlug as $slug => $qtyBySize) {
         $lookup->execute([$slug]);
-        $row = $lookup->fetch();
-        if (!$row) continue;
-        $productIds[$slug] = (int)$row['id'];
-        if ($row['stock'] === null) continue; // stock set nahi - track nahi hota
-
-        $stock = (int)$row['stock'];
-        if ($stock < $qty) {
+        $id = $lookup->fetchColumn();
+        if (!$id) continue;
+        $productIds[$slug] = (int)$id;
+        if (!adjustProductStock($db, (int)$id, $qtyBySize, -1, true, $stockError)) {
             $db->rollBack();
-            error($stock <= 0
-                ? "{$row['name']} is out of stock. Please remove it from your cart."
-                : "Only $stock of {$row['name']} left in stock. Please reduce the quantity.", 409);
+            error($stockError, 409);
         }
-        $db->prepare("UPDATE products SET stock = stock - ? WHERE id = ?")->execute([$qty, $row['id']]);
     }
 
     foreach ($body['items'] as $item) {

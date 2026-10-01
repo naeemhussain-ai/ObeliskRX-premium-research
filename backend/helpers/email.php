@@ -139,24 +139,81 @@ function sendNewOrderEmail(array $order): void {
 // 2b. Customer ko - Payment confirm ho gayi, order approved
 // ────────────────────────────────────────────────────
 function sendOrderApprovedEmail(array $order): void {
-    $subject  = 'Payment Confirmed - Order #' . $order['order_number'];
-    $name     = htmlspecialchars($order['first_name']);
-    $orderNo  = htmlspecialchars($order['order_number']);
-    $siteName = SITE_NAME;
+    $orderNo    = htmlspecialchars($order['order_number']);
+    $subject    = 'Your order #' . $order['order_number'] . ' is confirmed!';
+    $heading    = 'Your order is confirmed!';
+    $name       = htmlspecialchars($order['first_name']);
+    $siteName   = SITE_NAME;
+    $accountUrl = htmlspecialchars(SITE_URL . '/account');
+    $contactUrl = htmlspecialchars(SITE_URL . '/contact');
+
+    $items = is_string($order['items']) ? json_decode($order['items'], true) : ($order['items'] ?? []);
+    $rows  = '';
+    foreach ($items ?: [] as $item) {
+        $pName = htmlspecialchars($item['product_name'] ?? '');
+        $size  = htmlspecialchars($item['size'] ?? '');
+        $qty   = (int)($item['quantity'] ?? 0);
+        $sub   = number_format($qty * (float)($item['unit_price'] ?? 0), 2);
+        $rows .= "<tr>
+            <td><strong>$pName</strong><br><span style=\"color:#777; font-size:12px;\">$size</span></td>
+            <td>$qty</td>
+            <td>\$$sub</td>
+        </tr>";
+    }
+
+    $subtotal = number_format((float)($order['subtotal'] ?? $order['total']), 2);
+    $total    = number_format((float)$order['total'], 2);
+    $discount = (float)($order['discount_amount'] ?? 0);
+    $shipping = (float)($order['shipping_fee'] ?? 0);
+
+    $extraRows = '';
+    if ($discount > 0) {
+        $code = htmlspecialchars($order['coupon_code'] ?? '');
+        $extraRows .= "<tr><td colspan=\"2\" align=\"right\">Discount" . ($code ? " ($code)" : '') . "</td><td>-\$" . number_format($discount, 2) . "</td></tr>";
+    }
+    $extraRows .= "<tr><td colspan=\"2\" align=\"right\">Shipping</td><td>" . ($shipping > 0 ? '$' . number_format($shipping, 2) : 'Free') . "</td></tr>";
+
+    $address = htmlspecialchars($order['first_name'] . ' ' . $order['last_name']) . '<br>'
+             . htmlspecialchars($order['address_line1'])
+             . (!empty($order['address_line2']) ? '<br>' . htmlspecialchars($order['address_line2']) : '')
+             . '<br>' . htmlspecialchars($order['city'] . ', ' . $order['state'] . ' ' . $order['zip'])
+             . '<br>' . htmlspecialchars($order['country']);
 
     $body = <<<HTML
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0;">Great news! Your order #$orderNo is confirmed and will ship within 2 business days.</div>
     <p>Hi <strong>$name</strong>,</p>
-    <p>We've confirmed your payment for order <strong>#$orderNo</strong>. Your order is now approved and will be prepared for shipment.</p>
+    <p>Great news! We've received your payment and your order <strong>#$orderNo</strong> is now <strong>confirmed</strong>. Thank you for choosing $siteName!</p>
 
     <div class="info-box">
-      <p><strong>Order Number:</strong> $orderNo</p>
-      <p><strong>Status:</strong> Approved</p>
+      <p><strong>&#128230; Your order will be shipped within 2 business days.</strong></p>
+      <p>Our team is now carefully preparing and packing your order. As soon as it's on its way, we'll send you another email with the shipping details.</p>
     </div>
 
-    <p>Thank you for choosing <strong>$siteName</strong>!</p>
+    <h3 style="margin:28px 0 0; color:#0f172a; font-size:16px;">Order Summary</h3>
+    <table class="items">
+      <thead><tr><th>Product</th><th>Qty</th><th>Amount</th></tr></thead>
+      <tbody>$rows</tbody>
+      <tfoot>
+        <tr><td colspan="2" align="right">Subtotal</td><td>\$$subtotal</td></tr>
+        $extraRows
+        <tr class="total-row"><td colspan="2" align="right">Total Paid</td><td>\$$total</td></tr>
+      </tfoot>
+    </table>
+
+    <h3 style="margin:28px 0 8px; color:#0f172a; font-size:16px;">Shipping To</h3>
+    <p style="margin:0;">$address</p>
+
+    <p style="text-align:center;">
+      <a href="$accountUrl" class="btn" style="color:#0f172a !important; text-decoration:none;">View My Order</a>
+    </p>
+
+    <p style="margin-top:28px;">Have a question about your order? Just <a href="$contactUrl" style="color:#0f172a;">contact our team</a>. We're always happy to help.</p>
+    <p>Thank you for your trust in us!<br>The <strong>$siteName</strong> Team</p>
+
+    <p style="margin-top:24px; font-size:12px; color:#999;">All products are sold for laboratory research use only.</p>
     HTML;
 
-    _send($order['email'], $order['first_name'] . ' ' . $order['last_name'], $subject, $body, 'order_approved');
+    _send($order['email'], $order['first_name'] . ' ' . $order['last_name'], $subject, $body, 'order_approved', $heading);
 }
 
 // ────────────────────────────────────────────────────

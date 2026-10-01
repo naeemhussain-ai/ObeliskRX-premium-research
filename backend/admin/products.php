@@ -145,14 +145,29 @@ if (!empty($_GET['error'])) {
                             <?php endif; ?>
                         </td>
 
-                        <!-- Stock -->
+                        <!-- Stock (har size ka) -->
                         <td>
-                            <?php if ($p['stock'] === null): ?>
-                                <span class="badge badge-yellow" title="Edit this product to set its stock">Not set</span>
-                            <?php elseif ((int)$p['stock'] <= 0): ?>
-                                <span class="badge badge-red">Out of stock</span>
-                            <?php else: ?>
+                            <?php
+                            $stockRows = json_decode($p['size_prices'] ?? '', true) ?: [];
+                            $tracked   = array_filter($stockRows, fn($r) => ($r['stock'] ?? null) !== null);
+                            ?>
+                            <?php if ($tracked): ?>
+                                <?php foreach ($stockRows as $r): $st = $r['stock'] ?? null; ?>
+                                    <div style="font-size:12px;white-space:nowrap;">
+                                        <?= htmlspecialchars($r['size']) ?>:
+                                        <?php if ($st === null): ?>
+                                            <span class="text-muted">-</span>
+                                        <?php elseif ((int)$st <= 0): ?>
+                                            <span style="color:#dc2626;font-weight:700;">Out</span>
+                                        <?php else: ?>
+                                            <strong><?= (int)$st ?></strong>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php elseif ($p['stock'] !== null): ?>
                                 <strong><?= (int)$p['stock'] ?></strong> <span class="text-muted">pcs</span>
+                            <?php else: ?>
+                                <span class="badge badge-yellow" title="Edit this product to set stock for each size">Not set</span>
                             <?php endif; ?>
                         </td>
 

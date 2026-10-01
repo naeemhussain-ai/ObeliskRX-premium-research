@@ -25,9 +25,9 @@ export type Product = {
   oldPrice?: number;
   discount: number;
   sizes: string[];
-  /** Admin-set price per size; falls back to price/priceMax when missing. */
-  sizePrices?: { size: string; price: number }[];
-  /** Pieces in stock. null/undefined = not tracked (always orderable). */
+  /** Admin-set price + stock per size; price falls back to price/priceMax when missing. */
+  sizePrices?: { size: string; price: number; stock?: number | null }[];
+  /** Total pieces in stock across sizes. null/undefined = not tracked (always orderable). */
   stock?: number | null;
   description: string;
   specs: { label: string; value: string }[];
@@ -341,7 +341,7 @@ type ApiProduct = {
   slug: string; name: string; series: string; description: string;
   price: string; price_max: string | null; old_price: string | null;
   discount: number; sizes: string[]; specs: { label: string; value: string }[];
-  size_prices?: { size: string; price: number | string }[] | null;
+  size_prices?: { size: string; price: number | string; stock?: number | string | null }[] | null;
   stock?: number | string | null;
   image_url: string;
 };
@@ -357,7 +357,11 @@ function mapApiProduct(p: ApiProduct): Product {
     oldPrice: p.old_price ? parseFloat(p.old_price) : undefined,
     discount: p.discount,
     sizes: p.sizes ?? [],
-    sizePrices: p.size_prices?.map((r) => ({ size: r.size, price: Number(r.price) })),
+    sizePrices: p.size_prices?.map((r) => ({
+      size: r.size,
+      price: Number(r.price),
+      stock: r.stock == null ? null : Number(r.stock),
+    })),
     stock: p.stock == null ? null : Number(p.stock),
     description: p.description ?? "",
     specs: p.specs ?? [],
@@ -444,7 +448,25 @@ export const priceForSize = (p: Product, size: string) => {
   return idx === p.sizes.length - 1 ? p.priceMax : p.price;
 };
 
-export const isOutOfStock = (p: Product) => p.stock != null && p.stock <= 0;
+/** Pieces left for one size; null = not tracked. Falls back to the old product-level stock. */
+export const sizeStock = (p: Product, size: string): number | null => {
+  const perSize = p.sizePrices?.some((r) => r.stock != null);
+  if (!perSize) return p.stock ?? null;
+  return p.sizePrices?.find((r) => r.size === size)?.stock ?? null;
+};
+
+export const isSizeOutOfStock = (p: Product, size: string) => {
+  const left = sizeStock(p, size);
+  return left != null && left <= 0;
+};
+
+/** Every size sold out. */
+export const isOutOfStock = (p: Product) =>
+  p.sizes.length > 0 ? p.sizes.every((s) => isSizeOutOfStock(p, s)) : p.stock != null && p.stock <= 0;
+
+/** First size that can still be ordered (or the first size if all are sold out). */
+export const firstAvailableSize = (p: Product) =>
+  p.sizes.find((s) => !isSizeOutOfStock(p, s)) ?? p.sizes[0] ?? "";
 
 // React hook   products + COA dono API se sync karta hai
 import { useState, useEffect } from "react";

@@ -39,13 +39,12 @@ if ($action === 'add') {
     $oldPrice    = !empty($_POST['old_price'])  ? (float)$_POST['old_price']  : null;
     $discount    = (int)($_POST['discount'] ?? 0);
     $sizePrices  = parseSizePrices($_POST);
-    $stock       = parseStock($_POST['stock'] ?? '');
     $specsJson   = trim($_POST['specs_json'] ?? '[]');
     $isActive    = isset($_POST['is_active']) ? 1 : 0;
 
     // Validate required fields
-    if (!$name || !$slug || !$sizePrices || $stock === null) {
-        header('Location: product-add.php?error=' . urlencode('Name, slug, stock, and at least one size with a price are required.'));
+    if (!$name || !$slug || !$sizePrices || in_array(null, array_column($sizePrices, 'stock'), true)) {
+        header('Location: product-add.php?error=' . urlencode('Name, slug, and at least one size with its price and stock are required.'));
         exit();
     }
 
@@ -63,6 +62,7 @@ if ($action === 'add') {
     $priceMax       = max($allPrices) > $price ? max($allPrices) : null;
     $sizesJson      = json_encode(array_column($sizePrices, 'size'));
     $sizePricesJson = json_encode($sizePrices);
+    $stock          = totalStock($sizePrices);
 
     // Validate specs JSON
     $decoded = json_decode($specsJson, true);
@@ -137,12 +137,11 @@ if ($action === 'edit') {
     $oldPrice    = !empty($_POST['old_price'])  ? (float)$_POST['old_price']  : null;
     $discount    = (int)($_POST['discount'] ?? 0);
     $sizePrices  = parseSizePrices($_POST);
-    $stock       = parseStock($_POST['stock'] ?? '');
     $specsJson   = trim($_POST['specs_json'] ?? '[]');
     $isActive    = isset($_POST['is_active']) ? 1 : 0;
 
-    if (!$productId || !$name || !$slug || !$sizePrices || $stock === null) {
-        header("Location: product-edit.php?id=$productId&error=" . urlencode('Name, slug, stock, and at least one size with a price are required.'));
+    if (!$productId || !$name || !$slug || !$sizePrices || in_array(null, array_column($sizePrices, 'stock'), true)) {
+        header("Location: product-edit.php?id=$productId&error=" . urlencode('Name, slug, and at least one size with its price and stock are required.'));
         exit();
     }
 
@@ -169,6 +168,7 @@ if ($action === 'edit') {
     $priceMax       = max($allPrices) > $price ? max($allPrices) : null;
     $sizesJson      = json_encode(array_column($sizePrices, 'size'));
     $sizePricesJson = json_encode($sizePrices);
+    $stock          = totalStock($sizePrices);
 
     // Validate specs JSON
     $decoded = json_decode($specsJson, true);

@@ -3,7 +3,16 @@ import { Heart, Search, ShoppingCart, X, Check } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { Link } from "@/lib/router";
 import { useToast } from "@/hooks/useToast";
-import { formatPrice, priceLabel, priceForSize, normalizeSeries, isOutOfStock, type Product } from "@/lib/products";
+import {
+  formatPrice,
+  priceLabel,
+  priceForSize,
+  normalizeSeries,
+  isOutOfStock,
+  isSizeOutOfStock,
+  firstAvailableSize,
+  type Product,
+} from "@/lib/products";
 
 export function Logo({ className = "h-8", light = false }: { className?: string; light?: boolean }) {
   const textColor = light ? "#ffffff" : "#0B1F3A";
@@ -55,10 +64,11 @@ function QuickViewModal({
 }) {
   const { add } = useCart();
   const { addToast } = useToast();
-  const [size, setSize] = useState(product.sizes[0] ?? "");
+  const [size, setSize] = useState(() => firstAvailableSize(product));
   const [isAdding, setIsAdding] = useState(false);
   const sizedPrice = priceForSize(product, size);
-  const soldOut = isOutOfStock(product);
+  const allSoldOut = isOutOfStock(product);
+  const soldOut = allSoldOut || isSizeOutOfStock(product, size);
 
   const handleAdd = () => {
     if (soldOut) return;
@@ -127,8 +137,9 @@ function QuickViewModal({
             className="mx-auto w-full max-w-[220px] rounded-md border border-gray-300 px-4 py-2.5 text-sm text-gray-700 outline-none transition-colors focus:border-primary"
           >
             {product.sizes.map((s) => (
-              <option key={s} value={s}>
+              <option key={s} value={s} disabled={isSizeOutOfStock(product, s)}>
                 {s}
+                {isSizeOutOfStock(product, s) ? " (Out of stock)" : ""}
               </option>
             ))}
           </select>
@@ -138,7 +149,9 @@ function QuickViewModal({
         <div className="px-6 pb-4 pt-4">
           {soldOut && (
             <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-center text-xs font-semibold text-red-600">
-              This product is out of stock and can't be ordered.
+              {allSoldOut
+                ? "This product is out of stock and can't be ordered."
+                : "This size is out of stock. Please choose another size."}
             </p>
           )}
           <button
