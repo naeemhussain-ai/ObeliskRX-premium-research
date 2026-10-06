@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import {
   ClockIcon,
   Heart,
@@ -11,16 +11,33 @@ import { useAuth, AUTH_API } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
 import { formatPrice, getProducts } from "@/lib/products";
 import { Link, navigateTo } from "@/lib/router";
+import { PaymentInstructions } from "@/components/PaymentInstructions";
+import { PaymentProofForm } from "@/components/PaymentProofForm";
 
 type OrderItem = { product_name: string; size: string; quantity: number; unit_price: number };
 type Order = {
   id: number;
   order_number: string;
+  first_name: string;
+  last_name: string;
   status: string;
   total: number;
   created_at: string;
+  payment_proof_submitted_at: string | null;
   items: OrderItem[];
 };
+
+// Checkout email ka "Complete my order" link: /account?order=OBX-... -
+// login redirect ke baad bhi yaad rahe is liye sessionStorage mein rakho
+function getFocusOrder(): string {
+  const fromUrl = new URLSearchParams(window.location.search).get("order") ?? "";
+  try {
+    if (fromUrl) sessionStorage.setItem("focusOrder", fromUrl);
+    return fromUrl || sessionStorage.getItem("focusOrder") || "";
+  } catch {
+    return fromUrl;
+  }
+}
 
 const STATUS_LABEL: Record<string, string> = {
   pending:   "Pending",
@@ -38,10 +55,21 @@ const STATUS_COLOR: Record<string, string> = {
   rejected:  "bg-red-100 text-red-700",
 };
 
-function OrderCard({ order }: { order: Order }) {
-  const [open, setOpen] = useState(false);
+function OrderCard({ order, focused = false }: { order: Order; focused?: boolean }) {
+  const [open, setOpen] = useState(focused);
+  const [paid, setPaid] = useState(!!order.payment_proof_submitted_at);
+  const ref = useRef<HTMLDivElement>(null);
+  // Proof submit hone ke baad bhi form dikhao - wahi success message dikhata hai
+  const needsPayment = order.status === "pending" && !order.payment_proof_submitted_at;
+
+  useEffect(() => {
+    if (!focused) return;
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    try { sessionStorage.removeItem("focusOrder"); } catch { /* ignore */ }
+  }, [focused]);
+
   return (
-    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+    <div ref={ref} className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -78,6 +106,24 @@ function OrderCard({ order }: { order: Order }) {
               <span className="font-semibold">{formatPrice(Number(item.unit_price) * item.quantity)}</span>
             </div>
           ))}
+
+          {needsPayment && (
+            <div className="mt-4 space-y-4 border-t border-border pt-4">
+              {!paid && (
+                <>
+                  <p className="text-sm font-semibold text-[#0B1F3A]">
+                    Complete your payment and submit proof to confirm this order.
+                  </p>
+                  <PaymentInstructions />
+                </>
+              )}
+              <PaymentProofForm
+                orderNumber={order.order_number}
+                defaultFullName={`${order.first_name ?? ""} ${order.last_name ?? ""}`.trim()}
+                onSubmitted={() => setPaid(true)}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -86,6 +132,7 @@ function OrderCard({ order }: { order: Order }) {
 
 export function AccountPage() {
   const allProducts = getProducts();
+  const [focusOrder] = useState(getFocusOrder);
   const { customer, logout, token, isLoggedIn } = useAuth();
   const { items, count, subtotal, wishlist } = useCart();
 
@@ -174,7 +221,7 @@ export function AccountPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {upcoming.map((o) => <OrderCard key={o.id} order={o} />)}
+                {upcoming.map((o) => <OrderCard key={o.id} order={o} focused={o.order_number === focusOrder} />)}
               </div>
             )}
           </section>

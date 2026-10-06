@@ -14,7 +14,8 @@ if (!$customer) error('Unauthorized.', 401);
 
 $stmt = $db->prepare("
     SELECT id, order_number, first_name, last_name, email,
-           items, subtotal, total, payment_method, status, created_at
+           items, subtotal, total, payment_method, status, created_at,
+           payment_proof_submitted_at
     FROM orders
     WHERE email = ?
     ORDER BY created_at DESC
