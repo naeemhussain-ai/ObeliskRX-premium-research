@@ -353,21 +353,9 @@ function sendNewOrderEmail(array $order): void {
     _send(OWNER_EMAIL, OWNER_NAME, $subject, $body, 'new_order');
 }
 
-// ────────────────────────────────────────────────────
-// 2b. Customer ko - Payment confirm ho gayi, order approved
-// ────────────────────────────────────────────────────
-function buildOrderApprovedEmail(array $order): array {
-    require_once __DIR__ . '/abandoned_cart.php';
-
-    $orderNo   = htmlspecialchars($order['order_number']);
-    $subject   = 'Your order #' . $order['order_number'] . ' is confirmed!';
-    $firstName = trim((string)($order['first_name'] ?? ''));
-    $safeFirst = htmlspecialchars($firstName !== '' ? $firstName : 'there');
-    $font      = EMAIL_FONT;
-    $ink       = EMAIL_INK;
-    $orange    = EMAIL_ORANGE;
-    $cream     = EMAIL_CREAM;
-
+// Order ke products + totals table (pending aur approved dono emails mein)
+// Returns [tableHtml, itemsPlainText, footRows]
+function brandedOrderSummary(array $order, string $totalLabel): array {
     $items = is_string($order['items']) ? json_decode($order['items'], true) : ($order['items'] ?? []);
     $items = $items ?: [];
 
@@ -395,18 +383,134 @@ function buildOrderApprovedEmail(array $order): array {
         $foot[] = ['DISCOUNT' . ($code ? " ($code)" : ''), '-' . emailMoney($discount)];
     }
     $foot[] = ['SHIPPING', $shipping > 0 ? emailMoney($shipping) : 'FREE'];
-    $foot[] = ['TOTAL PAID', emailMoney((float)$order['total'])];
-
-    $hero = brandedHero('confirm', 'Your order is confirmed!', <<<HTML
-      <p style="margin:0 0 8px; font-family:$font; font-size:19px; line-height:23px; font-weight:300; color:$ink;">Hi $safeFirst</p>
-      <p style="margin:0; font-family:$font; font-size:15px; line-height:19px; color:$ink;">Great news! We've received your<br>payment and your order<br><strong style="color:$orange; font-weight:600;">#$orderNo</strong> is now <strong style="color:$orange; font-weight:600;">confirmed.</strong><br>Thank you for choosing ObeliskRX!</p>
-    HTML, '9px 260px 2px 46px');
+    $foot[] = [$totalLabel, emailMoney((float)$order['total'])];
 
     $table = brandedItemsTable(
         [['PRODUCT', 194, 'left'], ['SIZE', 110, 'center'], ['QTY', 106, 'center'], ['AMOUNT', 102, 'right']],
         $rows,
         $foot
     );
+
+    return [$table, $text, $foot];
+}
+
+// ────────────────────────────────────────────────────
+// 2a. Customer ko - Payment proof mil gaya, order pending (verification baqi)
+// ────────────────────────────────────────────────────
+function buildOrderPendingEmail(array $order): array {
+    require_once __DIR__ . '/abandoned_cart.php';
+
+    $orderNo   = htmlspecialchars($order['order_number']);
+    $subject   = 'We received your payment proof - order #' . $order['order_number'] . ' is pending';
+    $firstName = trim((string)($order['first_name'] ?? ''));
+    $safeFirst = htmlspecialchars($firstName !== '' ? $firstName : 'there');
+    $accountUrl = htmlspecialchars(SITE_URL . '/account');
+    $font      = EMAIL_FONT;
+    $ink       = EMAIL_INK;
+    $navy      = EMAIL_NAVY;
+    $orange    = EMAIL_ORANGE;
+    $cream     = EMAIL_CREAM;
+    $line      = EMAIL_LINE;
+
+    [$table, $text, $foot] = brandedOrderSummary($order, 'ORDER TOTAL');
+
+    $hero = brandedHero('pending', 'Your order is pending', <<<HTML
+      <p style="margin:0 0 8px; font-family:$font; font-size:19px; line-height:23px; font-weight:300; color:$ink;">Hi $safeFirst</p>
+      <p style="margin:0; font-family:$font; font-size:15px; line-height:19px; color:$ink;">Thank you! We've received the<br>payment proof for your order<br><strong style="color:$orange; font-weight:600;">#$orderNo</strong>.<br>Your order is <strong style="color:$orange; font-weight:600;">pending</strong> while<br>we verify your payment.</p>
+    HTML, '9px 260px 2px 46px');
+
+    $step = function (string $num, string $title, string $desc) use ($font, $ink, $navy): string {
+        return "<tr>
+          <td width=\"30\" valign=\"top\" style=\"width:30px; padding:0 0 12px;\">
+            <div style=\"width:24px; height:24px; border-radius:12px; background:$navy; font-family:$font; font-size:12px; line-height:24px; font-weight:600; color:#FFFFFF; text-align:center;\">$num</div>
+          </td>
+          <td valign=\"top\" style=\"padding:2px 0 12px 8px; font-family:$font; font-size:13.5px; line-height:18px; color:$ink;\">
+            <strong style=\"font-weight:600;\">$title</strong><br>$desc
+          </td>
+        </tr>";
+    };
+    $steps = $step('1', 'We verify your payment', 'Our team is reviewing the payment proof you submitted.')
+           . $step('2', 'Your order gets confirmed', "As soon as the payment is confirmed, we'll approve your order and email you a confirmation.")
+           . $step('3', 'We ship your order', "Confirmed orders ship within 2 business days, and we'll send you the shipping details.");
+
+    $button = brandedButton($accountUrl, 'View my order');
+
+    $rowsHtml = $hero . <<<HTML
+    <tr><td class="px" style="padding:16px 44px 0; background:#FFFFFF;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:$cream; border-radius:12px; box-shadow:0 2px 10px rgba(11,31,58,0.12);">
+        <tr><td style="padding:14px 20px 14px 22px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td width="3" style="width:3px; background:$orange; font-size:0; line-height:0;">&nbsp;</td>
+            <td style="padding:0 0 0 15px; font-family:$font; font-size:15px; line-height:19px; color:$ink;">
+              <span style="display:inline-block; margin:0 0 6px; padding:3px 12px; border-radius:20px; background:#FEF3C7; font-size:12px; line-height:16px; font-weight:600; color:#92400E;">Status: Pending</span><br>
+              <strong style="color:$orange; font-weight:600;">No further action is needed from you.</strong><br>
+              We'll confirm your payment, and then your order will be approved.
+            </td>
+          </tr></table>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td class="px" style="padding:24px 44px 10px 51px; font-family:$font; font-size:21px; line-height:26px; font-weight:300; color:$ink;">What happens next</td></tr>
+    <tr><td class="px" style="padding:0 44px 0 51px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">$steps</table>
+    </td></tr>
+    <tr><td class="px" style="padding:12px 44px 12px 51px; font-family:$font; font-size:21px; line-height:26px; font-weight:300; color:$ink;">Order Summary</td></tr>
+    <tr><td class="px" style="padding:0 44px;">$table</td></tr>
+    <tr><td align="center" style="padding:22px 44px 0;">$button</td></tr>
+    <tr><td class="px" style="padding:25px 44px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid $line;"><tr><td style="padding:10px 0 0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:$navy; border-radius:12px;"><tr>
+          <td align="center" style="padding:8px 14px 9px; font-family:$font; font-size:12.5px; line-height:17px; color:#FFFFFF; text-align:center;">
+            Questions about your payment or order? Reply to this email or write to<br>
+            <a href="mailto:Contact@ObeliskRX.com" style="color:#FFFFFF; text-decoration:underline; font-size:13px; font-weight:500; letter-spacing:1.5px;">Contact@ObeliskRX.com</a>
+          </td>
+        </tr></table>
+      </td></tr></table>
+    </td></tr>
+    <tr><td style="height:36px; font-size:0; line-height:0;">&nbsp;</td></tr>
+    HTML;
+    $rowsHtml .= brandedFooter("You're receiving this because you placed an order at ObeliskRX.com.");
+
+    $html = brandedLayout($subject, "Thank you! Your order #$orderNo is pending while we verify your payment.", $rowsHtml, '#FFFFFF');
+    $alt  = "Hi $firstName,\n\nThank you! We've received the payment proof for your order #{$order['order_number']}. "
+          . "Your order is now pending while we verify your payment. No further action is needed from you.\n\n"
+          . "What happens next\n"
+          . "1. We verify your payment.\n"
+          . "2. As soon as the payment is confirmed, we'll approve your order and email you a confirmation.\n"
+          . "3. Confirmed orders ship within 2 business days, and we'll send you the shipping details.\n\n"
+          . "Order Summary\n$text\n" . implode("\n", array_map(fn($f) => html_entity_decode($f[0]) . ': ' . $f[1], $foot))
+          . "\n\nView my order: " . SITE_URL . "/account"
+          . "\n\nQuestions? Reply to this email or write to Contact@ObeliskRX.com\n\nThe ObeliskRX team\nContact@ObeliskRX.com | (561) 571-8899";
+
+    return [$subject, $html, $alt];
+}
+
+function sendOrderPendingEmail(array $order): void {
+    [$subject, $html, $alt] = buildOrderPendingEmail($order);
+    _sendHtml($order['email'], $order['first_name'] . ' ' . $order['last_name'], $subject, $html, $alt, 'order_pending');
+}
+
+// ────────────────────────────────────────────────────
+// 2b. Customer ko - Payment confirm ho gayi, order approved
+// ────────────────────────────────────────────────────
+function buildOrderApprovedEmail(array $order): array {
+    require_once __DIR__ . '/abandoned_cart.php';
+
+    $orderNo   = htmlspecialchars($order['order_number']);
+    $subject   = 'Your order #' . $order['order_number'] . ' is confirmed!';
+    $firstName = trim((string)($order['first_name'] ?? ''));
+    $safeFirst = htmlspecialchars($firstName !== '' ? $firstName : 'there');
+    $font      = EMAIL_FONT;
+    $ink       = EMAIL_INK;
+    $orange    = EMAIL_ORANGE;
+    $cream     = EMAIL_CREAM;
+
+    [$table, $text, $foot] = brandedOrderSummary($order, 'TOTAL PAID');
+
+    $hero = brandedHero('confirm', 'Your order is confirmed!', <<<HTML
+      <p style="margin:0 0 8px; font-family:$font; font-size:19px; line-height:23px; font-weight:300; color:$ink;">Hi $safeFirst</p>
+      <p style="margin:0; font-family:$font; font-size:15px; line-height:19px; color:$ink;">Great news! We've received your<br>payment and your order<br><strong style="color:$orange; font-weight:600;">#$orderNo</strong> is now <strong style="color:$orange; font-weight:600;">confirmed.</strong><br>Thank you for choosing ObeliskRX!</p>
+    HTML, '9px 260px 2px 46px');
 
     $rowsHtml = $hero . <<<HTML
     <tr><td class="px" style="padding:16px 44px 0; background:#FFFFFF;">

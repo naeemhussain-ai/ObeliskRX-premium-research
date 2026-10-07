@@ -50,6 +50,9 @@ export function PaymentProofForm({ orderNumber, defaultFullName, onSubmitted }: 
         <p className="mt-2 text-sm text-muted-foreground">
           We'll confirm your payment, and then your order will be approved.
         </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          We've also sent these details to your email.
+        </p>
       </div>
     );
   }

@@ -72,4 +72,9 @@ try {
     sendPaymentProofEmail($updatedOrder);
 } catch (\Exception $e) {}
 
+// Customer ko - order pending hai, payment confirm hote hi approve ho jayega
+try {
+    sendOrderPendingEmail($updatedOrder);
+} catch (\Throwable $e) {}
+
 success([], "Thanks! Your order is pending - we'll confirm your payment and then approve your order.", 201);
