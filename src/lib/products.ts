@@ -31,6 +31,8 @@ export type Product = {
   stock?: number | null;
   description: string;
   specs: { label: string; value: string }[];
+  /** "Independently Tested · 99%+ Purity" label on the product image (admin ON/OFF). Missing = shown. */
+  showPurityBadge?: boolean;
 };
 
 // Order matches DB seed insertion order (same as API ORDER BY id ASC)
@@ -344,6 +346,7 @@ type ApiProduct = {
   discount: number; sizes: string[]; specs: { label: string; value: string }[];
   size_prices?: { size: string; price: number | string; stock?: number | string | null }[] | null;
   stock?: number | string | null;
+  show_purity_badge?: number | string | null;
   image_url: string;
 };
 
@@ -366,6 +369,7 @@ function mapApiProduct(p: ApiProduct): Product {
     stock: p.stock == null ? null : Number(p.stock),
     description: p.description ?? "",
     specs: p.specs ?? [],
+    showPurityBadge: p.show_purity_badge == null ? true : Number(p.show_purity_badge) === 1,
   };
 }
 

@@ -129,10 +129,12 @@ function ProductDetail() {
         {/* ===== Image ===== */}
         <div className="anim-fade-in-up">
           <div className="relative overflow-hidden rounded-2xl border border-border bg-surface p-8 shadow-card sm:p-12">
-            <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-bold text-foreground shadow-sm">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              Independently Tested · 99%+ Purity
-            </span>
+            {product.showPurityBadge !== false && (
+              <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-bold text-foreground shadow-sm">
+                <span className="size-1.5 rounded-full bg-emerald-500" />
+                Independently Tested · 99%+ Purity
+              </span>
+            )}
             <img
               src={product.image}
               alt={`${product.name} vial`}

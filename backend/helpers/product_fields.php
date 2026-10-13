@@ -13,6 +13,8 @@ function ensureProductColumns(PDO $db): void {
     $cols = [
         'size_prices' => 'JSON NULL AFTER sizes',
         'stock'       => 'INT NULL DEFAULT NULL AFTER size_prices',
+        // Product page par image ke upar "Independently Tested · 99%+ Purity" label (1 = dikhao)
+        'show_purity_badge' => 'TINYINT(1) NOT NULL DEFAULT 1',
     ];
     foreach ($cols as $col => $def) {
         if (!$db->query("SHOW COLUMNS FROM products LIKE '$col'")->fetch()) {

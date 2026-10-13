@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `products` (
   `specs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`specs`)),
   `image_url` varchar(500) DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,
+  `show_purity_badge` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),

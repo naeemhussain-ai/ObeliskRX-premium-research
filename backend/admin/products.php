@@ -28,12 +28,14 @@ if (!empty($_GET['success'])) {
         'updated' => 'Product updated successfully.',
         'deleted' => 'Product deleted successfully.',
         'toggled' => 'Product status updated.',
+        'badge'   => 'Purity label updated.',
     ];
     $successMsg = $map[$_GET['success']] ?? 'Done.';
 }
 if (!empty($_GET['error'])) {
-    $errorMsg = htmlspecialchars($_GET['error']);
+    $errorMsg = $_GET['error'] === 'csrf' ? 'Your session expired. Please try again.' : htmlspecialchars($_GET['error']);
 }
+$csrf = adminCsrfToken();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,6 +99,7 @@ if (!empty($_GET['error'])) {
                         <th>Sizes</th>
                         <th>Stock</th>
                         <th>Status</th>
+                        <th title="&quot;Independently Tested · 99%+ Purity&quot; label on the product page image">Purity Label</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -176,6 +179,19 @@ if (!empty($_GET['error'])) {
                             <span class="badge <?= $p['is_active'] ? 'badge-green' : 'badge-red' ?>">
                                 <?= $p['is_active'] ? 'Active' : 'Inactive' ?>
                             </span>
+                        </td>
+
+                        <!-- Purity label ON/OFF -->
+                        <td>
+                            <form method="POST" action="toggle-badge.php" style="margin:0;">
+                                <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                                <input type="hidden" name="product_id" value="<?= $p['id'] ?>">
+                                <input type="hidden" name="show_purity_badge" value="<?= $p['show_purity_badge'] ? 0 : 1 ?>">
+                                <button type="submit" class="btn btn-sm <?= $p['show_purity_badge'] ? 'btn-primary' : 'btn-outline' ?>"
+                                        title="<?= $p['show_purity_badge'] ? 'Label is shown. Click to hide it.' : 'Label is hidden. Click to show it.' ?>">
+                                    <?= $p['show_purity_badge'] ? 'ON' : 'OFF' ?>
+                                </button>
+                            </form>
                         </td>
 
                         <!-- Actions -->
