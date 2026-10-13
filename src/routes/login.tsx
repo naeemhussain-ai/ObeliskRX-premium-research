@@ -1,9 +1,9 @@
 ﻿import { useState } from "react";
-import { Eye, EyeOff, LogIn, UserPlus, MailCheck } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus, MailCheck, KeyRound } from "lucide-react";
 import { useAuth, AUTH_API } from "@/lib/auth";
 import { navigateTo } from "@/lib/router";
 
-type Tab = "login" | "register";
+type Tab = "login" | "register" | "forgot";
 
 function InputField({
   label,
@@ -69,6 +69,8 @@ export function LoginPage() {
   const [needsVerification, setNeedsVerification] = useState(false);
   const [resending, setResending] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
+  const [fEmail, setFEmail] = useState("");
+  const [resetSent, setResetSent] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +117,34 @@ export function LoginPage() {
     }
   };
 
+  const handleForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${AUTH_API}/auth/forgot-password.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: fEmail }),
+      });
+      const data = await res.json();
+      if (data.success) setResetSent(data.message || "Check your inbox for a reset link.");
+      else setError(data.message || "Something went wrong. Please try again.");
+    } catch {
+      setError("Could not connect. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openForgot = () => {
+    setFEmail(lEmail);
+    setResetSent("");
+    setError("");
+    setSuccess("");
+    setTab("forgot");
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (rPassword !== rConfirm) { setError("Passwords do not match."); return; }
@@ -152,7 +182,7 @@ export function LoginPage() {
               type="button"
               onClick={() => { setTab(t); setError(""); setSuccess(""); }}
               className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-200 ${
-                tab === t
+                (tab === "forgot" ? "login" : tab) === t
                   ? "bg-[#0B1F3A] text-white shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
@@ -199,6 +229,11 @@ export function LoginPage() {
               <form onSubmit={handleLogin} className="space-y-4">
                 <InputField label="Email" type="email" value={lEmail} onChange={setLEmail} placeholder="you@example.com" required />
                 <InputField label="Password" type="password" value={lPassword} onChange={setLPassword} placeholder="••••••••" required />
+                <div className="-mt-2 text-right">
+                  <button type="button" onClick={openForgot} className="text-xs font-semibold text-primary hover:underline">
+                    Forgot password?
+                  </button>
+                </div>
                 <button
                   type="submit"
                   disabled={loading}
@@ -212,6 +247,48 @@ export function LoginPage() {
                 No account?{" "}
                 <button type="button" onClick={() => setTab("register")} className="font-semibold text-primary hover:underline">
                   Create one
+                </button>
+              </p>
+            </>
+          ) : tab === "forgot" ? (
+            <>
+              <div className="mb-6 flex items-center gap-3">
+                <div className="grid size-10 place-items-center rounded-full bg-[#0B1F3A]/10 text-[#0B1F3A]">
+                  <KeyRound size={20} />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold">Reset your password</h1>
+                  <p className="text-xs text-muted-foreground">We'll email you a link to choose a new password</p>
+                </div>
+              </div>
+
+              {error && (
+                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              {resetSent ? (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {resetSent}
+                </div>
+              ) : (
+                <form onSubmit={handleForgot} className="space-y-4">
+                  <InputField label="Email" type="email" value={fEmail} onChange={setFEmail} placeholder="you@example.com" required />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-full bg-[#0B1F3A] py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0d1631] hover:-translate-y-0.5 disabled:opacity-60"
+                  >
+                    {loading ? "Sending…" : "Send reset link"}
+                  </button>
+                </form>
+              )}
+
+              <p className="mt-5 text-center text-sm text-muted-foreground">
+                Remembered it?{" "}
+                <button type="button" onClick={() => { setTab("login"); setError(""); }} className="font-semibold text-primary hover:underline">
+                  Back to sign in
                 </button>
               </p>
             </>

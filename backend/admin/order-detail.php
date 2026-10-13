@@ -40,7 +40,15 @@ $statusClass = [
                 <a href="orders.php" class="back-link">← Back to Orders</a>
                 <h1><?= htmlspecialchars($order['order_number']) ?></h1>
             </div>
-            <span class="badge <?= $statusClass ?>"><?= ucfirst($order['status']) ?></span>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span class="badge <?= $statusClass ?>"><?= ucfirst($order['status']) ?></span>
+                <form method="POST" action="delete-order.php" style="margin:0;">
+                    <input type="hidden" name="csrf_token" value="<?= adminCsrfToken() ?>">
+                    <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
+                    <button type="submit" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Delete order <?= htmlspecialchars($order['order_number'], ENT_QUOTES) ?> permanently? This cannot be undone.')">🗑 Delete Order</button>
+                </form>
+            </div>
         </div>
 
         <div class="detail-grid">

@@ -52,6 +52,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <span class="nav-badge"><?= $pendingOrders ?></span>
             <?php endif; ?>
         </a>
+        <a href="customers.php" class="<?= in_array($currentPage, ['customers.php']) ? 'active' : '' ?>">
+            👥 Customers
+        </a>
         <a href="reviews.php" class="<?= in_array($currentPage, ['reviews.php']) ? 'active' : '' ?>">
             ⭐ Reviews
             <?php if ($pendingReviews > 0): ?>
@@ -77,6 +80,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
     <div class="sidebar-footer">
         <span>👤 <?= htmlspecialchars(adminName()) ?></span>
+        <a href="change-password.php" class="logout-link" style="<?= $currentPage === 'change-password.php' ? 'font-weight:700;' : '' ?>">Change Password</a>
         <a href="logout.php" class="logout-link">Logout</a>
     </div>
 </div>

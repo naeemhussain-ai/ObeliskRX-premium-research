@@ -10,7 +10,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { useProducts, normalizeSeries, KNOWN_SERIES_LABELS } from "@/lib/products";
+import { useProductsState, normalizeSeries, KNOWN_SERIES_LABELS } from "@/lib/products";
 import { Link } from "@/lib/router";
 import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 
@@ -179,7 +179,7 @@ function FilterSidebar({
 }
 
 export function CatalogPage() {
-  const products = useProducts();
+  const { products, ready } = useProductsState();
   const [show, setShow] = useState(12);
   const [cols, setCols] = useState(4);
   const [page, setPage] = useState(1);
@@ -414,7 +414,9 @@ export function CatalogPage() {
             )}
           </div>
 
-          {filteredProducts.length === 0 ? (
+          {!ready && products.length === 0 ? (
+            <div className="py-24 text-center text-sm font-medium text-gray-500">Loading products…</div>
+          ) : filteredProducts.length === 0 ? (
             <div className="py-24 text-center rounded-2xl bg-surface border border-border">
               <p className="text-gray-500 font-medium">
                 No products match the selected filters.

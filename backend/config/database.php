@@ -6,9 +6,9 @@ if (file_exists($localConfig)) {
 } else {
     // ── Production (cPanel) Credentials ─────────────
     define('DB_HOST', 'localhost');
-    define('DB_NAME', 'axistechstaging_obeliskrx');
-    define('DB_USER', 'axistechstaging_obeliskrx');
-    define('DB_PASS', 'TiO6QXdXEV8!ok*]');
+    define('DB_NAME', 'wwwobeliskrx_obeliskrx');
+    define('DB_USER', 'wwwobeliskrx_admin');
+    define('DB_PASS', '.b7FR^2L[NZ.eqO6');
 }
 
 function getDB(): PDO {

@@ -32,6 +32,11 @@ function makeMailer(): PHPMailer {
 
     $mail->CharSet = 'UTF-8';
     $mail->setFrom(FROM_EMAIL, FROM_NAME);
+    // Envelope sender (Return-Path) bhi apne domain ka ho - warna server ka default
+    // user@hostname jata hai aur SPF/DMARC align nahi hote, email junk mein jati hai
+    $mail->Sender = FROM_EMAIL;
+    // Customer "reply" kare to support inbox mein jaye (emails mein "reply to this email" likha hai)
+    $mail->addReplyTo(OWNER_EMAIL, FROM_NAME);
     $mail->isHTML(true);
     return $mail;
 }
@@ -97,6 +102,8 @@ const EMAIL_INK    = '#0E1821';
 const EMAIL_ORANGE = '#F2591F';
 const EMAIL_CREAM  = '#F9F6F1';
 const EMAIL_LINE   = '#A3A6B1';
+// Shipped email mein customer ko dikhne wala delivery ka andaza - yahin se badlo
+const SHIPPED_DELIVERY_ESTIMATE = '2 business days';
 const BRANDED_CART_COLS = [['PRODUCT', 198, 'left'], ['SIZE', 74, 'center'], ['QTY', 74, 'center'], ['PRICE', 74, 'center'], ['SUBTOTAL', 92, 'center']];
 
 function emailAsset(string $file): string {
@@ -609,54 +616,84 @@ function brandedBeforeOrderAlt(string $firstName, string $itemsText, string $cta
          . "Shipping: Orders ship from Florida within 1-2 business days.\nPacking: Lyophilized powder in sealed vials, packed to arrive intact.\n\nThe ObeliskRX team";
 }
 
+// Branded design wali simple text email (header logo, heading, text, button, footer).
+// Shipped / cancelled / verification / password reset emails isi se bante hain -
+// images kam aur text zyada, taake spam filters ise "image-only" email na samjhein.
+function brandedMessageEmail(string $subject, string $preheader, string $heading, string $bodyHtml, string $note, string $buttonUrl = '', string $buttonLabel = ''): array {
+    $font = EMAIL_FONT;
+    $ink  = EMAIL_INK;
+    $line = EMAIL_LINE;
+    $button = $buttonUrl !== ''
+        ? '<tr><td align="center" style="padding:24px 44px 0;">' . brandedButton(htmlspecialchars($buttonUrl), $buttonLabel) . '</td></tr>'
+        : '';
+    $rows = <<<HTML
+    <tr><td class="px" style="padding:34px 44px 0; font-family:$font; font-size:24px; line-height:30px; font-weight:600; color:$ink;">$heading</td></tr>
+    <tr><td class="px" style="padding:14px 44px 0; font-family:$font; font-size:15px; line-height:22px; color:$ink;">$bodyHtml</td></tr>
+    $button
+    <tr><td class="px" style="padding:28px 44px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid $line;"><tr><td style="padding:14px 0 0; font-family:$font; font-size:13px; line-height:18px; color:$ink;">
+        Questions? Reply to this email or write to <a href="mailto:Contact@ObeliskRX.com" style="color:#1A4F7A; text-decoration:underline;">Contact@ObeliskRX.com</a>
+      </td></tr></table>
+    </td></tr>
+    <tr><td style="height:28px; font-size:0; line-height:0;">&nbsp;</td></tr>
+    HTML;
+    $rows .= brandedFooter($note);
+
+    $html = brandedLayout($subject, $preheader, $rows, '#FFFFFF');
+    $alt  = emailHtmlToText("<p>$heading</p>$bodyHtml")
+          . ($buttonUrl !== '' ? "\n\n$buttonLabel: $buttonUrl" : '')
+          . "\n\nQuestions? Reply to this email or write to Contact@ObeliskRX.com\n\nThe ObeliskRX team";
+    return [$html, $alt];
+}
+
+// Naam DB mein htmlspecialchars ho kar save hota hai - email mein dobara escape se pehle decode karo
+function emailFirstName(string $name): string {
+    $first = trim(explode(' ', trim(html_entity_decode($name, ENT_QUOTES, 'UTF-8')))[0]);
+    return htmlspecialchars($first !== '' ? $first : 'there');
+}
+
 // ────────────────────────────────────────────────────
 // 2. Customer ko - Order ship ho gaya
 // ────────────────────────────────────────────────────
 function sendOrderShippedEmail(array $order): void {
-    $subject  = 'Your Order #' . $order['order_number'] . ' Has Been Shipped!';
-    $name     = htmlspecialchars($order['first_name']);
-    $orderNo  = htmlspecialchars($order['order_number']);
-    $siteName = SITE_NAME;
+    $subject = 'Your Order #' . $order['order_number'] . ' Has Been Shipped!';
+    $first   = emailFirstName((string)$order['first_name']);
+    $orderNo = htmlspecialchars($order['order_number']);
+    $delivery = SHIPPED_DELIVERY_ESTIMATE;
+    $p       = 'margin:0 0 14px;';
 
     $body = <<<HTML
-    <p>Hi <strong>$name</strong>,</p>
-    <p>Great news! Your order <strong>#$orderNo</strong> has been shipped and is on its way to you.</p>
-
-    <div class="info-box">
-      <p><strong>Order Number:</strong> $orderNo</p>
-      <p><strong>Estimated Delivery:</strong> 7–14 business days</p>
-    </div>
-
-    <p>If you have any questions about your shipment, please don't hesitate to contact us.</p>
-    <p>Thank you for choosing <strong>$siteName</strong>!</p>
+    <p style="$p">Hi $first,</p>
+    <p style="$p">Great news! Your order <strong>#$orderNo</strong> has been shipped and is on its way to you.</p>
+    <p style="$p"><strong>Order Number:</strong> $orderNo<br><strong>Estimated Delivery:</strong> $delivery</p>
+    <p style="margin:0;">If you have any questions about your shipment, please don't hesitate to contact us. Thank you for choosing ObeliskRX!</p>
     HTML;
 
-    _send($order['email'], $order['first_name'] . ' ' . $order['last_name'], $subject, $body, 'order_shipped');
+    [$html, $alt] = brandedMessageEmail($subject, "Your order #$orderNo is on its way.", 'Your order has shipped', $body,
+        "You're receiving this because you placed an order at ObeliskRX.com.", SITE_URL . '/account', 'View my order');
+    _sendHtml($order['email'], $order['first_name'] . ' ' . $order['last_name'], $subject, $html, $alt, 'order_shipped');
 }
 
 // ────────────────────────────────────────────────────
 // 3. Customer ko - Order cancel ho gaya
 // ────────────────────────────────────────────────────
 function sendOrderCancelledEmail(array $order): void {
-    $subject   = 'Your Order #' . $order['order_number'] . ' Has Been Cancelled';
-    $name      = htmlspecialchars($order['first_name']);
-    $orderNo   = htmlspecialchars($order['order_number']);
-    $reason    = htmlspecialchars($order['rejection_reason'] ?? 'No reason provided.');
-    $fromEmail = FROM_EMAIL;
+    $subject = 'Your Order #' . $order['order_number'] . ' Has Been Cancelled';
+    $first   = emailFirstName((string)$order['first_name']);
+    $orderNo = htmlspecialchars($order['order_number']);
+    $reason  = htmlspecialchars($order['rejection_reason'] ?? 'No reason provided.');
+    $p       = 'margin:0 0 14px;';
 
     $body = <<<HTML
-    <p>Hi <strong>$name</strong>,</p>
-    <p>We're sorry to inform you that your order <strong>#$orderNo</strong> has been cancelled.</p>
-
-    <div class="info-box">
-      <p><strong>Order Number:</strong> $orderNo</p>
-      <p><strong>Reason:</strong> $reason</p>
-    </div>
-
-    <p>If you have any questions or would like to place a new order, please contact us at <a href="mailto:$fromEmail">$fromEmail</a>.</p>
+    <p style="$p">Hi $first,</p>
+    <p style="$p">We're sorry to inform you that your order <strong>#$orderNo</strong> has been cancelled.</p>
+    <p style="$p"><strong>Order Number:</strong> $orderNo<br><strong>Reason:</strong> $reason</p>
+    <p style="margin:0;">If you have any questions or would like to place a new order, just reply to this email.</p>
     HTML;
 
-    _send($order['email'], $order['first_name'] . ' ' . $order['last_name'], $subject, $body, 'order_cancelled');
+    [$html, $alt] = brandedMessageEmail($subject, "Your order #$orderNo has been cancelled.", 'Your order was cancelled', $body,
+        "You're receiving this because you placed an order at ObeliskRX.com.");
+    _sendHtml($order['email'], $order['first_name'] . ' ' . $order['last_name'], $subject, $html, $alt, 'order_cancelled');
 }
 
 // ────────────────────────────────────────────────────
@@ -716,24 +753,44 @@ function sendPaymentProofEmail(array $order): void {
 // 6. Customer ko - Email verify karo (naya account)
 // ────────────────────────────────────────────────────
 function sendVerificationEmail(string $email, string $name, string $token): void {
-    $subject  = 'Verify Your Email - ' . SITE_NAME;
-    $safeName = htmlspecialchars($name);
+    $subject   = 'Verify Your Email - ' . SITE_NAME;
+    $first     = emailFirstName($name);
     $verifyUrl = SITE_URL . '/verify-email?token=' . urlencode($token);
-    $siteName  = SITE_NAME;
+    $safeUrl   = htmlspecialchars($verifyUrl);
+    $p         = 'margin:0 0 14px;';
 
     $body = <<<HTML
-    <p>Hi <strong>$safeName</strong>,</p>
-    <p>Thanks for creating an account with <strong>$siteName</strong>. Please confirm this is your real email address to activate your account.</p>
-
-    <a href="$verifyUrl" class="btn">Verify My Email</a>
-
-    <p style="margin-top:24px; font-size:13px; color:#777;">Or copy and paste this link into your browser:<br>
-    <a href="$verifyUrl">$verifyUrl</a></p>
-
-    <p style="margin-top:24px; font-size:13px; color:#777;">This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.</p>
+    <p style="$p">Hi $first,</p>
+    <p style="$p">Thanks for creating an account with ObeliskRX. Please confirm this is your real email address to activate your account.</p>
+    <p style="margin:0; font-size:13px; line-height:18px; color:#555;">This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.<br><br>
+    Button not working? Copy and paste this link into your browser:<br><a href="$safeUrl" style="color:#1A4F7A; word-break:break-all;">$safeUrl</a></p>
     HTML;
 
-    _send($email, $name, $subject, $body, 'email_verification');
+    [$html, $alt] = brandedMessageEmail($subject, 'Confirm your email address to activate your ObeliskRX account.', 'Verify your email', $body,
+        "You're receiving this because an account was created with this email at ObeliskRX.com.", $verifyUrl, 'Verify my email');
+    _sendHtml($email, html_entity_decode($name, ENT_QUOTES, 'UTF-8'), $subject, $html, $alt, 'email_verification');
+}
+
+// ────────────────────────────────────────────────────
+// 6b. Customer ko - Password reset link (forgot password / admin ne bheja)
+// ────────────────────────────────────────────────────
+function sendPasswordResetEmail(string $email, string $name, string $token): bool {
+    $subject  = 'Reset your ObeliskRX password';
+    $first    = emailFirstName($name);
+    $resetUrl = SITE_URL . '/reset-password?token=' . urlencode($token);
+    $safeUrl  = htmlspecialchars($resetUrl);
+    $p        = 'margin:0 0 14px;';
+
+    $body = <<<HTML
+    <p style="$p">Hi $first,</p>
+    <p style="$p">We received a request to reset the password for your ObeliskRX account. Click the button below to choose a new password.</p>
+    <p style="margin:0; font-size:13px; line-height:18px; color:#555;">This link expires in 1 hour and can only be used once. If you didn't ask to reset your password, you can safely ignore this email - your password won't change.<br><br>
+    Button not working? Copy and paste this link into your browser:<br><a href="$safeUrl" style="color:#1A4F7A; word-break:break-all;">$safeUrl</a></p>
+    HTML;
+
+    [$html, $alt] = brandedMessageEmail($subject, 'Use this link to choose a new password for your ObeliskRX account.', 'Reset your password', $body,
+        "You're receiving this because a password reset was requested for your account at ObeliskRX.com.", $resetUrl, 'Reset my password');
+    return _sendHtml($email, $name, $subject, $html, $alt, 'password_reset');
 }
 
 // ────────────────────────────────────────────────────
@@ -849,7 +906,24 @@ function sendAbandonedCartEmail(array $cart, int $stage = 1): bool {
 
 // ── Internal send function ───────────────────────────
 function _send(string $toEmail, string $toName, string $subject, string $bodyHtml, string $type, ?string $heading = null): bool {
-    return _sendHtml($toEmail, $toName, $subject, emailLayout($heading ?? $subject, $bodyHtml), strip_tags($bodyHtml), $type);
+    return _sendHtml($toEmail, $toName, $subject, emailLayout($heading ?? $subject, $bodyHtml), emailHtmlToText($bodyHtml), $type);
+}
+
+// HTML body ka saaf plain-text version (links ke URL ke sath) - sirf strip_tags se
+// text ek line mein chipak jata tha aur links gum ho jate the (spam filters ise bura maante hain)
+function emailHtmlToText(string $html): string {
+    $text = preg_replace('/<(style|script)\b[^>]*>.*?<\/\1>/is', '', $html);
+    $text = preg_replace_callback('/<a\b[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/is', function ($m) {
+        $label = trim(strip_tags($m[2]));
+        $url   = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+        return ($label === '' || $label === $url) ? $url : "$label ($url)";
+    }, $text);
+    $text = preg_replace('/<br\s*\/?>/i', "\n", $text);
+    $text = preg_replace('/<\/(p|div|tr|h[1-6]|li)>/i', "\n\n", $text);
+    $text = html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8');
+    $text = preg_replace("/[ \t]+/", ' ', $text);
+    $text = preg_replace("/ *\n */", "\n", $text);
+    return trim(preg_replace("/\n{3,}/", "\n\n", $text));
 }
 
 // Poora tayyar HTML document bhejo (branded emails apna layout khud banati hain)

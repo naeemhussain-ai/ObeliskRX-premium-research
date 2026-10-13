@@ -17,6 +17,7 @@ import { FaqPage } from "@/routes/faq";
 import { HomePage } from "@/routes/index";
 import { LoginPage } from "@/routes/login";
 import { VerifyEmailPage } from "@/routes/verify-email";
+import { ResetPasswordPage } from "@/routes/reset-password";
 import { AccountPage } from "@/routes/account";
 import { ProductDetailPage } from "@/routes/product.$slug";
 import { RefundPolicyPage } from "@/routes/refund-policy";
@@ -44,6 +45,7 @@ const routes: RouteDefinition[] = [
   { path: "/cart", title: "ObeliskRX | Shopping Cart", component: CartPage },
   { path: "/login", title: "ObeliskRX | Sign In", component: LoginPage },
   { path: "/verify-email", title: "ObeliskRX | Verify Email", component: VerifyEmailPage },
+  { path: "/reset-password", title: "ObeliskRX | Reset Password", component: ResetPasswordPage },
   { path: "/account", title: "ObeliskRX | My Account", component: AccountPage },
   { path: "/product/$slug", title: "ObeliskRX | Product Detail", component: ProductDetailPage },
   { path: "/terms", title: "ObeliskRX | Terms of Service", component: TermsPage },
@@ -72,7 +74,7 @@ function RoutedPage() {
 
   return (
     <RouteStateProvider path={currentPath} params={{}}>
-      <DocumentTitle title="ObeliskRX | Page Not Found" />
+      <DocumentTitle title="404 - Page Not Found | ObeliskRX" />
       <NotFoundPage />
     </RouteStateProvider>
   );

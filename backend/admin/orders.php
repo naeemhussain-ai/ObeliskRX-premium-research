@@ -2,10 +2,21 @@
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../config/database.php';
 requireAdmin();
+$csrf = adminCsrfToken();
 
 $db     = getDB();
 $filter = $_GET['status'] ?? 'all';
 $where  = $filter !== 'all' ? "WHERE status = " . $db->quote($filter) : '';
+
+// Customers page se ek customer ke orders dekhne ke liye (?customer=ID)
+$customerFilter = (int)($_GET['customer'] ?? 0);
+$customerEmail  = '';
+if ($customerFilter > 0) {
+    $where .= ($where ? ' AND ' : 'WHERE ') . 'customer_id = ' . $customerFilter;
+    $ce = $db->prepare("SELECT email FROM customers WHERE id = ?");
+    $ce->execute([$customerFilter]);
+    $customerEmail = (string)$ce->fetchColumn();
+}
 
 $orders = $db->query("SELECT * FROM orders $where ORDER BY created_at DESC")->fetchAll();
 
@@ -34,6 +45,23 @@ $pendingCount = $statusCounts['pending'] ?? 0;
             <?php endif; ?></h1>
         </div>
 
+        <?php if (($_GET['success'] ?? '') === 'deleted'): ?>
+        <div style="background:#dcfce7;color:#166534;border:1px solid #bbf7d0;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;">
+            🗑 Order deleted.
+        </div>
+        <?php elseif (!empty($_GET['error'])): ?>
+        <div style="background:#fee2e2;color:#991b1b;border:1px solid #fecaca;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;">
+            <?= ($_GET['error'] === 'csrf') ? 'Your session expired. Please try again.' : 'Order not found.' ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($customerFilter > 0): ?>
+        <div style="background:#e0f2fe;color:#075985;border:1px solid #bae6fd;padding:10px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;">
+            Showing orders for <strong><?= htmlspecialchars($customerEmail ?: 'customer #' . $customerFilter) ?></strong>
+            &nbsp;·&nbsp; <a href="orders.php">Show all orders</a>
+        </div>
+        <?php endif; ?>
+
         <!-- Filter Tabs -->
         <div class="filter-tabs">
             <?php
@@ -47,7 +75,7 @@ $pendingCount = $statusCounts['pending'] ?? 0;
             ];
             foreach ($tabs as $key => [$label, $count]):
             ?>
-                <a href="?status=<?= $key ?>" class="tab <?= $filter === $key ? 'active' : '' ?>">
+                <a href="?status=<?= $key ?><?= $customerFilter ? '&customer=' . $customerFilter : '' ?>" class="tab <?= $filter === $key ? 'active' : '' ?>">
                     <?= $label ?>
                     <?php if ($count > 0): ?>
                         <span class="tab-count"><?= $count ?></span>
@@ -110,6 +138,13 @@ $pendingCount = $statusCounts['pending'] ?? 0;
                         <td><?= date('M d, Y', strtotime($order['created_at'])) ?></td>
                         <td>
                             <a href="order-detail.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-outline">View</a>
+                            <form method="POST" action="delete-order.php" style="display:inline;margin:0;">
+                                <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                                <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
+                                <input type="hidden" name="return_status" value="<?= htmlspecialchars($filter) ?>">
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Delete order <?= htmlspecialchars($order['order_number'], ENT_QUOTES) ?> permanently? This cannot be undone.')">Delete</button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

@@ -309,7 +309,8 @@ const _staticProducts: Product[] = [
   },
 ];
 
-const PRODUCTS_KEY = "obeliskrx-products";
+// v2: purane cache mein code ki static (purani) images seed hoti thin - naya key unhein ignore karta hai
+const PRODUCTS_KEY = "obeliskrx-products-v2";
 const API = import.meta.env.VITE_API_URL ?? "http://localhost/obeliskrx/backend/api";
 
 // Older products (and the admin's built-in dropdown) used short internal names.
@@ -368,42 +369,52 @@ function mapApiProduct(p: ApiProduct): Product {
   };
 }
 
-export async function syncProductsFromAPI(): Promise<void> {
+// Is page-load mein server se aaya hua taaza data (null = abhi tak nahi aaya)
+let liveProducts: Product[] | null = null;
+let syncInFlight: Promise<void> | null = null;
+
+function readCachedProducts(): Product[] | null {
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
-    const res = await fetch(`${API}/products/?limit=100`, { signal: controller.signal });
-    clearTimeout(timer);
-    if (!res.ok) return;
-    const json = (await res.json()) as { data?: { products: ApiProduct[] }; products?: ApiProduct[] };
-    const products = json.data?.products ?? (json as any).products;
-    if (!Array.isArray(products) || products.length === 0) return;
-    const mapped = products.map(mapApiProduct);
-    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(mapped));
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Product[];
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
   } catch {
-    // Server unreachable   localStorage/static data use hoga
+    return null;
   }
 }
 
-export function getProducts(): Product[] {
-  try {
-    const raw = localStorage.getItem(PRODUCTS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Product[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+export function syncProductsFromAPI(): Promise<void> {
+  // Ek page par kai components ek sath maangein to ek hi request jaye
+  if (syncInFlight) return syncInFlight;
+  syncInFlight = (async () => {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 15000);
+      const res = await fetch(`${API}/products/?limit=100`, { signal: controller.signal, cache: "no-store" });
+      clearTimeout(timer);
+      if (!res.ok) return;
+      const json = (await res.json()) as { data?: { products: ApiProduct[] }; products?: ApiProduct[] };
+      const products = json.data?.products ?? (json as any).products;
+      if (!Array.isArray(products) || products.length === 0) return;
+      liveProducts = products.map(mapApiProduct);
+      try {
+        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(liveProducts));
+      } catch {
+        // Storage quota exceeded or unavailable
       }
+    } catch {
+      // Server unreachable - cache/static data use hoga
+    } finally {
+      syncInFlight = null;
     }
-  } catch {
-    // JSON parse error or localStorage unavailable   fall through to seed
-  }
-  // Seed with static products
-  try {
-    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(_staticProducts));
-  } catch {
-    // Storage quota exceeded or unavailable
-  }
-  return _staticProducts;
+  })();
+  return syncInFlight;
+}
+
+// Taaza server data > pichli visit ka cache > code ki static list (sirf jab server na mile)
+export function getProducts(): Product[] {
+  return liveProducts ?? readCachedProducts() ?? _staticProducts;
 }
 
 export function saveProduct(product: Product): void {
@@ -471,12 +482,27 @@ export const firstAvailableSize = (p: Product) =>
 // React hook   products + COA dono API se sync karta hai
 import { useState, useEffect } from "react";
 import { syncCoaFromAPI } from "@/lib/coa";
-export function useProducts(): Product[] {
-  const [products, setProducts] = useState<Product[]>(getProducts);
+/**
+ * products: abhi dikhane wali list. ready: server ka taaza data aa gaya (ya server fail ho gaya).
+ * Product page ready ka intezar karta hai taake purani image/qeemat na dikhe.
+ */
+export function useProductsState(): { products: Product[]; ready: boolean } {
+  const [products, setProducts] = useState<Product[]>(() => liveProducts ?? readCachedProducts() ?? []);
+  const [ready, setReady] = useState(liveProducts !== null);
   useEffect(() => {
-    Promise.all([syncProductsFromAPI(), syncCoaFromAPI()]).then(() =>
-      setProducts(getProducts())
-    );
+    let active = true;
+    Promise.all([syncProductsFromAPI(), syncCoaFromAPI()]).then(() => {
+      if (!active) return;
+      setProducts(getProducts());
+      setReady(true);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
-  return products;
+  return { products, ready };
+}
+
+export function useProducts(): Product[] {
+  return useProductsState().products;
 }

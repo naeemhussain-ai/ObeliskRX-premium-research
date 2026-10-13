@@ -93,6 +93,13 @@ $seriesList = [
                 <h1>Edit Product</h1>
             </div>
         </div>
+        
+    <?php if (!empty($_GET['error'])): ?>
+        <div style="background:#fee2e2;color:#991b1b;padding:15px;margin-bottom    :15px;">
+            <?= htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php endif; ?>
+
 
         <div class="card">
             <form method="POST" action="action-product.php" enctype="multipart/form-data" novalidate onsubmit="updateSpecsJson()">

@@ -1,19 +1,22 @@
 Options -MultiViews
 RewriteEngine On
 
+# Homepage bhi index.php se khule (wahi 404 check karta hai)
+DirectoryIndex index.php index.html
+
 # ES module files (e.g. pdf.js web worker) must be served as JavaScript
 <IfModule mod_mime.c>
     AddType text/javascript .mjs
 </IfModule>
 
 # Backend PHP files   Apache directly serve kare, SPA intercept na kare
-RewriteCond %{REQUEST_URI} ^/obeliskrx/backend/ [NC]
-RewriteRule ^ - [L]
+# (relative path - site root aur /obeliskrx/ folder dono mein chalta hai)
+RewriteRule ^backend/ - [L]
 
 # Existing files aur directories seedha serve karo
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Baqi sab routes → SPA index.html
-RewriteRule ^ index.html [L]
+# Baqi sab routes → index.php (asli page = 200, ghalat address = 404, dono par React app)
+RewriteRule ^ index.php [L]

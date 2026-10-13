@@ -147,11 +147,12 @@ export function CoaPage() {
             Testing Methods
           </span>
           <h2 className="mt-4 text-3xl font-bold tracking-tight">
-            What we measure on every lot before it ships.
+            Every lot. Independently tested. Fully published.
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            All testing is performed in-house and re-run by an independent ISO 17025-accredited
-            laboratory. Both result sets are published against the lot.
+            Each ObeliskRX lot is tested by an independent third-party lab before it's listed. The full
+            Certificate of Analysis is posted right on the product page, so you can review the results
+            before you order.
           </p>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-3">

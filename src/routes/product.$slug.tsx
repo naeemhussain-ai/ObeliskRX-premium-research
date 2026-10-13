@@ -25,7 +25,7 @@ import { useStaggerAnimation } from "@/hooks/useScrollAnimation";
 import { getCoa } from "@/lib/coa";
 import {
   formatPrice,
-  useProducts,
+  useProductsState,
   priceForSize,
   priceLabel,
   normalizeSeries,
@@ -38,7 +38,8 @@ import {
 function ProductNotFound() {
   return (
     <div className="container-page py-24 text-center">
-      <h1 className="text-2xl font-bold">Product not found</h1>
+      <p className="text-7xl font-extrabold tracking-tight text-primary sm:text-8xl">404</p>
+      <h1 className="mt-4 text-2xl font-bold">Product not found</h1>
       <Link to="/catalog" className="mt-4 inline-block text-sm text-primary underline">
         Back to catalog
       </Link>
@@ -49,7 +50,7 @@ function ProductNotFound() {
 const shareIcons = [Facebook, Twitter, Star, Linkedin, Link2];
 
 function ProductDetail() {
-  const products = useProducts();
+  const { products, ready } = useProductsState();
   const { slug } = useRouteParams<{ slug: string }>();
   const product = products.find((p) => p.slug === slug);
 
@@ -65,6 +66,11 @@ function ProductDetail() {
   useEffect(() => {
     if (product?.sizes[0] && !size) setSize(firstAvailableSize(product));
   }, [product?.slug]);
+
+  // Server ka taaza data aane tak kuch na dikhao - warna cache ki purani image/qeemat dikh jati thi
+  if (!ready) {
+    return <div className="container-page py-24 text-center text-sm font-medium text-gray-500">Loading product…</div>;
+  }
 
   if (!product) {
     return <ProductNotFound />;
